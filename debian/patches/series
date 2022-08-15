@@ -1,0 +1,3 @@
+deepin-smartmirror-http.patch
+deepin-fix-keyring-deps.patch
+deepin-fix-os-vendor-detect-for-automatic-package-system.patch

@@ -1,0 +1,67 @@
+Description: 更改debian-keyring依赖至deepin-keyring
+ 通过为uos和deepin添加对应的vendor目录，将keyring依赖解析至deepin-keyring，解除对debian-keyring的依赖。
+ 依赖关系解除后，仍可通过安装debian-keyring的方式保持对上游debian仓库的正常使用。
+
+Author: miaochangwei <miaochangwei@uniontech.com>
+Origin: https://gerrit.uniontech.com/plugins/gitiles/base/apt/+/0517cd96ba6674490200ee38b74d8e7deceee99d
+--- apt-2.4.5.orig/doc/apt-verbatim.ent
++++ apt-2.4.5/doc/apt-verbatim.ent
+@@ -282,6 +282,7 @@
+ <!ENTITY debian-testing-codename "bookworm">
+ <!ENTITY debian-stable-version "11">
+ <!ENTITY ubuntu-codename "hirsute">
++<!ENTITY deepin-codename "apricot">
+ 
+ <!-- good and bad just refers to matching and not matching a pattern…
+      It is not a remark about the specific perl version.
+--- /dev/null
++++ apt-2.4.5/vendor/deepin/apt-vendor.ent
+@@ -0,0 +1,13 @@
++<!-- details about the keys used by the distribution -->
++<!ENTITY keyring-distro "Deepin">
++<!ENTITY keyring-package "<package>deepin-keyring</package>">
++<!ENTITY keyring-filename "">
++<!ENTITY keyring-removed-filename "">
++<!ENTITY keyring-master-filename "">
++<!ENTITY keyring-uri "">
++
++<!ENTITY sourceslist-list-format "deb http://community-packages.deepin.com/deepin &deepin-codename; main contrib non-free">
++<!ENTITY sourceslist-sources-format "Types: deb
++URIs: http://community-packages.deepin.com/deepin
++Suites: &deepin-codename;
++Components: main contrib non-free">
+--- /dev/null
++++ apt-2.4.5/vendor/deepin/sources.list.in
+@@ -0,0 +1,6 @@
++# See sources.list(5) manpage for more information
++# Remember that CD-ROMs, DVDs and such are managed through the apt-cdrom tool.
++&sourceslist-list-format;
++
++# Uncomment if you want the apt-get source function to work
++#deb-src http://community-packages.deepin.com/deepin &apricot; main contrib non-free
+--- apt-2.4.5.orig/vendor/getinfo
++++ apt-2.4.5/vendor/getinfo
+@@ -61,7 +61,7 @@ getfield() {
+ }
+ 
+ case "$1" in
+-debian-stable-codename|debian-oldstable-codename|debian-testing-codename|ubuntu-codename)
++debian-stable-codename|debian-oldstable-codename|debian-testing-codename|ubuntu-codename|deepin-codename)
+ 	getrawfield "$1" "$VERBATIM"
+ 	;;
+ sourceslist-list-format|keyring-package|keyring-filename|keyring-master-filename|keyring-removed-filename|keyring-uri|current-codename)
+--- /dev/null
++++ apt-2.4.5/vendor/uos/apt-vendor.ent
+@@ -0,0 +1,7 @@
++<!-- details about the keys used by the distribution -->
++<!ENTITY keyring-distro "Uos">
++<!ENTITY keyring-package "<package>deepin-keyring</package>">
++<!ENTITY keyring-filename "">
++<!ENTITY keyring-removed-filename "">
++<!ENTITY keyring-master-filename "">
++<!ENTITY keyring-uri "">
+--- /dev/null
++++ apt-2.4.5/vendor/uos/sources.list.in
+@@ -0,0 +1,2 @@
+++# See sources.list(5) manpage for more information
+++# Remember that CD-ROMs, DVDs and such are managed through the apt-cdrom tool.

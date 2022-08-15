@@ -1,0 +1,50 @@
+Description: deepin-smartmirror-http.patch
+ Add a field X-Repo-Token to the http message header, 
+ when using the specified domain name
+Author: wangyouwan <wangyouwan@uniontech.com>
+
+Origin: https://gerrit.uniontech.com/plugins/gitiles/base/apt/+/3cd31730d89021876255797e0b4b48d46c1a0a2a
+Task: https://pms.uniontech.com/zentao/task-view-30613.html
+Last-Update: 2022-05-25
+
+--- apt-2.4.5.orig/methods/aptmethod.h
++++ apt-2.4.5/methods/aptmethod.h
+@@ -73,6 +73,16 @@ public:
+       strprintf(confpn, "Debug::Acquire::%s", pni.c_str());
+       return _config->FindB(confln,_config->FindB(confsn, _config->FindB(confpn, false)));
+    }
++   std::string ConfigFindSmartMirrors(char const * const postfix, std::string const &defValue) const APT_NONNULL(2)
++   {
++     std::string conf;
++     strprintf(conf, "Acquire::SmartMirrors::%s", postfix);
++     auto const value = _config->Find(conf);
++     if (value.empty() == false)
++        return value;
++
++      return defValue;
++   }
+    std::string ConfigFind(char const * const postfix, std::string const &defValue) const APT_NONNULL(2)
+    {
+       for (auto name = methodNames.rbegin(); name != methodNames.rend(); ++name)
+--- apt-2.4.5.orig/methods/http.cc
++++ apt-2.4.5/methods/http.cc
+@@ -959,6 +959,19 @@ void HttpMethod::SendReq(FetchItem *Itm)
+    Req << "User-Agent: " << ConfigFind("User-Agent",
+ 		"Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")");
+ 
++    std::string domain;
++    auto const found = ProperHost.substr(0, ProperHost.find_last_of(".")).find_last_of(".");
++
++    if (found != string::npos)
++        domain = ProperHost.substr(found+1, ProperHost.length());
++    else
++        domain = ProperHost;
++
++    Configuration::MatchAgainstConfig DomainList("Acquire::SmartMirrors::DomainList");
++
++    if (DomainList.Match(domain) == true)
++        Req << "X-Repo-Token: " << ConfigFindSmartMirrors("Token", "") << "\r\n";
++
+ #ifdef HAVE_SYSTEMD
+    if (ConfigFindB("User-Agent-Non-Interactive", false))
+    {
