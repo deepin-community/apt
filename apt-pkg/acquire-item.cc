@@ -2030,7 +2030,6 @@ void pkgAcqMetaClearSig::Failed(string const &Message,pkgAcquire::MethodConfig c
 	 string const PartialRelease = GetPartialFileNameFromURI(DetachedDataTarget.URI);
 	 string const FinalInRelease = GetFinalFilename();
 	 Rename(DestFile, PartialRelease);
-	 TransactionManager->TransactionStageCopy(this, PartialRelease, FinalRelease);
 	 LoadLastMetaIndexParser(TransactionManager, FinalRelease, FinalInRelease);
 
 	 // we parse the indexes here because at this point the user wanted
@@ -2038,7 +2037,10 @@ void pkgAcqMetaClearSig::Failed(string const &Message,pkgAcquire::MethodConfig c
 	 if (TransactionManager->MetaIndexParser->Load(PartialRelease, &ErrorText) == false || VerifyVendor(Message) == false)
 	    /* expired Release files are still a problem you need extra force for */;
 	 else
+	 {
+	    TransactionManager->TransactionStageCopy(this, PartialRelease, FinalRelease);
 	    TransactionManager->QueueIndexes(true);
+	 }
       }
    }
 }
@@ -2247,9 +2249,10 @@ void pkgAcqMetaSig::Failed(string const &Message,pkgAcquire::MethodConfig const 
       if (MetaIndex->VerifyVendor(Message) == false)
 	 /* expired Release files are still a problem you need extra force for */;
       else
+      {
+	 TransactionManager->TransactionStageCopy(MetaIndex, MetaIndex->DestFile, FinalRelease);
 	 TransactionManager->QueueIndexes(GoodLoad);
-
-      TransactionManager->TransactionStageCopy(MetaIndex, MetaIndex->DestFile, FinalRelease);
+      }
    }
    else if (TransactionManager->IMSHit == false)
       Rename(MetaIndex->DestFile, MetaIndex->DestFile + ".FAILED");
@@ -2371,13 +2374,13 @@ bool pkgAcqDiffIndex::ParseDiffIndex(string const &IndexDiffFile)	/*{{{*/
    {
       std::string tagname = *type;
       tagname.append("-Current");
-      std::string const tmp = Tags.FindS(tagname.c_str());
+      auto const tmp = Tags.Find(tagname);
       if (tmp.empty() == true)
 	 continue;
 
       string hash;
       unsigned long long size;
-      std::stringstream ss(tmp);
+      std::stringstream ss(tmp.to_string());
       ss.imbue(posix);
       ss >> hash >> size;
       if (unlikely(hash.empty() == true))
@@ -2441,13 +2444,13 @@ bool pkgAcqDiffIndex::ParseDiffIndex(string const &IndexDiffFile)	/*{{{*/
 
       std::string tagname = *type;
       tagname.append("-History");
-      std::string const tmp = Tags.FindS(tagname.c_str());
+      auto const tmp = Tags.Find(tagname);
       if (tmp.empty() == true)
 	 continue;
 
       string hash, filename;
       unsigned long long size;
-      std::stringstream ss(tmp);
+      std::stringstream ss(tmp.to_string());
       ss.imbue(posix);
 
       while (ss >> hash >> size >> filename)
@@ -2498,13 +2501,13 @@ bool pkgAcqDiffIndex::ParseDiffIndex(string const &IndexDiffFile)	/*{{{*/
 
       std::string tagname = *type;
       tagname.append("-Patches");
-      std::string const tmp = Tags.FindS(tagname.c_str());
+      auto const tmp = Tags.Find(tagname);
       if (tmp.empty() == true)
 	 continue;
 
       string hash, filename;
       unsigned long long size;
-      std::stringstream ss(tmp);
+      std::stringstream ss(tmp.to_string());
       ss.imbue(posix);
 
       while (ss >> hash >> size >> filename)
@@ -2536,13 +2539,13 @@ bool pkgAcqDiffIndex::ParseDiffIndex(string const &IndexDiffFile)	/*{{{*/
    {
       std::string tagname = *type;
       tagname.append("-Download");
-      std::string const tmp = Tags.FindS(tagname.c_str());
+      auto const tmp = Tags.Find(tagname);
       if (tmp.empty() == true)
 	 continue;
 
       string hash, filename;
       unsigned long long size;
-      std::stringstream ss(tmp);
+      std::stringstream ss(tmp.to_string());
       ss.imbue(posix);
 
       // FIXME: all of pdiff supports only .gz compressed patches
@@ -2613,7 +2616,7 @@ bool pkgAcqDiffIndex::ParseDiffIndex(string const &IndexDiffFile)	/*{{{*/
    if (pdiff_merge == true)
    {
       // reprepro and dak add this flag if they merge patches on the server
-      std::string const precedence = Tags.FindS("X-Patch-Precedence");
+      auto const precedence = Tags.Find("X-Patch-Precedence");
       pdiff_merge = (precedence != "merged");
    }
 
@@ -3410,7 +3413,7 @@ pkgAcqArchive::pkgAcqArchive(pkgAcquire *const Owner, pkgSourceList *const Sourc
 	 for (auto const &hs : hsl)
 	    if (ExpectedHashes.push_back(hs) == false)
 	    {
-	       _error->Warning("Sources disagree on hashes for supposely identical version '%s' of '%s'.",
+	       _error->Warning("Sources disagree on hashes for supposedly identical version '%s' of '%s'.",
 			       Version.VerStr(), Version.ParentPkg().FullName(false).c_str());
 	       break;
 	    }
@@ -3710,17 +3713,62 @@ std::string pkgAcqChangelog::URI(pkgCache::VerIterator const &Ver)	/*{{{*/
       pkgCache::PkgIterator const Pkg = Ver.ParentPkg();
       if (Pkg->CurrentVer != 0 && Pkg.CurrentVer() == Ver)
       {
-	 std::string const root = _config->FindDir("Dir");
-	 std::string const basename = root + std::string("usr/share/doc/") + Pkg.Name() + "/changelog";
-	 std::string const debianname = basename + ".Debian";
-	 if (FileExists(debianname))
-	    return "copy://" + debianname;
-	 else if (FileExists(debianname + ".gz"))
-	    return "store://" + debianname + ".gz";
-	 else if (FileExists(basename))
-	    return "copy://" + basename;
-	 else if (FileExists(basename + ".gz"))
-	    return "store://" + basename + ".gz";
+	 auto const LocalFile = [](pkgCache::PkgIterator const &Pkg) -> std::string {
+	    std::string const root = _config->FindDir("Dir");
+	    std::string const basename = root + std::string("usr/share/doc/") + Pkg.Name() + "/changelog";
+	    std::string const debianname = basename + ".Debian";
+	    auto const exts = APT::Configuration::getCompressorExtensions(); // likely we encounter only .gz
+	    for (auto file : { debianname, basename })
+	    {
+	       if (FileExists(file))
+		  return "copy://" + file;
+	       for (auto const& ext : exts)
+	       {
+		  auto const compressedfile = file + ext;
+		  if (FileExists(compressedfile))
+		     return "store://" + compressedfile;
+	       }
+	    }
+	    return "";
+	 }(Pkg);
+	 if (not LocalFile.empty())
+	 {
+	    _error->PushToStack();
+	    FileFd trimmed;
+	    if (APT::String::Startswith(LocalFile, "copy://"))
+	       trimmed.Open(LocalFile.substr(7), FileFd::ReadOnly, FileFd::None);
+	    else
+	       trimmed.Open(LocalFile.substr(8), FileFd::ReadOnly, FileFd::Extension);
+
+	    bool trimmedFile = false;
+	    if (trimmed.IsOpen())
+	    {
+	       /* We want to look at the last line… in a (likely) compressed file,
+		  which means we more or less have to uncompress the entire file.
+		  So we skip ahead the filesize minus our choosen line size in
+		  the hope that changelogs don't grow by being compressed to
+		  avoid doing this costly dance on at least a bit of the file. */
+	       char buffer[150];
+	       if (auto const filesize = trimmed.FileSize(); filesize > sizeof(buffer))
+		  trimmed.Skip(filesize - sizeof(buffer));
+	       std::string_view giveaways[] = {
+		  "# To read the complete changelog use", // Debian
+		  "# For older changelog entries, run", // Ubuntu
+	       };
+	       while (trimmed.ReadLine(buffer, sizeof(buffer)) != nullptr)
+	       {
+		  std::string_view const line{buffer};
+		  if (std::any_of(std::begin(giveaways), std::end(giveaways), [=](auto const gw) { return line.compare(0, gw.size(), gw) == 0; }))
+		  {
+		     trimmedFile = true;
+		     break;
+		  }
+	       }
+	    }
+	    _error->RevertToStack();
+	    if (not trimmedFile)
+	       return LocalFile;
+	 }
       }
    }
 

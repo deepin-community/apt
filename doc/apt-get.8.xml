@@ -14,7 +14,7 @@
    &apt-email;
    &apt-product;
    <!-- The last update date -->
-   <date>2021-01-08T00:00:00Z</date>
+   <date>2023-01-25T00:00:00Z</date>
  </refentryinfo>
  
  <refmeta>
@@ -228,7 +228,8 @@
 
      <varlistentry><term><option>download</option></term>
        <listitem><para><literal>download</literal> will download the given
-           binary package into the current directory.
+           binary package into the current directory. The authenticity of
+           the package data is ensured as usual.
        </para></listitem>
      </varlistentry>
 
@@ -252,6 +253,12 @@
      <varlistentry><term><option>autoremove</option> (and the <option>auto-remove</option> alias since 1.1)</term>
      <listitem><para><literal>autoremove</literal> is used to remove packages that were automatically
      installed to satisfy dependencies for other packages and are now no longer needed.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autopurge</option></term>
+     <listitem><para>Like <literal>autoremove</literal>, but <literal>autopurge</literal> also
+     removes configuration files. This is a shortcut for <literal>autoremove
+     --purge</literal>.</para></listitem>
      </varlistentry>
 
      <varlistentry><term><option>changelog</option></term>
@@ -605,11 +612,11 @@
 	   <literal>APT::Get::AllowUnauthenticated</literal>.</para></listitem>
      </varlistentry>
 
-     <varlistentry><term><option>--no-allow-insecure-repositories</option></term>
-     <listitem><para>Forbid the update command to acquire unverifiable
-     data from configured sources. APT will fail at the update command
-     for repositories without valid cryptographically signatures. See
-     also &apt-secure; for details on the concept and the implications.
+     <varlistentry><term><option>--allow-insecure-repositories</option></term>
+     <listitem><para>Allow the update command to acquire unverifiable
+     data from configured sources. APT will otherwise fail at the update
+     command for repositories without valid cryptographically signatures.
+     See also &apt-secure; for details on the concept and the implications.
 
      Configuration Item: <literal>Acquire::AllowInsecureRepositories</literal>.</para></listitem>
      </varlistentry>

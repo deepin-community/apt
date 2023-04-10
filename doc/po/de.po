@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 2.0.1\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
+"POT-Creation-Date: 2023-02-08 17:09+0100\n"
 "PO-Revision-Date: 2020-04-04 08:45+0200\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -1414,9 +1414,13 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
+#, fuzzy
+#| msgid ""
+#| "<literal>download</literal> will download the given binary package into "
+#| "the current directory."
 msgid ""
 "<literal>download</literal> will download the given binary package into the "
-"current directory."
+"current directory. The authenticity of the package data is ensured as usual."
 msgstr ""
 "<literal>download</literal> wird das angegebene Binärpaket in das aktuelle "
 "Verzeichnis herunterladen."
@@ -1474,6 +1478,14 @@ msgstr ""
 "<literal>autoremove</literal> wird benutzt, um Pakete zu entfernen, die "
 "automatisch installiert wurden, um Abhängigkeiten für andere Pakete zu "
 "erfüllen, und die nicht mehr benötigt werden."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"Like <literal>autoremove</literal>, but <literal>autopurge</literal> also "
+"removes configuration files. This is a shortcut for <literal>autoremove --"
+"purge</literal>."
+msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
@@ -2088,12 +2100,19 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
+#, fuzzy
+#| msgid ""
+#| "Forbid the update command to acquire unverifiable data from configured "
+#| "sources. APT will fail at the update command for repositories without "
+#| "valid cryptographically signatures. See also &apt-secure; for details on "
+#| "the concept and the implications.  Configuration Item: <literal>Acquire::"
+#| "AllowInsecureRepositories</literal>."
 msgid ""
-"Forbid the update command to acquire unverifiable data from configured "
-"sources. APT will fail at the update command for repositories without valid "
-"cryptographically signatures. See also &apt-secure; for details on the "
-"concept and the implications.  Configuration Item: <literal>Acquire::"
-"AllowInsecureRepositories</literal>."
+"Allow the update command to acquire unverifiable data from configured "
+"sources. APT will otherwise fail at the update command for repositories "
+"without valid cryptographically signatures.  See also &apt-secure; for "
+"details on the concept and the implications.  Configuration Item: "
+"<literal>Acquire::AllowInsecureRepositories</literal>."
 msgstr ""
 "verbietet dem Befehl »update« das Beschaffen nicht überprüfbarer Daten von "
 "konfigurierten Quellen. APT wird beim Befehl »update« für Depots ohne "
@@ -8045,10 +8064,10 @@ msgid ""
 "<literal>stable</literal> or <literal>testing</literal> or a codename like "
 "<literal>&debian-stable-codename;</literal> or <literal>&debian-testing-"
 "codename;</literal> while component is one of <literal>main</literal>, "
-"<literal>contrib</literal> or <literal>non-free</literal>. The <literal>deb-"
-"src</literal> type references a Debian distribution's source code in the "
-"same form as the <literal>deb</literal> type.  A <literal>deb-src</literal> "
-"line is required to fetch source indexes."
+"<literal>contrib</literal>, <literal>non-free</literal> or <literal>non-free-"
+"firmware</literal>. The <literal>deb-src</literal> type references a Debian "
+"distribution's source code in the same form as the <literal>deb</literal> "
+"type.  A <literal>deb-src</literal> line is required to fetch source indexes."
 msgstr ""
 "Der <literal>deb</literal>-Typ beschreibt ein typisches zweistufiges Debian-"
 "Archiv, <filename>Distribution/Bestandteil</filename>. "
@@ -8056,11 +8075,11 @@ msgstr ""
 "<literal>stable</literal> oder <literal>testing</literal> oder ein Codename "
 "wie <literal>&debian-stable-codename;</literal> oder <literal>&debian-"
 "testing-codename;</literal> während Bestandteil entweder <literal>main</"
-"literal>, <literal>contrib</literal> oder <literal>non-free</literal> ist. "
-"Der <literal>deb-src</literal>-Typ beschreibt den Quellcode einer Debian-"
-"Distribution in der gleichen Form wie den <literal>deb</literal>-Typ. Eine "
-"<literal>deb-src</literal>-Zeile wird benötigt, um Quellindizes "
-"herunterzuladen."
+"literal>, <literal>contrib</literal>, <literal>non-free</literal> oder "
+"<literal>non-free-firmware</literal> ist. Der <literal>deb-src</literal>-Typ "
+"beschreibt den Quellcode einer Debian-Distribution in der gleichen Form wie "
+"den <literal>deb</literal>-Typ. Eine <literal>deb-src</literal>-Zeile wird "
+"benötigt, um Quellindizes herunterzuladen."
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8417,7 +8436,7 @@ msgid ""
 "Types: deb\n"
 "URIs: https://deb.debian.org\n"
 "Suites: stable\n"
-"Components: main contrib non-free\n"
+"Components: main contrib non-free non-free-firmware\n"
 "Signed-By:\n"
 " -----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 " .\n"
@@ -8834,16 +8853,17 @@ msgstr ""
 #: sources.list.5.xml
 msgid ""
 "Uses the archive stored locally (or NFS mounted) at /home/apt/debian for "
-"stable/main, stable/contrib, and stable/non-free."
+"stable/main, stable/contrib, stable/non-free and stable/non-free-firmware."
 msgstr ""
 "benutzt die lokal gespeicherten (oder per NFS eingehängten) Archive in /home/"
-"apt/debian für stable/main, stable/contrib und stable/non-free."
+"apt/debian für stable/main, stable/contrib, stable/non-free und stable/non-"
+"free-firmware."
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian stable main contrib non-free"
-msgstr "deb file:/home/apt/debian stable main contrib non-free"
+msgid "deb file:/home/apt/debian stable main contrib non-free non-free-firmware"
+msgstr "deb file:/home/apt/debian stable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8852,12 +8872,12 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: stable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: stable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8868,8 +8888,8 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian unstable main contrib non-free"
-msgstr "deb file:/home/apt/debian unstable main contrib non-free"
+msgid "deb file:/home/apt/debian unstable main contrib non-free non-free-firmware"
+msgstr "deb file:/home/apt/debian unstable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8878,12 +8898,12 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8893,8 +8913,8 @@ msgstr "Quellenangabe für Obiges"
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb-src file:/home/apt/debian unstable main contrib non-free"
-msgstr "deb-src file:/home/apt/debian unstable main contrib non-free"
+msgid "deb-src file:/home/apt/debian unstable main contrib non-free non-free-firmware"
+msgstr "deb-src file:/home/apt/debian unstable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8903,12 +8923,12 @@ msgid ""
 "Types: deb-src\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb-src\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -9861,11 +9881,11 @@ msgstr ""
 msgid ""
 "This is a space separated list of sections which appear under the "
 "distribution; typically this is something like <literal>main contrib non-"
-"free</literal>"
+"free non-free-firmware</literal>"
 msgstr ""
 "Dies ist eine durch Leerzeichen getrennte Liste der Abschnitte, die unter "
 "der Distribution erscheint, typischerweise etwas wie <literal>main contrib "
-"non-free</literal>"
+"non-free non-free-firmware</literal>"
 
 #. type: Content of: <refentry><refsect1><refsect2><variablelist><varlistentry><listitem><para>
 #: apt-ftparchive.1.xml
@@ -11749,8 +11769,11 @@ msgstr "<code>~i</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-patterns.7.xml
-msgid "Selects packages that are currently installed."
-msgstr "wählt Pakete aus, die derzeit installiert sind."
+msgid ""
+"Selects packages that are currently installed. Since version 2.5.4, "
+"narrowing this pattern (see narrowing patterns above) makes it only match "
+"installed versions (see version patterns below)."
+msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
@@ -11854,10 +11877,8 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?name(REGEX)</code>"
 msgid "<code>?codename(REGEX)</code>"
-msgstr "<code>?name(REGULÄRER_AUSDRUCK)</code>"
+msgstr "<code>?codename(REGULÄRER_AUSDRUCK)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-patterns.7.xml
@@ -11874,6 +11895,15 @@ msgstr ""
 "wählt Versionen aus, deren Ursprung auf den regulären Ausdruck passt. "
 "Ursprung bedeutet hier, die Werte nach <code>o=</code> in <command>apt-cache "
 "policy</command>."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-patterns.7.xml
+msgid ""
+"Selects package versions that are currently installed. Versions prior to "
+"2.5.4 only matched at the package level, hence <code>?any-version(?installed?"
+"version(2.0))</code>matched even if 2.0 was not installed, but another "
+"version was."
+msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
@@ -12009,115 +12039,83 @@ msgstr "Diese Muster wählen bestimmte Versionen eines Pakets aus."
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?depends(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?depends(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DPATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DMUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?pre-depends(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?pre-depends(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DPre-Depends:PATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DPre-Depends:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?suggests(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?suggests(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DSuggests:PATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DSuggests:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?conflicts(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?conflicts(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>~DConflicts:PATTERN</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>~DConflicts:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>(PATTERN)</code>"
 msgid "<code>?replaces(PATTERN)</code>"
-msgstr "<code>(MUSTER)</code>"
+msgstr "<code>?replaces(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DReplaces:PATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DReplaces:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?obsoletes(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?obsoletes(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>~DObsoletes:PATTERN</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>~DObsoletes:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>(PATTERN)</code>"
 msgid "<code>?breaks(PATTERN)</code>"
-msgstr "<code>(MUSTER)</code>"
+msgstr "<code>?breaks(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DBreaks:PATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DBreaks:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>?not(PATTERN)</code>"
 msgid "<code>?enhances(PATTERN)</code>"
-msgstr "<code>?not(MUSTER)</code>"
+msgstr "<code>?enhances(MUSTER)</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
-#, fuzzy
-#| msgid "<code>!PATTERN</code>"
 msgid "<code>~DEnhances:PATTERN</code>"
-msgstr "<code>!MUSTER</code>"
+msgstr "<code>~DEnhances:MUSTER</code>"
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-patterns.7.xml
@@ -12270,18 +12268,6 @@ msgstr ""
 "Priorität <code>required</code> hat, wenn Sie jedoch nicht das <code>~</"
 "code> eintippen, würde es erfordern, dass der Paketname <code>poptional</"
 "code> enthält."
-
-#. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
-#: apt-patterns.7.xml
-msgid ""
-"Grouping patterns with <code>(...)</code> or writing <code>?or(A,B)</code> "
-"as <code>A|B</code> are not supported. We do not believe that the use of "
-"<code>|</code> is that common, and the grouping is not necessary without it."
-msgstr ""
-"Bündelnde Muster mit <code>(…)</code> oder der Schreibweise <code>A|B</code> "
-"für <code>?or(A,B)</code> werden nicht unterstützt. Wir gehen nicht davon "
-"aus, dass die Verwendung von <code>|</code> üblich ist und ohne diese ist "
-"eine Bündelung unnötig."
 
 #. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
 #: apt-patterns.7.xml
@@ -12805,14 +12791,14 @@ msgstr ""
 #, no-wrap
 msgid ""
 " Please give the components to get\n"
-" The components are typically something like: main contrib non-free\n"
+" The components are typically something like: main contrib non-free non-free-firmware\n"
 "\n"
-" Components [main contrib non-free]:\n"
+" Components [main contrib non-free non-free-firmware]:\n"
 msgstr ""
 " Bitte geben Sie die Bestandteile an, die Sie erhalten möchten\n"
-" Die Bestandteile sind normalerweise etwas wie: »main« »contrib« »non-free«\n"
+" Die Bestandteile sind normalerweise etwas wie: »main« »contrib« »non-free« »non-free-firmware«\n"
 "\n"
-" Bestandteile [main contrib non-free]:\n"
+" Bestandteile [main contrib non-free non-free-firmware]:\n"
 
 #. type: Content of: <book><chapter><para>
 #: guide.dbk
@@ -13933,6 +13919,20 @@ msgid "Which will use the already fetched archives on the disc."
 msgstr ""
 "fortfahren, wodurch die bereits auf der Platte heruntergeladenen Archive "
 "benutzt werden."
+
+#~ msgid "Selects packages that are currently installed."
+#~ msgstr "wählt Pakete aus, die derzeit installiert sind."
+
+#~ msgid ""
+#~ "Grouping patterns with <code>(...)</code> or writing <code>?or(A,B)</"
+#~ "code> as <code>A|B</code> are not supported. We do not believe that the "
+#~ "use of <code>|</code> is that common, and the grouping is not necessary "
+#~ "without it."
+#~ msgstr ""
+#~ "Bündelnde Muster mit <code>(…)</code> oder der Schreibweise <code>A|B</"
+#~ "code> für <code>?or(A,B)</code> werden nicht unterstützt. Wir gehen nicht "
+#~ "davon aus, dass die Verwendung von <code>|</code> üblich ist und ohne "
+#~ "diese ist eine Bündelung unnötig."
 
 #~ msgid "Regular expressions and &glob; syntax"
 #~ msgstr "Reguläre Ausdrücke und &glob;-Syntax"

@@ -1,6 +1,10 @@
 # German messages for the apt suite.
 # Copyright (C) 1997, 1998, 1999 Jason Gunthorpe and others.
-# Helge Kreutzmann <debian@helgefjell.de>, 2020-2022.
+#
+# Licensing is complex as the msgid come from several files, please see
+# the individual files for licensing information.
+#
+# Helge Kreutzmann <debian@helgefjell.de>, 2020-2023.
 # Holger Wansing <linux@wansing-online.de>, 2008, 2009, 2010, 2012, 2014, 2017, 2018.
 # Jens Seidel <jensseidel@users.sf.net>, 2008.
 # Michael Piefel <piefel@informatik.hu-berlin.de>, 2001, 2002, 2003, 2004, 2006.
@@ -9,10 +13,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.4.1\n"
+"Project-Id-Version: apt 2.5.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
-"PO-Revision-Date: 2022-03-11 17:39+0100\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"PO-Revision-Date: 2023-01-20 16:58+0100\n"
 "Last-Translator: Helge Kreutzmann <debian@helgefjell.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -209,7 +213,8 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Konflikt bei Distribution: %s (%s erwartet, aber %s bekommen)"
 
-#: apt-pkg/acquire-item.cc
+#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr "Für das Depot »%s« wurde der »%s«-Wert von »%s« in »%s« geändert."
@@ -222,7 +227,7 @@ msgstr ""
 "geändert."
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -2943,7 +2948,7 @@ msgstr "Pakete entfernen"
 msgid "Remove packages and config files"
 msgstr "Pakete vollständig entfernen (inkl. Konfigurationsdateien)"
 
-#: cmdline/apt-get.cc cmdline/apt.cc
+#: cmdline/apt-get.cc
 msgid "Remove automatically all unused packages"
 msgstr "alle nicht mehr verwendeten Pakete automatisch entfernen"
 
@@ -3261,6 +3266,10 @@ msgstr "Pakete erneut installieren"
 #: cmdline/apt.cc
 msgid "remove packages"
 msgstr "Pakete entfernen"
+
+#: cmdline/apt.cc
+msgid "automatically remove all unused packages"
+msgstr "alle nicht mehr verwendeten Pakete automatisch entfernen"
 
 #. system wide stuff
 #: cmdline/apt.cc

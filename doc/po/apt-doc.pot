@@ -5,9 +5,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: apt-doc 2.4.5\n"
+"Project-Id-Version: apt-doc 2.6.0\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-04-08 12:23+0200\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1041,7 +1041,7 @@ msgstr ""
 #: apt-get.8.xml
 msgid ""
 "<literal>download</literal> will download the given binary package into the "
-"current directory."
+"current directory. The authenticity of the package data is ensured as usual."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
@@ -1081,6 +1081,14 @@ msgid ""
 "<literal>autoremove</literal> is used to remove packages that were "
 "automatically installed to satisfy dependencies for other packages and are "
 "now no longer needed."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"Like <literal>autoremove</literal>, but <literal>autopurge</literal> also "
+"removes configuration files. This is a shortcut for <literal>autoremove "
+"--purge</literal>."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
@@ -1491,10 +1499,10 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
 msgid ""
-"Forbid the update command to acquire unverifiable data from configured "
-"sources. APT will fail at the update command for repositories without valid "
-"cryptographically signatures. See also &apt-secure; for details on the "
-"concept and the implications.  Configuration Item: "
+"Allow the update command to acquire unverifiable data from configured "
+"sources. APT will otherwise fail at the update command for repositories "
+"without valid cryptographically signatures.  See also &apt-secure; for "
+"details on the concept and the implications.  Configuration Item: "
 "<literal>Acquire::AllowInsecureRepositories</literal>."
 msgstr ""
 
@@ -5633,11 +5641,11 @@ msgid ""
 "<literal>stable</literal> or <literal>testing</literal> or a codename like "
 "<literal>&debian-stable-codename;</literal> or "
 "<literal>&debian-testing-codename;</literal> while component is one of "
-"<literal>main</literal>, <literal>contrib</literal> or "
-"<literal>non-free</literal>. The <literal>deb-src</literal> type references "
-"a Debian distribution's source code in the same form as the "
-"<literal>deb</literal> type.  A <literal>deb-src</literal> line is required "
-"to fetch source indexes."
+"<literal>main</literal>, <literal>contrib</literal>, "
+"<literal>non-free</literal> or <literal>non-free-firmware</literal>. The "
+"<literal>deb-src</literal> type references a Debian distribution's source "
+"code in the same form as the <literal>deb</literal> type.  A "
+"<literal>deb-src</literal> line is required to fetch source indexes."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
@@ -5872,7 +5880,7 @@ msgid ""
 "Types: deb\n"
 "URIs: https://deb.debian.org\n"
 "Suites: stable\n"
-"Components: main contrib non-free\n"
+"Components: main contrib non-free non-free-firmware\n"
 "Signed-By:\n"
 " -----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 " .\n"
@@ -6135,13 +6143,13 @@ msgstr ""
 #: sources.list.5.xml
 msgid ""
 "Uses the archive stored locally (or NFS mounted) at /home/apt/debian for "
-"stable/main, stable/contrib, and stable/non-free."
+"stable/main, stable/contrib, stable/non-free and stable/non-free-firmware."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian stable main contrib non-free"
+msgid "deb file:/home/apt/debian stable main contrib non-free non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><literallayout>
@@ -6151,7 +6159,7 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: stable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
@@ -6162,7 +6170,7 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian unstable main contrib non-free"
+msgid "deb file:/home/apt/debian unstable main contrib non-free non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><literallayout>
@@ -6172,7 +6180,7 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
@@ -6183,7 +6191,9 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb-src file:/home/apt/debian unstable main contrib non-free"
+msgid ""
+"deb-src file:/home/apt/debian unstable main contrib non-free "
+"non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><literallayout>
@@ -6193,7 +6203,7 @@ msgid ""
 "Types: deb-src\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
@@ -6884,7 +6894,7 @@ msgstr ""
 msgid ""
 "This is a space separated list of sections which appear under the "
 "distribution; typically this is something like <literal>main contrib "
-"non-free</literal>"
+"non-free non-free-firmware</literal>"
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><refsect2><variablelist><varlistentry><listitem><para>
@@ -8261,7 +8271,10 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-patterns.7.xml
-msgid "Selects packages that are currently installed."
+msgid ""
+"Selects packages that are currently installed. Since version 2.5.4, "
+"narrowing this pattern (see narrowing patterns above) makes it only match "
+"installed versions (see version patterns below)."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
@@ -8366,6 +8379,15 @@ msgid ""
 "Selects versions that come from the codename that matches the specified "
 "regular expression. Codename, here, means the values after <code>n=</code> "
 "in <command>apt-cache policy</command>."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-patterns.7.xml
+msgid ""
+"Selects package versions that are currently installed. Versions prior to "
+"2.5.4 only matched at the package level, hence "
+"<code>?any-version(?installed?version(2.0))</code>matched even if 2.0 was "
+"not installed, but another version was."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
@@ -8682,14 +8704,6 @@ msgid ""
 "<code>?and(...,~poptional)</code>: this requires the package to have "
 "<code>required</code> priority, but if you do not type the <code>~</code>, "
 "it would require the package name to contain <code>poptional</code>."
-msgstr ""
-
-#. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
-#: apt-patterns.7.xml
-msgid ""
-"Grouping patterns with <code>(...)</code> or writing <code>?or(A,B)</code> "
-"as <code>A|B</code> are not supported. We do not believe that the use of "
-"<code>|</code> is that common, and the grouping is not necessary without it."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
@@ -9054,9 +9068,10 @@ msgstr ""
 #, no-wrap
 msgid ""
 " Please give the components to get\n"
-" The components are typically something like: main contrib non-free\n"
+" The components are typically something like: main contrib non-free "
+"non-free-firmware\n"
 "\n"
-" Components [main contrib non-free]:\n"
+" Components [main contrib non-free non-free-firmware]:\n"
 msgstr ""
 
 #. type: Content of: <book><chapter><para>

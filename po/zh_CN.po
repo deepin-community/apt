@@ -1,4 +1,9 @@
 # Chinese/Simplified translation of apt.
+#
+# Licensing is complex as the msgid come from several files, please see
+# the individual files for licensing information.
+#
+# This file originally stated:
 # This file is put in the public domain.
 # Deng Xiyue <manphiz-guest@users.alioth.debian.org>, 2007, 2008.
 # Tchaikov <tchaikov@sjtu.org>, 2005, 2007.
@@ -9,10 +14,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.3.15\n"
+"Project-Id-Version: apt 2.5.3\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
-"PO-Revision-Date: 2022-02-03 13:55-0500\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"PO-Revision-Date: 2022-10-05 17:20-0400\n"
 "Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
 "Language-Team: Chinese (simplified) <debian-l10n-chinese@lists.debian.org>\n"
 "Language: zh_CN\n"
@@ -20,7 +25,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
@@ -189,7 +194,8 @@ msgstr "%s 的 Release 文件已经过期(已经过期了 %s)。该仓库的更�
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "冲突的发行版：%s (期望 %s 但得到 %s)"
 
-#: apt-pkg/acquire-item.cc
+#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr "仓库'%s'将其'%s'值从'%s'修改到了'%s'"
@@ -200,7 +206,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr "仓库'%s'将其'%s'的默认优先级从'%hi'修改到了'%hi'。"
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -2710,7 +2716,7 @@ msgstr "卸载软件包"
 msgid "Remove packages and config files"
 msgstr "卸载并清除软件包的配置"
 
-#: cmdline/apt-get.cc cmdline/apt.cc
+#: cmdline/apt-get.cc
 msgid "Remove automatically all unused packages"
 msgstr "卸载所有自动安装且不再使用的软件包"
 
@@ -3007,6 +3013,12 @@ msgstr "重新安装软件包"
 #: cmdline/apt.cc
 msgid "remove packages"
 msgstr "移除软件包"
+
+#: cmdline/apt.cc
+#, fuzzy
+#| msgid "Remove automatically all unused packages"
+msgid "automatically remove all unused packages"
+msgstr "卸载所有自动安装且不再使用的软件包"
 
 #. system wide stuff
 #: cmdline/apt.cc
@@ -3694,6 +3706,8 @@ msgid ""
 "Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
 "section in apt-key(8) for details."
 msgstr ""
+"密钥存储在过时的 trusted.gpg 密钥环中（%s），请参见 apt-key(8) 的 "
+"DEPRECATION 一节以了解详情。"
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc

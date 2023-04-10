@@ -1,4 +1,8 @@
 # translation of apt_po_eu.po to Euskara
+# Licensing is complex as the msgid come from several files, please see
+# the individual files for licensing information.
+#
+# This file originally stated:
 # This file is put in the public domain.
 #
 # Hizkuntza Politikarako Sailburuordetza <hizkpol@ej-gv.es>, 2005.
@@ -7,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
 "PO-Revision-Date: 2009-05-17 00:41+0200\n"
 "Last-Translator: Piarres Beobide <pi@beobide.net>\n"
 "Language-Team: Euskara <debian-l10n-basque@lists.debian.org>\n"
@@ -178,7 +182,8 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr ""
 
-#: apt-pkg/acquire-item.cc
+#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -189,7 +194,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -2718,7 +2723,7 @@ msgstr "Kendu paketeak"
 msgid "Remove packages and config files"
 msgstr "Paketeak kendu eta garbitu"
 
-#: cmdline/apt-get.cc cmdline/apt.cc
+#: cmdline/apt-get.cc
 msgid "Remove automatically all unused packages"
 msgstr "Automatikoki kendu erabiltzen ez diren paketeak"
 
@@ -3024,6 +3029,12 @@ msgstr "Pin duten Paketeak:"
 #, fuzzy
 msgid "remove packages"
 msgstr "Hautsitako paketeak"
+
+#: cmdline/apt.cc
+#, fuzzy
+#| msgid "Remove automatically all unused packages"
+msgid "automatically remove all unused packages"
+msgstr "Automatikoki kendu erabiltzen ez diren paketeak"
 
 #. system wide stuff
 #: cmdline/apt.cc
