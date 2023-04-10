@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt-doc 1.4\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
+"POT-Creation-Date: 2023-02-08 17:09+0100\n"
 "PO-Revision-Date: 2017-01-06 04:50+0900\n"
 "Last-Translator: Takuma Yamada <tyamada@takumayamada.com>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
@@ -1397,9 +1397,13 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
+#, fuzzy
+#| msgid ""
+#| "<literal>download</literal> will download the given binary package into "
+#| "the current directory."
 msgid ""
 "<literal>download</literal> will download the given binary package into the "
-"current directory."
+"current directory. The authenticity of the package data is ensured as usual."
 msgstr ""
 "<literal>download</literal> は、与えたバイナリパッケージを、カレントディレク"
 "トリにダウンロードします。"
@@ -1454,6 +1458,14 @@ msgid ""
 msgstr ""
 "<literal>autoremove</literal> は、他のパッケージの依存関係を満たすために自動"
 "的にインストールされ、もう必要なくなったパッケージを削除するのに使用します。"
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"Like <literal>autoremove</literal>, but <literal>autopurge</literal> also "
+"removes configuration files. This is a shortcut for <literal>autoremove --"
+"purge</literal>."
+msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
@@ -2038,12 +2050,19 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
+#, fuzzy
+#| msgid ""
+#| "Forbid the update command to acquire unverifiable data from configured "
+#| "sources. APT will fail at the update command for repositories without "
+#| "valid cryptographically signatures. See also &apt-secure; for details on "
+#| "the concept and the implications.  Configuration Item: <literal>Acquire::"
+#| "AllowInsecureRepositories</literal>."
 msgid ""
-"Forbid the update command to acquire unverifiable data from configured "
-"sources. APT will fail at the update command for repositories without valid "
-"cryptographically signatures. See also &apt-secure; for details on the "
-"concept and the implications.  Configuration Item: <literal>Acquire::"
-"AllowInsecureRepositories</literal>."
+"Allow the update command to acquire unverifiable data from configured "
+"sources. APT will otherwise fail at the update command for repositories "
+"without valid cryptographically signatures.  See also &apt-secure; for "
+"details on the concept and the implications.  Configuration Item: "
+"<literal>Acquire::AllowInsecureRepositories</literal>."
 msgstr ""
 "設定された取得元から検証できないデータを取得する update コマンドを禁止しま"
 "す。APT は、有効な暗号による署名のないリポジトリ用の update コマンドで失敗し"
@@ -7698,10 +7717,10 @@ msgid ""
 "<literal>stable</literal> or <literal>testing</literal> or a codename like "
 "<literal>&debian-stable-codename;</literal> or <literal>&debian-testing-"
 "codename;</literal> while component is one of <literal>main</literal>, "
-"<literal>contrib</literal> or <literal>non-free</literal>. The <literal>deb-"
-"src</literal> type references a Debian distribution's source code in the "
-"same form as the <literal>deb</literal> type.  A <literal>deb-src</literal> "
-"line is required to fetch source indexes."
+"<literal>contrib</literal>, <literal>non-free</literal> or <literal>non-free-"
+"firmware</literal>. The <literal>deb-src</literal> type references a Debian "
+"distribution's source code in the same form as the <literal>deb</literal> "
+"type.  A <literal>deb-src</literal> line is required to fetch source indexes."
 msgstr ""
 "<literal>deb</literal> タイプでは典型的な 2 段階の Debian アーカイブ "
 "<filename>distribution/component</filename> を参照します。"
@@ -7709,10 +7728,10 @@ msgstr ""
 "<literal>testing</literal> または <literal>&debian-stable-codename;</"
 "literal> や <literal>&debian-testing-codename;</literal> のようなコード名にな"
 "ります。component は、<literal>main</literal>, <literal>contrib</literal>, "
-"<literal>non-free</literal> のどれかです。<literal>deb-src</literal> タイプで"
-"は、debian ディストリビューションのソースコードを、<literal>deb</literal> タ"
-"イプと同じ形式で参照します。<literal>deb-src</literal> 行は、ソースインデック"
-"スを取得するのに必要です。"
+"<literal>non-free</literal>, <literal>non-free-firmware</literal> のどれかで"
+"す。<literal>deb-src</literal> タイプでは、debian ディストリビューションの"
+"ソースコードを、<literal>deb</literal> タイプと同じ形式で参照します。"
+"<literal>deb-src</literal> 行は、ソースインデックスを取得するのに必要です。"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8045,7 +8064,7 @@ msgid ""
 "Types: deb\n"
 "URIs: https://deb.debian.org\n"
 "Suites: stable\n"
-"Components: main contrib non-free\n"
+"Components: main contrib non-free non-free-firmware\n"
 "Signed-By:\n"
 " -----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 " .\n"
@@ -8401,16 +8420,17 @@ msgstr ""
 #: sources.list.5.xml
 msgid ""
 "Uses the archive stored locally (or NFS mounted) at /home/apt/debian for "
-"stable/main, stable/contrib, and stable/non-free."
+"stable/main, stable/contrib, stable/non-free and stable/non-free-firmware."
 msgstr ""
 "/home/apt/debian に格納されている stable/main, stable/contrib, stable/non-"
-"free 用のローカル (または NFS) アーカイブを使用します。"
+"free, stable/non-free-firmware 用のローカル (または NFS) アーカイブを使用しま"
+"す。"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian stable main contrib non-free"
-msgstr "deb file:/home/apt/debian stable main contrib non-free"
+msgid "deb file:/home/apt/debian stable main contrib non-free non-free-firmware"
+msgstr "deb file:/home/apt/debian stable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8419,12 +8439,12 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: stable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: stable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8434,8 +8454,8 @@ msgstr "上記と同様ですが、不安定版 (開発版) を使用します�
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb file:/home/apt/debian unstable main contrib non-free"
-msgstr "deb file:/home/apt/debian unstable main contrib non-free"
+msgid "deb file:/home/apt/debian unstable main contrib non-free non-free-firmware"
+msgstr "deb file:/home/apt/debian unstable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8444,12 +8464,12 @@ msgid ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -8459,8 +8479,8 @@ msgstr "上記のソースの指定は以下のようになります。"
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
 #, no-wrap
-msgid "deb-src file:/home/apt/debian unstable main contrib non-free"
-msgstr "deb-src file:/home/apt/debian unstable main contrib non-free"
+msgid "deb-src file:/home/apt/debian unstable main contrib non-free non-free-firmware"
+msgstr "deb-src file:/home/apt/debian unstable main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><literallayout>
 #: sources.list.5.xml
@@ -8469,12 +8489,12 @@ msgid ""
 "Types: deb-src\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 msgstr ""
 "Types: deb-src\n"
 "URIs: file:/home/apt/debian\n"
 "Suites: unstable\n"
-"Components: main contrib non-free"
+"Components: main contrib non-free non-free-firmware"
 
 #. type: Content of: <refentry><refsect1><para>
 #: sources.list.5.xml
@@ -9390,10 +9410,10 @@ msgstr ""
 msgid ""
 "This is a space separated list of sections which appear under the "
 "distribution; typically this is something like <literal>main contrib non-"
-"free</literal>"
+"free non-free-firmware</literal>"
 msgstr ""
 "distribution 以下に現れるセクションを、空白区切りで指定したリストです。通常、"
-"<literal>main contrib non-free</literal> のようになります。"
+"<literal>main contrib non-free non-free-firmware</literal> のようになります。"
 
 #. type: Content of: <refentry><refsect1><refsect2><variablelist><varlistentry><listitem><para>
 #: apt-ftparchive.1.xml
@@ -10972,7 +10992,10 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-patterns.7.xml
-msgid "Selects packages that are currently installed."
+msgid ""
+"Selects packages that are currently installed. Since version 2.5.4, "
+"narrowing this pattern (see narrowing patterns above) makes it only match "
+"installed versions (see version patterns below)."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
@@ -11079,6 +11102,15 @@ msgid ""
 "Selects versions that come from the codename that matches the specified "
 "regular expression. Codename, here, means the values after <code>n=</code> "
 "in <command>apt-cache policy</command>."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-patterns.7.xml
+msgid ""
+"Selects package versions that are currently installed. Versions prior to "
+"2.5.4 only matched at the package level, hence <code>?any-version(?installed?"
+"version(2.0))</code>matched even if 2.0 was not installed, but another "
+"version was."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
@@ -11400,14 +11432,6 @@ msgid ""
 "~poptional)</code>: this requires the package to have <code>required</code> "
 "priority, but if you do not type the <code>~</code>, it would require the "
 "package name to contain <code>poptional</code>."
-msgstr ""
-
-#. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
-#: apt-patterns.7.xml
-msgid ""
-"Grouping patterns with <code>(...)</code> or writing <code>?or(A,B)</code> "
-"as <code>A|B</code> are not supported. We do not believe that the use of "
-"<code>|</code> is that common, and the grouping is not necessary without it."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><itemizedlist><listitem><para>
@@ -11909,14 +11933,14 @@ msgstr ""
 #, no-wrap
 msgid ""
 " Please give the components to get\n"
-" The components are typically something like: main contrib non-free\n"
+" The components are typically something like: main contrib non-free non-free-firmware\n"
 "\n"
-" Components [main contrib non-free]:\n"
+" Components [main contrib non-free non-free-firmware]:\n"
 msgstr ""
 " 取得するコンポーネントを指定してください\n"
-" コンポーネントには以下のようなものがあります: main contrib non-free\n"
+" コンポーネントには以下のようなものがあります: main contrib non-free non-free-firmware\n"
 "\n"
-" コンポーネント [main contrib non-free]:\n"
+" コンポーネント [main contrib non-free non-free-firmware]:\n"
 
 #. type: Content of: <book><chapter><para>
 #: guide.dbk

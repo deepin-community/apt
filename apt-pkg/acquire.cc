@@ -53,11 +53,11 @@
 using namespace std;
 
 // helper to convert time_point to a timeval
-static struct timeval SteadyDurationToTimeVal(std::chrono::steady_clock::duration Time)
+constexpr struct timeval SteadyDurationToTimeVal(std::chrono::steady_clock::duration Time)
 {
    auto const Time_sec = std::chrono::duration_cast<std::chrono::seconds>(Time);
    auto const Time_usec = std::chrono::duration_cast<std::chrono::microseconds>(Time - Time_sec);
-   return {Time_sec.count(), Time_usec.count()};
+   return timeval{static_cast<time_t>(Time_sec.count()), static_cast<suseconds_t>(Time_usec.count())};
 }
 
 std::string pkgAcquire::URIEncode(std::string const &part)		/*{{{*/
@@ -1470,7 +1470,8 @@ bool pkgAcquireStatus::Pulse(pkgAcquire *Owner)
       std::string msg;
       long i = CurrentItems < TotalItems ? CurrentItems + 1 : CurrentItems;
       // only show the ETA if it makes sense
-      if (ETA > 0 && ETA < std::chrono::seconds(std::chrono::hours(24 * 2)).count())
+      auto const twodays = std::chrono::seconds(std::chrono::hours(24 * 2)).count();
+      if (ETA > 0 && ETA < static_cast<decltype(ETA)>(twodays))
 	 strprintf(msg, _("Retrieving file %li of %li (%s remaining)"), i, TotalItems, TimeToStr(ETA).c_str());
       else
 	 strprintf(msg, _("Retrieving file %li of %li"), i, TotalItems);

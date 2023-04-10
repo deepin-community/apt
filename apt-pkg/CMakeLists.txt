@@ -2,6 +2,8 @@
 include_directories(${PROJECT_BINARY_DIR}/include/apt-pkg)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include/apt-pkg/)
+execute_process(COMMAND grep -v "^#" "${CMAKE_CURRENT_SOURCE_DIR}/tagfile-keys.list"
+		OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list")
 execute_process(COMMAND ${TRIEHASH_EXECUTABLE}
                         --ignore-case
                          --header ${PROJECT_BINARY_DIR}/include/apt-pkg/tagfile-keys.h
@@ -10,8 +12,10 @@ execute_process(COMMAND ${TRIEHASH_EXECUTABLE}
                          --enum-name pkgTagSection::Key
                          --function-name pkgTagHash
                          --include "<apt-pkg/tagfile.h>"
-                         ${CMAKE_CURRENT_SOURCE_DIR}/tagfile-keys.list)
+                         --include "<apt-pkg/header-is-private.h>"
+                         "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "tagfile-keys.list")
+set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.cc" PROPERTIES COMPILE_DEFINITIONS APT_COMPILING_APT)
 
 
 # Set the version of the library

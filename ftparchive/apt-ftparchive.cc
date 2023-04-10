@@ -53,7 +53,7 @@ static struct timeval GetTimevalFromSteadyClock()			/*{{{*/
    auto const Time = std::chrono::steady_clock::now().time_since_epoch();
    auto const Time_sec = std::chrono::duration_cast<std::chrono::seconds>(Time);
    auto const Time_usec = std::chrono::duration_cast<std::chrono::microseconds>(Time - Time_sec);
-   return { Time_sec.count(), Time_usec.count() };
+   return { static_cast<time_t>(Time_sec.count()), static_cast<suseconds_t>(Time_usec.count()) };
 }
 									/*}}}*/
 static auto GetTimeDeltaSince(struct timeval StartTime)			/*{{{*/
@@ -116,19 +116,19 @@ struct PackageMap
    bool SrcDone;
    time_t ContentsMTime;
    
-   struct ContentsCompare : public binary_function<PackageMap,PackageMap,bool>
+   struct ContentsCompare
    {
       inline bool operator() (const PackageMap &x,const PackageMap &y)
       {return x.ContentsMTime < y.ContentsMTime;};
    };
     
-   struct DBCompare : public binary_function<PackageMap,PackageMap,bool>
+   struct DBCompare
    {
       inline bool operator() (const PackageMap &x,const PackageMap &y)
       {return x.BinCacheDB < y.BinCacheDB;};
    };  
 
-   struct SrcDBCompare : public binary_function<PackageMap,PackageMap,bool>
+   struct SrcDBCompare
    {
       inline bool operator() (const PackageMap &x,const PackageMap &y)
       {return x.SrcCacheDB < y.SrcCacheDB;};

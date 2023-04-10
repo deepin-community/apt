@@ -175,7 +175,7 @@ runapt() {
 	shift
 	case "$CMD" in
 	sh|aptitude|*/*|command) ;;
-	*) CMD="${BUILDDIRECTORY}/$CMD";;
+	*) CMD="${APTCMDLINEBINDIR}/$CMD";;
 	esac
 	if [ "$CMD" = 'aptitude' ]; then
 		MALLOC_PERTURB_=21 MALLOC_CHECK_=2 APT_CONFIG="$(getaptconfig)" LD_LIBRARY_PATH="${LIBRARYPATH}:${LD_LIBRARY_PATH}" command "$CMD" "$@"
@@ -228,7 +228,7 @@ gdb() {
 	esac
 	shift
 	if [ "${CMD##*/}" = "$CMD" ]; then
-		CMD="${BUILDDIRECTORY}/${CMD}"
+		CMD="${APTCMDLINEBINDIR}/${CMD}"
 	fi
 	runapt command gdb --quiet -ex "directory '$SOURCEDIRECTORY'" -ex run "$CMD" --args "$CMD" "$@"
 }
@@ -248,7 +248,7 @@ valgrind() {
 	esac
 	shift
 	if [ "${CMD##*/}" = "$CMD" ]; then
-		CMD="${BUILDDIRECTORY}/${CMD}"
+		CMD="${APTCMDLINEBINDIR}/${CMD}"
 	fi
 	runapt command valgrind "$CMD" "$@"
 }
@@ -373,18 +373,12 @@ setupenvironment() {
 	fi
 	mkdir -p 'rootdir/usr/bin' 'rootdir/var/cache' 'rootdir/var/lib' 'rootdir/var/log' 'rootdir/var/crash' 'rootdir/tmp'
 
-	# Find the newest build directory (sets PROJECT_BINARY_DIR)
-	find_project_binary_dir
-
 	_setupprojectenvironment
 
 	# create some files in /tmp and look at user/group to get what this means
 	TEST_DEFAULT_USER="$(id -un)"
 	touch "${TMPWORKINGDIRECTORY}/test-file"
 	TEST_DEFAULT_GROUP=$(stat --format '%G'  "${TMPWORKINGDIRECTORY}/test-file")
-
-	# prefer our apt binaries over the system apt binaries
-	export PATH="${BUILDDIRECTORY}:${PATH}:/usr/local/sbin:/usr/sbin:/sbin"
 
 	if [ -r "${TESTDIRECTORY}/extra-environment" ]; then
 		. "${TESTDIRECTORY}/extra-environment"
@@ -393,19 +387,20 @@ setupenvironment() {
 	msgdone "info"
 }
 _setupprojectenvironment() {
-        # allow overriding the default BUILDDIR location
+	# allow overriding the default BUILDDIR locations
 	SOURCEDIRECTORY="${APT_INTEGRATION_TESTS_SOURCE_DIR:-"${TESTDIRECTORY}/../../"}"
-	BUILDDIRECTORY="${APT_INTEGRATION_TESTS_BUILD_DIR:-"${PROJECT_BINARY_DIR}/cmdline"}"
-	LIBRARYPATH="${APT_INTEGRATION_TESTS_LIBRARY_PATH:-"${BUILDDIRECTORY}/../apt-pkg"}"
-        METHODSDIR="${APT_INTEGRATION_TESTS_METHODS_DIR:-"${BUILDDIRECTORY}/../methods"}"
-        APTHELPERBINDIR="${APT_INTEGRATION_TESTS_LIBEXEC_DIR:-"${BUILDDIRECTORY}"}"
-        APTTESTHELPERSBINDIR="${APT_INTEGRATION_TESTS_HELPERS_BIN_DIR:-"${BUILDDIRECTORY}/../test/interactive-helper"}"
-        APTFTPARCHIVEBINDIR="${APT_INTEGRATION_TESTS_FTPARCHIVE_BIN_DIR:-"${BUILDDIRECTORY}/../ftparchive"}"
-        APTINTERNALSOLVER="${APT_INTEGRATION_TESTS_INTERNAL_SOLVER:-"${BUILDDIRECTORY}/solvers/apt"}"
-	APTDUMPSOLVER="${APT_INTEGRATION_TESTS_DUMP_SOLVER:-"${BUILDDIRECTORY}/solvers/dump"}"
-	APTINTERNALPLANNER="${APT_INTEGRATION_TESTS_INTERNAL_PLANNER:-"${BUILDDIRECTORY}/planners/apt"}"
+	BUILDDIRECTORY="${APT_INTEGRATION_TESTS_BUILD_DIR:-"$(find_project_binary_dir; printf '%s' "$PROJECT_BINARY_DIR")"}"
+	LIBRARYPATH="${APT_INTEGRATION_TESTS_LIBRARY_PATH:-"${BUILDDIRECTORY}/apt-pkg"}"
+	METHODSDIR="${APT_INTEGRATION_TESTS_METHODS_DIR:-"${BUILDDIRECTORY}/methods"}"
+	APTHELPERBINDIR="${APT_INTEGRATION_TESTS_LIBEXEC_DIR:-"${BUILDDIRECTORY}/cmdline"}"
+	APTTESTHELPERSBINDIR="${APT_INTEGRATION_TESTS_HELPERS_BIN_DIR:-"${BUILDDIRECTORY}/test/interactive-helper"}"
+	APTFTPARCHIVEBINDIR="${APT_INTEGRATION_TESTS_FTPARCHIVE_BIN_DIR:-"${BUILDDIRECTORY}/ftparchive"}"
+	APTCMDLINEBINDIR="${APT_INTEGRATION_TESTS_CMDLINE_BIN_DIR:-"${BUILDDIRECTORY}/cmdline"}"
+	APTINTERNALSOLVER="${APT_INTEGRATION_TESTS_INTERNAL_SOLVER:-"${APTCMDLINEBINDIR}/solvers/apt"}"
+	APTDUMPSOLVER="${APT_INTEGRATION_TESTS_DUMP_SOLVER:-"${APTCMDLINEBINDIR}/solvers/dump"}"
+	APTINTERNALPLANNER="${APT_INTEGRATION_TESTS_INTERNAL_PLANNER:-"${APTCMDLINEBINDIR}/planners/apt"}"
 	ARTIFACTSDIR="${APT_INTEGRATION_TESTS_ARTIFACTS_DIR:-"${BUILDDIRECTORY}/artifacts"}"
-	test -x "${BUILDDIRECTORY}/apt-get" || msgdie "You need to build tree first"
+	test -x "${APTCMDLINEBINDIR}/apt-get" || msgdie 'You need to build tree first'
 
 	echo "#x-apt-configure-index \"${SOURCEDIRECTORY}/doc/examples/configure-index\";" > aptconfig.conf
 	mkdir aptarchive keys
@@ -422,8 +417,7 @@ _setupprojectenvironment() {
 	ln -s "${APTINTERNALPLANNER}" usr/lib/apt/planners/apt
 	echo "Dir::Bin::Solvers \"${TMPWORKINGDIRECTORY}/rootdir/usr/lib/apt/solvers\";" >> ../aptconfig.conf
 	echo "Dir::Bin::Planners \"${TMPWORKINGDIRECTORY}/rootdir/usr/lib/apt/planners\";" >> ../aptconfig.conf
-        # use the autoremove from the BUILDDIRECTORY if its there, otherwise
-        # system
+        # use the autoremove from the BUILDDIRECTORY if its there, otherwise system
         if [ -z "${APT_INTEGRATION_TESTS_SOURCE_DIR}" ]; then
 	    ln -s "${SOURCEDIRECTORY}/debian/apt.conf.autoremove" etc/apt/apt.conf.d/01autoremove
         else
@@ -452,11 +446,11 @@ _setupprojectenvironment() {
 	echo "APT::Get::Show-User-Simulation-Note \"false\";" >> aptconfig.conf
 	echo "Dir::Bin::Methods \"${TMPWORKINGDIRECTORY}/rootdir/usr/lib/apt/methods\";" >> aptconfig.conf
 	# either store apt-key were we can access it, even if we run it as a different user
-	#cp "${BUILDDIRECTORY}/apt-key" "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/"
+	#cp "${APTCMDLINEBINDIR}/apt-key" "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/"
 	#chmod o+rx "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/apt-key"
 	#echo "Dir::Bin::apt-key \"${TMPWORKINGDIRECTORY}/rootdir/usr/bin/apt-key\";" >> aptconfig.conf
 	# destroys coverage reporting though, so we disable changing user for the calling gpgv
-	echo "Dir::Bin::apt-key \"${BUILDDIRECTORY}/apt-key\";" >> aptconfig.conf
+	echo "Dir::Bin::apt-key \"${APTCMDLINEBINDIR}/apt-key\";" >> aptconfig.conf
 	if [ "$(id -u)" = '0' ]; then
 		echo 'Binary::gpgv::APT::Sandbox::User "root";' >> aptconfig.conf
 		# same for the solver executables
@@ -479,10 +473,56 @@ if [ -r '${TMPWORKINGDIRECTORY}/noopchroot.so' ]; then
 		export LD_PRELOAD="noopchroot.so"
 	fi
 fi
+EXEC='exec'
 EOF
 	cp "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/dpkg" "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/gdb-dpkg"
+	local DPKG_VERSION="$(command dpkg-query --showformat '${VERSION}' --show dpkg)"
+	if command dpkg --compare-versions "${DPKG_VERSION}" '<<' '1.21.0'; then
+		cat >> "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/dpkg" <<EOF
+dpkg_assert_call() {
+	while [ -n "\$1" ]; do
+		if [ "\${1#*--assert-}" != "\$1" ]; then return 0; fi
+		if [ "\$1" = '--' ]; then break; fi
+		shift
+	done
+	return 1
+}
+if dpkg_assert_call "\$@" && ! command dpkg-checkbuilddeps --admindir='${TMPWORKINGDIRECTORY}/rootdir/var/lib/dpkg' -d 'dpkg' /dev/null >/dev/null 2>&1; then
+	EXEC=''
+	ORIGINAL="${TMPWORKINGDIRECTORY}/rootdir/var/lib/dpkg/status"
+	BACKUP="${TMPWORKINGDIRECTORY}/rootdir/var/lib/dpkg/status.apt-backup"
+	restoredpkgstatus() {
+		if [ -n "\$BACKUP" ]; then
+			if [ -e "\$BACKUP" ]; then
+				mv -f "\$BACKUP" "\$ORIGINAL"
+			else
+				rm -f "\$ORIGINAL"
+			fi
+			BACKUP=''
+		fi
+	}
+	trap "restoredpkgstatus;" 0 HUP INT QUIT ILL ABRT FPE SEGV PIPE TERM
+	if [ -e "\$ORIGINAL" ]; then
+		cp -a "\$ORIGINAL" "\$BACKUP"
+	fi
+	cat >> "${TMPWORKINGDIRECTORY}/rootdir/var/lib/dpkg/status" << EOS
+
+Package: dpkg
+Architecture: all
+Version: ${DPKG_VERSION}+fake
+Status: install ok installed
+Maintainer: Joe Sixpack <joe@example.org>
+Installed-Size: 42
+Description: tells dpkg it supports what we need
+ Some versions of dpkg check its own version from the status file
+ to know if it supports multi-arch and stuff in --assert-*.
+
+EOS
+fi
+EOF
+	fi
 	cat >> "${TMPWORKINGDIRECTORY}/rootdir/usr/bin/dpkg" <<EOF
-exec fakeroot '${DPKG:-dpkg}' --root='${TMPWORKINGDIRECTORY}/rootdir' \\
+\$EXEC fakeroot '${DPKG:-dpkg}' --root='${TMPWORKINGDIRECTORY}/rootdir' \\
 	--admindir="${TMPWORKINGDIRECTORY}/rootdir/var/lib/dpkg" \\
 	--log='${TMPWORKINGDIRECTORY}/rootdir/var/log/dpkg.log' \\
 	--force-not-root --force-bad-path "\$@"
@@ -497,9 +537,6 @@ EOF
 	echo "Dir::Bin::dpkg \"${TMPWORKINGDIRECTORY}/rootdir/usr/bin/dpkg\";" > rootdir/etc/apt/apt.conf.d/99dpkg
 
 	{
-		if ! command dpkg --assert-multi-arch >/dev/null 2>&1; then
-			echo "DPKG::options:: \"--force-architecture\";" # Added to test multiarch before dpkg is ready for it…
-		fi
 		echo 'quiet "0";'
 		echo 'quiet::NoUpdate "true";'
 		echo 'quiet::NoStatistic "true";'
@@ -542,6 +579,9 @@ EOF
 
 	# most tests just need one signed Release file, not both
 	export APT_DONT_SIGN='Release.gpg'
+
+	# prefer our apt binaries over the system apt binaries
+	export PATH="${APTCMDLINEBINDIR}:${PATH}:/usr/sbin:/sbin"
 }
 
 getarchitecture() {
@@ -586,17 +626,9 @@ configdpkg() {
 			if tail -1 rootdir/var/lib/dpkg/status | grep -q .; then
 				echo >> rootdir/var/lib/dpkg/status
 			fi
-		else
-			echo -n > rootdir/var/lib/dpkg/status
 		fi
 	fi
 	rm -f rootdir/etc/apt/apt.conf.d/00foreigndpkg
-	# make sure dpkg can detect itself as capable of it
-	if [ "0" = "$(dpkg -l dpkg 2> /dev/null | grep '^i' | wc -l)" ]; then
-		# dpkg doesn't really check the version as long as it is fully installed,
-		# but just to be sure we choose one above the required version
-		insertinstalledpackage 'dpkg' "all" '1.16.2+fake'
-	fi
 	if dpkg --assert-multi-arch >/dev/null 2>&1 ; then
 		local ARCHS="$(getarchitectures)"
 		local DPKGARCH="$(dpkg --print-architecture)"
@@ -616,6 +648,9 @@ configdpkg() {
 				fi
 			fi
 		done
+	else
+		# test multiarch before dpkg is ready for it…
+		echo "DPKG::options:: \"--force-architecture\";" > rootdir/etc/apt/apt.conf.d/00foreigndpkg
 	fi
 }
 
@@ -1169,15 +1204,15 @@ generatereleasefiles() {
 		msgninfo "\tGenerate Release files for flat… "
 		aptftparchiverelease ./aptarchive > aptarchive/Release
 	fi
+	if [ -n "$VALIDUNTIL" ]; then
+		sed -i "/^Date: / a\
+Valid-Until: $(date -u -d "$VALIDUNTIL" -R)" $(find ./aptarchive -name 'Release')
+	fi
 	if [ -n "$DATE" -a "$DATE" != "now" ]; then
 		for release in $(find ./aptarchive -name 'Release'); do
 			sed -i "s/^Date: .*$/Date: $(date -u -d "$DATE" -R)/" "$release"
 			touch -d "$DATE" "$release"
 		done
-	fi
-	if [ -n "$VALIDUNTIL" ]; then
-		sed -i "/^Date: / a\
-Valid-Until: $(date -u -d "$VALIDUNTIL" -R)" $(find ./aptarchive -name 'Release')
 	fi
 	msgdone "info"
 }
@@ -1831,12 +1866,12 @@ msgfailoutput() {
 		if [ -s "$COREDUMP" ]; then
 			if [ -z "$COREEXE" ]; then
 				case "$CMD" in
-				apt) COREEXE="${BUILDDIRECTORY}/${CMD}";;
+				apt) COREEXE="${APTCMDLINEBINDIR}/${CMD}";;
 				aptftparchive) COREEXE="${APTFTPARCHIVEBINDIR}/apt-ftparchive";;
 				apthelper) COREEXE="${APTHELPERBINDIR}/apt-helper";;
 				aptwebserver) COREEXE="${APTTESTHELPERSBINDIR}/aptwebserver";;
-				apt*) COREEXE="${BUILDDIRECTORY}/apt-${CMD##*apt}";;
-				*) COREEXE="${BUILDDIRECTORY}/${CMD}";;
+				apt*) COREEXE="${APTCMDLINEBINDIR}/apt-${CMD##*apt}";;
+				*) COREEXE="${APTCMDLINEBINDIR}/${CMD}";;
 				esac
 			fi
 

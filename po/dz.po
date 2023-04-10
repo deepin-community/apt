@@ -1,10 +1,15 @@
+#
+# Licensing is complex as the msgid come from several files, please see
+# the individual files for licensing information.
+#
+# This file originally stated:
 # This file is put in the public domain.
 # Kinley Tshering <gasepkuenden2k3@hotmail.com>, 2006
 msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
 "PO-Revision-Date: 2006-09-19 09:49+0530\n"
 "Last-Translator: Kinley Tshering <gasepkuenden2k3@hotmail.com>\n"
 "Language-Team: Dzongkha <pgeyleg@dit.gov.bt>\n"
@@ -178,7 +183,8 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr ""
 
-#: apt-pkg/acquire-item.cc
+#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -189,7 +195,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -2716,7 +2722,7 @@ msgstr "འདི་གིས་ ཐུམ་སྒྲིལ་ཚུ་རྩ�
 msgid "Remove packages and config files"
 msgstr ""
 
-#: cmdline/apt-get.cc cmdline/apt.cc
+#: cmdline/apt-get.cc
 #, fuzzy
 msgid "Remove automatically all unused packages"
 msgstr "འདི་འབདཝ་ད་%sའདི་གཞི་བཙུགས་འབད་ནི་ཨིན།"
@@ -3023,6 +3029,11 @@ msgstr "ཁབ་གཟེར་བཏབ་ཡོད་པའི་ཐུམ་
 #, fuzzy
 msgid "remove packages"
 msgstr "ཆད་པ་ཡོད་པའི་ཐུམ་སྒྲིལ་ཚུ།"
+
+#: cmdline/apt.cc
+#, fuzzy
+msgid "automatically remove all unused packages"
+msgstr "འདི་འབདཝ་ད་%sའདི་གཞི་བཙུགས་འབད་ནི་ཨིན།"
 
 #. system wide stuff
 #: cmdline/apt.cc

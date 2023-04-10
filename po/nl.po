@@ -1,4 +1,7 @@
 # Dutch po-file for apt
+# Licensing is complex as the msgid come from several files, please see
+# the individual files for licensing information.
+#
 # This file is distributed under the same license as the apt package.
 #
 # Guus Sliepen <guus@sliepen.warande.net>, 2002.
@@ -6,14 +9,14 @@
 # Wannes Soenen <wannes@wannes.cjb.net>, 2002.
 # Frans Pop <elendil@planet.nl>, 2010.
 # Jeroen Schot <schot@a-eskwadraat.nl>, 2011.
-# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2014-2021.
+# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2014-2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.3.13\n"
+"Project-Id-Version: apt 2.4.4\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2022-02-22 20:01+0100\n"
-"PO-Revision-Date: 2021-12-01 15:20+0100\n"
+"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"PO-Revision-Date: 2022-04-08 20:34+0200\n"
 "Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
 "Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
 "Language: nl\n"
@@ -211,7 +214,8 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Tegenstrijdige distributie: %s (verwachtte %s, maar kreeg %s)"
 
-#: apt-pkg/acquire-item.cc
+#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr "Bij pakketbron '%s' is de '%s'-waarde gewijzigd van '%s' naar '%s'"
@@ -224,7 +228,7 @@ msgstr ""
 "%hi."
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc
+#: apt-pkg/acquire-item.cc apt-private/private-update.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -2897,7 +2901,7 @@ msgstr "Pakketten verwijderen"
 msgid "Remove packages and config files"
 msgstr "Pakketten en hun configuratiebestanden verwijderen"
 
-#: cmdline/apt-get.cc cmdline/apt.cc
+#: cmdline/apt-get.cc
 msgid "Remove automatically all unused packages"
 msgstr "Automatisch alle ongebruikte pakketten verwijderen"
 
@@ -3208,6 +3212,12 @@ msgstr "pakketten opnieuw installeren"
 #: cmdline/apt.cc
 msgid "remove packages"
 msgstr "pakketten verwijderen"
+
+#: cmdline/apt.cc
+#, fuzzy
+#| msgid "Remove automatically all unused packages"
+msgid "automatically remove all unused packages"
+msgstr "Automatisch alle ongebruikte pakketten verwijderen"
 
 #. system wide stuff
 #: cmdline/apt.cc
@@ -3923,6 +3933,9 @@ msgid ""
 "Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
 "section in apt-key(8) for details."
 msgstr ""
+"De sleutel wordt opgeslagen in de uitgefaseerde sleutelbos (%s) in trusted."
+"gpg, raadpleeg de afdeling UITFASERING (DEPRECATION) in apt-key(8) voor "
+"details."
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc

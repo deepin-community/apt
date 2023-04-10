@@ -14,7 +14,7 @@
    &apt-email;
    &apt-product;
    <!-- The last update date -->
-   <date>2019-05-10T00:00:00Z</date>
+   <date>2023-01-29T00:00:00Z</date>
  </refentryinfo>
  
  <refmeta>
@@ -369,7 +369,7 @@ for i in Sections do
       <listitem><para>
       This is a space separated list of sections which appear 
       under the distribution; typically this is something like 
-      <literal>main contrib non-free</literal></para></listitem>
+      <literal>main contrib non-free non-free-firmware</literal></para></listitem>
       </varlistentry>
       
       <varlistentry><term><option>Architectures</option></term>

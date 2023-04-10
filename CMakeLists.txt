@@ -10,7 +10,12 @@ include_directories(${PROJECT_BINARY_DIR}/include)
 
 enable_testing()
 
-option(WITH_DOC "Build documentation." ON)
+option(WITH_DOC "Build all documentation." ON)
+include(CMakeDependentOption)
+cmake_dependent_option(WITH_DOC_MANPAGES "Force building manpages." OFF "NOT WITH_DOC" OFF)
+cmake_dependent_option(WITH_DOC_GUIDES "Force building guides." OFF "NOT WITH_DOC" OFF)
+cmake_dependent_option(WITH_DOC_DOXYGEN "Force building doxygen documentation." OFF "NOT WITH_DOC" OFF)
+cmake_dependent_option(WITH_DOC_EXAMPLES "Force building example configurations." OFF "NOT WITH_DOC" OFF)
 option(WITH_TESTS "Build tests" ON)
 option(USE_NLS "Localisation support." ON)
 
@@ -200,7 +205,7 @@ endif()
 # Configure some variables like package, version and architecture.
 set(PACKAGE ${PROJECT_NAME})
 set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-set(PACKAGE_VERSION "2.4.5")
+set(PACKAGE_VERSION "2.6.0")
 string(REGEX MATCH "^[0-9.]+" PROJECT_VERSION ${PACKAGE_VERSION})
 
 if (NOT DEFINED DPKG_DATADIR)
@@ -235,8 +240,10 @@ configure_file(CMake/apti18n.h.in ${PROJECT_BINARY_DIR}/include/apti18n.h)
 
 # Add our subdirectories
 add_subdirectory(vendor)
+if (NOT USE_SYSTEM_APTPKG)
 add_subdirectory(apt-pkg)
 add_subdirectory(apt-private)
+endif()
 add_subdirectory(cmdline)
 add_subdirectory(completions)
 add_subdirectory(doc)
@@ -247,7 +254,9 @@ add_subdirectory(test)
 
 if (USE_NLS)
 add_subdirectory(po)
+endif()
 
+if(TARGET update-po AND TARGET update-po4a)
 # Link update-po4a into the update-po target
 add_dependencies(update-po update-po4a)
 endif()
