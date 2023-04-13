@@ -32,7 +32,7 @@ Index: apt-2.6.0/methods/http.cc
 ===================================================================
 --- apt-2.6.0.orig/methods/http.cc
 +++ apt-2.6.0/methods/http.cc
-@@ -959,6 +959,19 @@ void HttpMethod::SendReq(FetchItem *Itm)
+@@ -959,6 +959,21 @@ void HttpMethod::SendReq(FetchItem *Itm)
     Req << "User-Agent: " << ConfigFind("User-Agent",
  		"Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")");
  
@@ -47,8 +47,10 @@ Index: apt-2.6.0/methods/http.cc
 +    Configuration::MatchAgainstConfig DomainList("Acquire::SmartMirrors::DomainList");
 +
 +    if (DomainList.Match(domain) == true)
-+        Req << "X-Repo-Token: " << ConfigFindSmartMirrors("Token", "") << "\r\n";
-+
++    { 
++	 Req << "\r\n";
++        Req << "X-Repo-Token: " << ConfigFindSmartMirrors("Token", "");
++    } 
  #ifdef HAVE_SYSTEMD
     if (ConfigFindB("User-Agent-Non-Interactive", false))
     {

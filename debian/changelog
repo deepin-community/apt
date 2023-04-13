@@ -1,3 +1,11 @@
+apt (2.6.0-1deepin5) unstable; urgency=medium
+
+  * Fix request header errors
+  * apt update return 400 error
+  * https://pms.uniontech.com/bug-view-189741.html
+
+ -- LiChengGang <lichenggang@uniontech.com>  Thu, 13 Apr 2023 13:11:24 +0800
+
 apt (2.6.0-1deepin4) unstable; urgency=medium
 
   * add deepin patch.
