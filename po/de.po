@@ -13,10 +13,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.5.5\n"
+"Project-Id-Version: apt 2.7.2\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2023-03-06 12:29+0000\n"
-"PO-Revision-Date: 2023-01-20 16:58+0100\n"
+"POT-Creation-Date: 2023-09-20 08:27+0000\n"
+"PO-Revision-Date: 2023-07-17 19:13+0200\n"
 "Last-Translator: Helge Kreutzmann <debian@helgefjell.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -1949,6 +1949,19 @@ msgstr "Beschädigte Pakete"
 
 #: apt-private/private-install.cc
 msgid ""
+"Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
+"system."
+msgstr ""
+
+#. TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Selected %s for removal.\n"
+msgid "See %s for more details."
+msgstr "%s zum Entfernen vorgewählt.\n"
+
+#: apt-private/private-install.cc
+msgid ""
 "Unable to fetch some archives, maybe run apt-get update or try with --fix-"
 "missing?"
 msgstr ""
@@ -2623,6 +2636,12 @@ msgid ""
 msgstr ""
 "Die Verwendung von %s sollte gegenüber der Methode bevorzugt werden, Login-"
 "Informationen direkt in den %s-Abschnitt für »%s« einzutragen."
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
+msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr "Fehlendes Signed-By im Eintrag %s für »%s«"
 
 #: apt-private/private-update.cc
 #, c-format
