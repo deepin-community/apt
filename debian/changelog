@@ -1,16 +1,153 @@
-apt (2.6.0-1deepin5) unstable; urgency=medium
+apt (2.7.8) unstable; urgency=medium
 
-  * Fix request header errors
-  * apt update return 400 error
-  * https://pms.uniontech.com/bug-view-189741.html
+  [ Gábor Németh ]
+  * Add 'dist-clean' command to remove packages and list files (Closes:
+    #959093); this is experimental and does not yet have docs or tests.
 
- -- LiChengGang <lichenggang@uniontech.com>  Thu, 13 Apr 2023 13:11:24 +0800
+  [ David Kalnischkies ]
+  * Have Grp.FindPreferredPkg return very foreign pkgs as last resort
+  * Improve and test distclean implementation
+  * Do not store .diff_Index files in update
 
-apt (2.6.0-1deepin4) unstable; urgency=medium
+  [ Tianyu Chen ]
+  * apt-pkg/cacheset.cc: set ShowErrors to true when no version matched
+    (Closes: #1053887)
 
-  * add deepin patch.
+  [ Julian Andres Klode ]
+  * Do not silently ignore directories for reserved file names
+  * test: Disable valgrind on armhf, incompatible with stack clash protector
+    (Closes: #1059352)
 
- -- LiChengGang <lichenggang@uniontech.com>  Mon, 10 Apr 2023 11:32:51 +0800
+ -- Julian Andres Klode <jak@debian.org>  Mon, 08 Jan 2024 10:32:31 +0100
+
+apt (2.7.7) unstable; urgency=medium
+
+  [ sid ]
+  * Fix incorrect time unit comment for PulseInterval
+
+  [ Patrice Duroux ]
+  * Update fr.po (add a missing dot)
+
+  [ Julian Andres Klode ]
+  * Stop calculating Description-md5 if missing
+  * Revert "Do not fail on systems running in FIPSmode."
+  * s/AlreadDownloaded/AlreadyDownloaded/ in doc/progress-reporting.md.
+    Thanks to jwilk for suggestion
+  * Bump Priority to required to match Debian archive.
+    This unbreaks mmdebstrap scenarios if you mirror Debian or use
+    a distro where apt did not get overridden to required.
+    Reported-By: josch on IRC, following discovery by helmut
+  * Restore ?garbage by calling MarkAndSweep before parsing (LP: #1995790)
+  * Fix the test suite by adding new "m" flags to debug output
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1055178)
+
+  [ David Kalnischkies ]
+  * Raise cmake_minimum_required to 3.13 to avoid warnings
+  * Use different variable name in GTest source path detection
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 22 Nov 2023 16:43:47 +0100
+
+apt (2.7.6) unstable; urgency=medium
+
+  [ Américo Monteiro ]
+  * Portuguese manpages translation update (Closes: #1051731)
+
+  [ Julian Andres Klode ]
+  * Downgrade unmerged-usr from error to two warnings (Closes: #1052058)
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 20 Sep 2023 10:25:26 +0200
+
+apt (2.7.5) unstable; urgency=medium
+
+  * doc/po/nl.po: Fix spurious translation of docbook tag
+
+ -- Julian Andres Klode <jak@debian.org>  Sat, 16 Sep 2023 13:32:18 +0200
+
+apt (2.7.4) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * CI: Do not require UID 1000 for our test user.
+  * methods: store: Use APT_BUFFER_SIZE (64k) instead of 4k buffers
+  * Only accept installs of usrmerge on unmerged-usr systems.
+    As of bookworm, merged-usr is mandatory, and people got caught
+    in the crosshairs of the dpkg fsys-unmessusr debacle and inadvertently
+    reverted back to an unmerged configuration and continue to remain
+    on an unsupported system unknowingly.
+  * Drop alternatives to the gpgv dependency (Closes: #1051642)
+  * Remove unnecessary explicit st_dev check for merged-usr
+
+  [ Frans Spiesschaert ]
+  * Dutch translation update (Closes: #1051720)
+  * Dutch documentation translation update (Closes: #1051723)
+
+  [ Helge Kreutzmann ]
+  * updated German translation (Closes: #1049427)
+
+ -- Julian Andres Klode <jak@debian.org>  Sat, 16 Sep 2023 13:01:48 +0200
+
+apt (2.7.3) unstable; urgency=medium
+
+  [ Tianon Gravi ]
+  * Add "apt-patterns" reference to "apt list" description in apt(8)
+
+  [ Frans Spiesschaert ]
+  * Dutch manpages translation update (Closes: #1033904)
+  * Dutch program translation update (Closes: #1033909)
+
+  [ Mert Dirik ]
+  * Turkish program translation update
+
+  [ Remus-Gabriel Chelu ]
+  * Romanian program translation update (Closes: #1040644)
+
+  [ David Kalnischkies ]
+  * Add apt-patterns(7) to apt{,-cache,-get} SEE ALSO sections
+
+  [ Julian Andres Klode ]
+  * Compare SHA256 to check if versions are really the same (Closes: #931175)
+    (LP: #2029268)
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 02 Aug 2023 14:30:47 +0200
+
+apt (2.7.2) unstable; urgency=medium
+
+  [ A. Maitland Bottoms ]
+  * Do not fail on systems running in FIPSmode.
+
+  [ Julian Andres Klode ]
+  * Upload to unstable
+  * update: Add notice about missing Signed-By in deb822 sources
+  * doc: Bump distro versions for apt-key removal
+  * dist-upgrade: Revert phased updates using keeps only (LP: #2025462)
+  * Do not mark updates for install that are still phasing
+  * Fix snapshot crashes with multiple components inside Ubuntu docker
+    image
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 12 Jul 2023 17:23:26 +0200
+
+apt (2.7.1) experimental; urgency=medium
+
+  * Seed snapshot servers for well-known hosts, including PPAs. Note
+    that it is preferable for repositories to declare their snapshot
+    server in the Snapshots Release file field than to rely on this
+    feature.
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 24 May 2023 18:56:31 +0200
+
+apt (2.7.0) experimental; urgency=medium
+
+  [ Jacob Kauffmann ]
+  * Keep "or group" when installing package to satisfy it
+
+  [ Julian Andres Klode ]
+  * Add apt install,upgrade,... -U,--update options. Please note that
+    this still releases locks in between and is subject to races.
+  * Initial support for snapshot servers, apt --snapshot option. Some
+    implementation details may change down the road to 2.8
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 02 May 2023 16:41:47 +0200
 
 apt (2.6.0) unstable; urgency=medium
 

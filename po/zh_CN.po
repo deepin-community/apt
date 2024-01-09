@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 2.5.3\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"POT-Creation-Date: 2023-09-20 08:27+0000\n"
 "PO-Revision-Date: 2022-10-05 17:20-0400\n"
 "Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
 "Language-Team: Chinese (simplified) <debian-l10n-chinese@lists.debian.org>\n"
@@ -1808,6 +1808,19 @@ msgstr "破损的软件包"
 
 #: apt-private/private-install.cc
 msgid ""
+"Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
+"system."
+msgstr ""
+
+#. TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Selected %s for removal.\n"
+msgid "See %s for more details."
+msgstr "选中 %s 以待卸载。\n"
+
+#: apt-private/private-install.cc
+msgid ""
 "Unable to fetch some archives, maybe run apt-get update or try with --fix-"
 "missing?"
 msgstr ""
@@ -2422,6 +2435,12 @@ msgid ""
 "Usage of %s should be preferred over embedding login information directly in "
 "the %s entry for '%s'"
 msgstr "您应当优先考虑使用 %s 而非直接把账户信息直接写在 %s 的条目 '%s' 中"
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
+msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
 
 #: apt-private/private-update.cc
 #, c-format

@@ -1056,9 +1056,12 @@ bool pkgProblemResolver::ResolveInternal(bool const BrokenFix)
 			      clog << "  Try Installing " << APT::PrettyPkg(&Cache, Start.TargetPkg()) << " before changing " << I.FullName(false) << std::endl;
 			   auto const OldBroken = Cache.BrokenCount();
 			   Cache.MarkInstall(Start.TargetPkg(), true, 1, false);
+			   OrOp = OrKeep;
 			   // FIXME: we should undo the complete MarkInstall process here
-			   if (Cache[Start.TargetPkg()].InstBroken() == true || Cache.BrokenCount() > OldBroken)
+			   if (Cache[Start.TargetPkg()].InstBroken() == true || Cache.BrokenCount() > OldBroken) {
 			      Cache.MarkDelete(Start.TargetPkg(), false, 1, false);
+			      OrOp = OrRemove;
+			   }
 			}
 		     }
 		  }
@@ -1231,7 +1234,8 @@ bool pkgProblemResolver::InstOrNewPolicyBroken(pkgCache::PkgIterator I)
    }
 
    // a newly broken policy (recommends/suggests) is a problem
-   if (Cache[I].NowPolicyBroken() == false &&
+   if ((Flags[I->ID] & BrokenPolicyAllowed) == 0 &&
+       Cache[I].NowPolicyBroken() == false &&
        Cache[I].InstPolicyBroken() == true)
    {
       if (Debug == true)
