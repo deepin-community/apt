@@ -1,4 +1,4 @@
-apt (2.7.12deepin1) UNRELEASED; urgency=medium
+apt (2.7.12deepin1) unstable; urgency=medium
 
   * Apply deepin changes.
 
