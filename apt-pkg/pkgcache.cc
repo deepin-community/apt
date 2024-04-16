@@ -32,11 +32,11 @@
 #include <apt-pkg/version.h>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstring>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <stddef.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <xxhash.h>
 
@@ -393,11 +393,17 @@ pkgCache::PkgIterator pkgCache::GrpIterator::FindPreferredPkg(bool const &Prefer
 	pkgCache::PkgIterator Pkg = FindPkg(StringView("native", 6));
 	if (Pkg.end() == false && (PreferNonVirtual == false || Pkg->VersionList != 0))
 		return Pkg;
-
-	std::vector<std::string> const archs = APT::Configuration::getArchitectures();
-	for (std::vector<std::string>::const_iterator a = archs.begin();
-	     a != archs.end(); ++a) {
-		Pkg = FindPkg(*a);
+	// native and foreign
+	for (auto const &a : APT::Configuration::getArchitectures())
+	{
+		Pkg = FindPkg(a);
+		if (Pkg.end() == false && (PreferNonVirtual == false || Pkg->VersionList != 0))
+			return Pkg;
+	}
+	// very foreign/barbarian
+	for (auto const &a : _config->FindVector("APT::BarbarianArchitectures"))
+	{
+		Pkg = FindPkg(a);
 		if (Pkg.end() == false && (PreferNonVirtual == false || Pkg->VersionList != 0))
 			return Pkg;
 	}
@@ -405,6 +411,10 @@ pkgCache::PkgIterator pkgCache::GrpIterator::FindPreferredPkg(bool const &Prefer
 	Pkg = FindPkg(StringView("none", 4));
 	if (Pkg.end() == false && (PreferNonVirtual == false || Pkg->VersionList != 0))
 		return Pkg;
+	// the "rest" we somehow know about (+ those we tried already again as skipping is hard)
+	for (Pkg = PackageList(); not Pkg.end(); Pkg = NextPkg(Pkg))
+		if (Pkg.end() == false && (PreferNonVirtual == false || Pkg->VersionList != 0))
+			return Pkg;
 
 	if (PreferNonVirtual == true)
 		return FindPreferredPkg(false);
@@ -1007,5 +1017,30 @@ pkgCache::DescIterator pkgCache::VerIterator::TranslatedDescription() const
 }
 
 									/*}}}*/
+// VerIterator::IsSecurity - check if it is a security update /*{{{*/
 
+// See if this version is a security update. This also checks, for installed packages,
+// if any of the previous versions is a security update
+bool pkgCache::VerIterator::IsSecurityUpdate() const
+{
+   auto Pkg = ParentPkg();
+   auto Installed = Pkg.CurrentVer();
+
+   auto OtherVer = Pkg.VersionList();
+
+   // Advance to first version < our version
+   while (OtherVer->ID != S->ID)
+      ++OtherVer;
+
+   // Iterate over all versions < our version
+   for (; !OtherVer.end() && (Installed.end() || OtherVer->ID != Installed->ID); OtherVer++)
+   {
+      for (auto PF = OtherVer.FileList(); !PF.end(); PF++)
+	 if (PF.File() && PF.File().Archive() != nullptr && APT::String::Endswith(PF.File().Archive(), "-security"))
+	    return true;
+   }
+   return false;
+}
+
+									/*}}}*/
 pkgCache::~pkgCache() {}

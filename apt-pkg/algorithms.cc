@@ -32,6 +32,7 @@
 #include <apt-pkg/prettyprinters.h>
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <set>
@@ -39,7 +40,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <string.h>
 #include <sys/utsname.h>
 
 #include <apti18n.h>
@@ -1056,9 +1056,12 @@ bool pkgProblemResolver::ResolveInternal(bool const BrokenFix)
 			      clog << "  Try Installing " << APT::PrettyPkg(&Cache, Start.TargetPkg()) << " before changing " << I.FullName(false) << std::endl;
 			   auto const OldBroken = Cache.BrokenCount();
 			   Cache.MarkInstall(Start.TargetPkg(), true, 1, false);
+			   OrOp = OrKeep;
 			   // FIXME: we should undo the complete MarkInstall process here
-			   if (Cache[Start.TargetPkg()].InstBroken() == true || Cache.BrokenCount() > OldBroken)
+			   if (Cache[Start.TargetPkg()].InstBroken() == true || Cache.BrokenCount() > OldBroken) {
 			      Cache.MarkDelete(Start.TargetPkg(), false, 1, false);
+			      OrOp = OrRemove;
+			   }
 			}
 		     }
 		  }
@@ -1231,7 +1234,8 @@ bool pkgProblemResolver::InstOrNewPolicyBroken(pkgCache::PkgIterator I)
    }
 
    // a newly broken policy (recommends/suggests) is a problem
-   if (Cache[I].NowPolicyBroken() == false &&
+   if ((Flags[I->ID] & BrokenPolicyAllowed) == 0 &&
+       Cache[I].NowPolicyBroken() == false &&
        Cache[I].InstPolicyBroken() == true)
    {
       if (Debug == true)
@@ -1241,6 +1245,26 @@ bool pkgProblemResolver::InstOrNewPolicyBroken(pkgCache::PkgIterator I)
 
    return false;
 }
+									/*}}}*/
+// ProblemResolver::KeepPhasedUpdates - Keep back phased updates	/*{{{*/
+// ---------------------------------------------------------------------
+// Hold back upgrades to phased versions of already installed packages, unless
+// they are security updates
+bool pkgProblemResolver::KeepPhasedUpdates()
+{
+   for (pkgCache::PkgIterator I = Cache.PkgBegin(); I.end() == false; ++I)
+   {
+      if (not Cache.PhasingApplied(I))
+	 continue;
+
+      Cache.MarkKeep(I, false, false);
+      Cache.MarkProtected(I);
+      Protect(I);
+   }
+
+   return true;
+}
+
 									/*}}}*/
 // ProblemResolver::ResolveByKeep - Resolve problems using keep		/*{{{*/
 // ---------------------------------------------------------------------
@@ -1550,11 +1574,15 @@ std::string GetProtectedKernelsRegex(pkgCache *cache, bool ReturnRemove)
    if (version2unames.size() == 0)
       return "";
 
-   auto latest = version2unames.rbegin();
-   auto previous = latest;
-   ++previous;
-
+   auto versions = version2unames.rbegin();
    std::set<std::string> keep;
+
+   auto keepKernels = (unsigned long)_config->FindI("APT::NeverAutoRemove::KernelCount", 2);
+   if (keepKernels < 2)
+      keepKernels = 2;
+
+   if (Debug)
+      std::clog << "Amount of kernels to keep " << keepKernels << std::endl;
 
    if (not bootedVersion.empty())
    {
@@ -1562,18 +1590,21 @@ std::string GetProtectedKernelsRegex(pkgCache *cache, bool ReturnRemove)
 	 std::clog << "Keeping booted kernel " << bootedVersion << std::endl;
       keep.insert(bootedVersion);
    }
-   if (latest != version2unames.rend())
+
+   while (keep.size() < keepKernels && versions != version2unames.rend())
    {
+      auto v = versions->first;
+      if (v == bootedVersion)
+      {
+	 versions++;
+	 continue;
+      }
       if (Debug)
-	 std::clog << "Keeping latest kernel " << latest->first << std::endl;
-      keep.insert(latest->first);
+	 std::clog << "Keeping previous kernel " << v << std::endl;
+      keep.insert(v);
+      versions++;
    }
-   if (keep.size() < 2 && previous != version2unames.rend())
-   {
-      if (Debug)
-	 std::clog << "Keeping previous kernel " << previous->first << std::endl;
-      keep.insert(previous->first);
-   }
+
    // Escape special characters '.' and '+' in version strings so we can build a regular expression
    auto escapeSpecial = [](std::string input) -> std::string {
       for (size_t pos = 0; (pos = input.find_first_of(".+", pos)) != input.npos; pos += 2) {

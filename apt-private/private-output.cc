@@ -13,14 +13,14 @@
 #include <apt-private/private-cachefile.h>
 #include <apt-private/private-output.h>
 
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <langinfo.h>
 #include <regex.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -488,6 +488,16 @@ void ShowDel(ostream &out,CacheFile &Cache)
 	    return str;
 	 },
 	 CandidateVersion(&Cache));
+}
+									/*}}}*/
+// ShowPhasing - Show packages kept due to phasing			/*{{{*/
+void ShowPhasing(ostream &out, CacheFile &Cache, APT::PackageVector const &HeldBackPackages)
+{
+   SortedPackageUniverse Universe(Cache);
+   ShowList(out, _("The following upgrades have been deferred due to phasing:"), HeldBackPackages,
+	    &AlwaysTrue,
+	    &PrettyFullName,
+	    CurrentToCandidateVersion(&Cache));
 }
 									/*}}}*/
 // ShowKept - Show kept packages					/*{{{*/

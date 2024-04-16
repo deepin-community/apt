@@ -32,8 +32,13 @@
 #include <apt-pkg/tagfile.h>
 
 #include <algorithm>
-#include <ctime>
+#include <cerrno>
 #include <chrono>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -42,11 +47,6 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <errno.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -276,6 +276,15 @@ static HashStringList GetExpectedHashesFromFor(metaIndex * const Parser, std::st
    return R->Hashes;
 }
 									/*}}}*/
+static void RemoveOldLeftoverDiffIndex(IndexTarget const &Target)	/*{{{*/
+{
+   std::string const FinalFile = GetFinalFileNameFromURI(GetDiffIndexURI(Target));
+   RemoveFile("TransactionCommit", FinalFile);
+   for (auto const &ext: APT::Configuration::getCompressorExtensions())
+      if (not ext.empty() && ext != ".")
+	 RemoveFile("TransactionCommit", FinalFile + ext);
+}
+									/*}}}*/
 
 class pkgAcquire::Item::Private /*{{{*/
 {
@@ -414,12 +423,16 @@ bool pkgAcqTransactionItem::QueueURI(pkgAcquire::ItemDesc &Item)
 	 std::clog << "Skip " << Target.URI << " as transaction was already dealt with!" << std::endl;
       return false;
    }
-   std::string const FinalFile = GetFinalFilename();
-   if (TransactionManager->IMSHit == true && FileExists(FinalFile) == true)
+   if (TransactionManager->IMSHit)
    {
-      PartialFile = DestFile = FinalFile;
-      Status = StatDone;
-      return false;
+      std::string const FinalFile = GetFinalFilename();
+      if (FinalFile.empty() || FileExists(FinalFile))
+      {
+	 if (not FinalFile.empty())
+	    PartialFile = DestFile = FinalFile;
+	 Status = StatDone;
+	 return false;
+      }
    }
    // this ensures we rewrite only once and only the first step
    auto const OldBaseURI = Target.Option(IndexTarget::BASE_URI);
@@ -508,11 +521,7 @@ std::string pkgAcquire::Item::GetFinalFilename() const
 }
 std::string pkgAcqDiffIndex::GetFinalFilename() const
 {
-   std::string const FinalFile = GetFinalFileNameFromURI(GetDiffIndexURI(Target));
-   // we don't want recompress, so lets keep whatever we got
-   if (CurrentCompressionExtension == "uncompressed")
-      return FinalFile;
-   return FinalFile + "." + CurrentCompressionExtension;
+   return {};
 }
 std::string pkgAcqIndex::GetFinalFilename() const
 {
@@ -675,12 +684,11 @@ bool pkgAcqDiffIndex::TransactionState(TransactionStates const state)
 
    switch (state)
    {
-      case TransactionStarted: _error->Fatal("Item %s changed to invalid transaction start state!", Target.URI.c_str()); break;
+      case TransactionStarted: _error->Fatal("Item %s changed to invalid transaction start state!", GetDiffIndexURI(Target).c_str()); break;
       case TransactionCommit:
+	 RemoveOldLeftoverDiffIndex(Target);
 	 break;
       case TransactionAbort:
-	 std::string const Partial = GetPartialFileNameFromURI(Target.URI);
-	 RemoveFile("TransactionAbort", Partial);
 	 break;
    }
 
@@ -761,6 +769,7 @@ class APT_HIDDEN CleanupItem : public pkgAcqTransactionItem		/*{{{*/
 	       std::clog << "rm " << DestFile << " # " << DescURI() << std::endl;
 	    if (RemoveFile("TransItem::TransactionCommit", DestFile) == false)
 	       return false;
+	    RemoveOldLeftoverDiffIndex(Target);
 	    break;
       }
       return true;
@@ -1704,9 +1713,6 @@ void pkgAcqMetaClearSig::QueueIndexes(bool const verify)			/*{{{*/
 	 if (filename.empty() == false)
 	 {
 	    new NoActionItem(Owner, Target, filename);
-	    std::string const idxfilename = GetFinalFileNameFromURI(GetDiffIndexURI(Target));
-	    if (FileExists(idxfilename))
-	       new NoActionItem(Owner, Target, idxfilename);
 	    targetsSeen.emplace(Target.Option(IndexTarget::CREATED_BY));
 	    continue;
 	 }
@@ -2703,12 +2709,8 @@ void pkgAcqDiffIndex::Failed(string const &Message,pkgAcquire::MethodConfig cons
    new pkgAcqIndex(Owner, TransactionManager, Target);
 }
 									/*}}}*/
-bool pkgAcqDiffIndex::VerifyDone(std::string const &Message, pkgAcquire::MethodConfig const * const)/*{{{*/
+bool pkgAcqDiffIndex::VerifyDone(std::string const &/*Message*/, pkgAcquire::MethodConfig const * const)/*{{{*/
 {
-   string const FinalFile = GetFinalFilename();
-   if(StringToBool(LookupTag(Message,"IMS-Hit"),false))
-      DestFile = FinalFile;
-
    if (ParseDiffIndex(DestFile))
       return true;
 
@@ -2748,7 +2750,7 @@ void pkgAcqDiffIndex::Done(string const &Message,HashStringList const &Hashes,	/
       }
    }
 
-   TransactionManager->TransactionStageCopy(this, DestFile, GetFinalFilename());
+   TransactionManager->TransactionStageRemoval(this, DestFile);
 
    Complete = true;
    Status = StatDone;

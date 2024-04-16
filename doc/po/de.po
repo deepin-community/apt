@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 2.0.1\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2023-02-08 17:09+0100\n"
+"POT-Creation-Date: 2024-02-20 18:39+0000\n"
 "PO-Revision-Date: 2020-04-04 08:45+0200\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -879,13 +879,21 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt.8.xml
+#, fuzzy
+#| msgid ""
+#| "<option>list</option> is somewhat similar to <command>dpkg-query --list</"
+#| "command> in that it can display a list of packages satisfying certain "
+#| "criteria.  It supports &glob; patterns for matching package names as well "
+#| "as options to list installed (<option>--installed</option>), upgradeable "
+#| "(<option>--upgradeable</option>) or all available (<option>--all-"
+#| "versions</option>) versions."
 msgid ""
 "<option>list</option> is somewhat similar to <command>dpkg-query --list</"
 "command> in that it can display a list of packages satisfying certain "
-"criteria.  It supports &glob; patterns for matching package names as well as "
-"options to list installed (<option>--installed</option>), upgradeable "
-"(<option>--upgradeable</option>) or all available (<option>--all-versions</"
-"option>) versions."
+"criteria.  It supports &glob; patterns for matching package names, &apt-"
+"patterns;, as well as options to list installed (<option>--installed</"
+"option>), upgradeable (<option>--upgradeable</option>)  or all available "
+"(<option>--all-versions</option>) versions."
 msgstr ""
 "<literal>list</literal> ist <command>dpkg-query --list</command> insofern "
 "ziemlich ähnlich, als dass es eine Liste von Paketen anzeigen kann, die "
@@ -909,6 +917,20 @@ msgstr ""
 "<literal>edit-sources</literal> ermöglicht die Bearbeitung Ihrer &sources-"
 "list;-Dateien in Ihrem bevorzugten Texteditor und stellt außerdem "
 "grundlegende Plausibilitätsprüfungen bereit."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
+#: apt.8.xml
+#, fuzzy
+#| msgid "(&apt-cache;)"
+msgid "(summarised in &apt-cache;)"
+msgstr "(&apt-cache;)"
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
+#: apt.8.xml
+#, fuzzy
+#| msgid "(&apt-get;)"
+msgid "(summarised in &apt-get;)"
+msgstr "(&apt-get;)"
 
 #. type: Content of: <refentry><refsect1><title>
 #: apt.8.xml
@@ -957,11 +979,13 @@ msgstr "Siehe auch"
 #. type: Content of: <refentry><refsect1><para>
 #: apt.8.xml
 msgid ""
-"&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, The APT "
-"User's guide in &guidesdir;, &apt-preferences;, the APT Howto."
+"&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, &apt-"
+"patterns;, The APT User's guide in &guidesdir;, &apt-preferences;, the APT "
+"Howto."
 msgstr ""
-"&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, die APT-"
-"Benutzeranleitung in &guidesdir;, &apt-preferences;, das APT-Howto."
+"&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, &apt-"
+"patterns;, die APT-Benutzeranleitung in &guidesdir;, &apt-preferences;, das "
+"APT-Howto."
 
 #. type: Content of: <refentry><refsect1><title>
 #: apt.8.xml apt-get.8.xml apt-cache.8.xml apt-mark.8.xml apt-cdrom.8.xml
@@ -1468,6 +1492,20 @@ msgstr ""
 "Installed</literal> wird installierte Pakete vor der Löschung bewahren, wenn "
 "sie auf »off« gesetzt ist."
 
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
+#: apt-get.8.xml
+msgid "alias)"
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"<literal>distclean</literal> removes all files under <filename>&statedir;/"
+"lists</filename> except Release, Release.gpg, and InRelease.  It can be used "
+"for example, when finalizing images distributed to users.  The release files "
+"are kept for security reasons, to prevent various types of attacks."
+msgstr ""
+
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
 msgid ""
@@ -1963,6 +2001,16 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt-get.8.xml
 msgid ""
+"This option controls the snapshot chosen for archives with "
+"<literal>Snapshot: enable</literal> in the source entry. For example, "
+"<option>-S 20220102T030405Z</option> selects a snapshot from January 2nd, "
+"2022 at 03:04:05 UTC.  Configuration Item: <literal>APT::Snapshot</literal>; "
+"see also the &sources-list; manual page."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
 "This option controls the default input to the policy engine; it creates a "
 "default pin at priority 990 using the specified release string.  This "
 "overrides the general settings in <filename>/etc/apt/preferences</"
@@ -2193,6 +2241,27 @@ msgstr ""
 msgid "Fail the update command if any error occured, even a transient one."
 msgstr ""
 
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"Run the <option>update</option> command before the specified command. This "
+"is supported for commands installing, removing, or upgrading packages such "
+"as <option>install</option>, <option>remove</option>, <option>safe-upgrade</"
+"option>, <option>full-upgrade</option>.  This can be useful to ensure a "
+"command always installs the latest versions, or, in combination with the "
+"<option>--snapshot</option> option to make sure the snapshot is present when "
+"install is being run."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-get.8.xml
+msgid ""
+"Caveat: Due to technical limitations, locks are acquired individually for "
+"each phase, hence an install may fail to acquire locks after successfully "
+"executing the update. Until this is resolved, this is merely syntactic sugar "
+"for <literal>apt update &amp;&amp; apt install</literal>"
+msgstr ""
+
 #. type: Content of: <refentry><refsect1><title>
 #: apt-get.8.xml apt-cache.8.xml apt-key.8.xml apt-mark.8.xml apt.conf.5.xml
 #: apt_preferences.5.xml apt_auth.conf.5.xml
@@ -2202,13 +2271,13 @@ msgstr "Dateien"
 #. type: Content of: <refentry><refsect1><para>
 #: apt-get.8.xml
 msgid ""
-"&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-config;, "
-"&apt-secure;, The APT User's guide in &guidesdir;, &apt-preferences;, the "
-"APT Howto."
+"&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-"
+"patterns;, &apt-config;, &apt-secure;, The APT User's guide in &guidesdir;, "
+"&apt-preferences;, the APT Howto."
 msgstr ""
-"&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-config;, "
-"&apt-secure;, die APT-Benutzeranleitung in &guidesdir;, &apt-preferences;, "
-"das APT-Howto."
+"&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-"
+"patterns;, &apt-config;, &apt-secure;, die APT-Benutzeranleitung in "
+"&guidesdir;, &apt-preferences;, das APT-Howto."
 
 #. type: Content of: <refentry><refsect1><para>
 #: apt-get.8.xml
@@ -2885,8 +2954,8 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
 #: apt-cache.8.xml
-msgid "&apt-conf;, &sources-list;, &apt-get;"
-msgstr "&apt-conf;, &sources-list;, &apt-get;"
+msgid "&apt-conf;, &sources-list;, &apt-get;, &apt-patterns;"
+msgstr "&apt-conf;, &sources-list;, &apt-get;, &apt-patterns;"
 
 #. type: Content of: <refentry><refsect1><para>
 #: apt-cache.8.xml
@@ -2928,7 +2997,7 @@ msgstr ""
 
 #. type: Content of: <refentry><refsect1><para>
 #: apt-key.8.xml
-msgid "apt-key(8) will last be available in Debian 11 and Ubuntu 22.04."
+msgid "apt-key(8) will last be available in Debian 12 and Ubuntu 24.04."
 msgstr ""
 
 #. type: Content of: <refentry><refsect1><title>
@@ -4577,6 +4646,14 @@ msgstr ""
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
 #: apt.conf.5.xml
 msgid ""
+"Snapshot to use for all repositories configured with <literal>Snapshot: yes</"
+"literal>. See also &sources-list;, the <option>--snapshot</option> option "
+"that sets this value, and <option>Acquire::Snapshots::URI</option> below."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+msgid ""
 "Ignore held packages; this global option causes the problem resolver to "
 "ignore held packages in its decision making."
 msgstr ""
@@ -4768,6 +4845,42 @@ msgstr ""
 "Der CDROM-Unterabschnitt steuert das &apt-cdrom;-Werkzeug. Lesen Sie bitte "
 "dessen Dokumentation, um weitere Informationen über die dortigen Optionen zu "
 "erhalten."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+#, fuzzy
+#| msgid ""
+#| "Selects packages where the name matches the given regular expression."
+msgid "Never autoremove packages that match the regular expression(s)."
+msgstr ""
+"wählt Pakete aus, deren Name auf den angegebenen regulären Ausdruck passt."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+msgid ""
+"This option tells apt autoremove that kernels are protected and defaults to "
+"true. In case kernels are not protected they are treated as any other "
+"package."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+msgid ""
+"Define the regular expression(s) for versioned kernel packages.  Based on "
+"these expressions a rule set is injected into apt similar to APT::"
+"NeverAutoRemove regular expressions."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+msgid ""
+"Keep a custom amount of kernels when autoremoving and defaults to 2, meaning "
+"two kernels are kept. Apt will always keep the running kernel and the latest "
+"one. If the latest kernel is the same as the running kernel, the second "
+"latest kernel is kept.  Because of this, any value lower than 2 will be "
+"ignored. If you want only the latest kernel, you should set APT::Protect-"
+"Kernels to false."
+msgstr ""
 
 #. type: Content of: <refentry><refsect1><title>
 #: apt.conf.5.xml
@@ -5448,6 +5561,78 @@ msgid ""
 "literal>' is available for this option indicating that this source can't be "
 "used to acquire changelog files from. Another source will be tried if "
 "available in this case."
+msgstr ""
+"Changelogs können nur beschafft werden, falls ein URI bekannt ist, von dem "
+"sie geholt werden können. Vorzugsweise gibt die Release-Datei ihn in einem "
+"»Changelogs«-Feld an. Falls dies nicht verfügbar ist, werden die Felder "
+"»Label« und »Origin« der Release-Datei benutzt, um zu prüfen, ob eine "
+"<literal>Acquire::Changelogs::URI::Label::<replaceable>BESCHRIFTUNG</"
+"replaceable></literal>- oder <literal>Acquire::Changelogs::URI::Origin::"
+"<replaceable>URSPRUNG</replaceable></literal>-Option existiert und, falls "
+"dies der Fall ist, wird dieser Wert genommen. Der Wert in der Release-Datei "
+"kann mit <literal>Acquire::Changelogs::URI::Override::Label::"
+"<replaceable>BESCHRIFTUNG</replaceable></literal> oder <literal>Acquire::"
+"Changelogs::URI::Override::Origin::<replaceable>URSPRUNG</replaceable></"
+"literal> außer Kraft gesetzt werden. Der Wert sollte ein normaler URI auf "
+"eine Textdatei sein, außer dass paketspezifische Daten durch den Platzhalter "
+"<literal>@CHANGEPATH@</literal> ersetzt werden. Der Wert dafür ist: 1. Falls "
+"das Paket von einem Bestandteil stammt (z.B. <literal>main</literal>), ist "
+"dies der erste Teil, ansonsten wird er weggelassen. 2. der erste Buchstabe "
+"des Quellpaketnamens, es sei denn, der Paketname beginnt mit »<literal>lib</"
+"literal>«. In diesem Fall werden es die vier ersten Buchstaben sein. 3. der "
+"komplette Quellpaketname. 4. wieder der vollständige Name und 5. die "
+"Quellversion. Der erste (falls vorhanden), zweite, dritte und vierte Teil "
+"werden durch einen Schrägstrich (»<literal>/</literal>«) voneinander "
+"getrennt und zwischen dem vierten und fünften ist ein Unterstrich "
+"(»<literal>_</literal>«). Der Spezialwert »<literal>no</literal>«, der für "
+"diese Option verfügbar ist, gibt an, dass diese Quelle nicht benutzt werden "
+"kann, um von dort Changelog-Dateien zu beschaffen. In diesem Fall wird, "
+"falls verfügbar, eine andere Quelle ausprobiert."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt.conf.5.xml
+#, fuzzy
+#| msgid ""
+#| "Acquiring changelogs can only be done if an URI is known from where to "
+#| "get them.  Preferable the Release file indicates this in a 'Changelogs' "
+#| "field. If this isn't available the Label/Origin field of the Release file "
+#| "is used to check if a <literal>Acquire::Changelogs::URI::Label::"
+#| "<replaceable>LABEL</replaceable></literal> or <literal>Acquire::"
+#| "Changelogs::URI::Origin::<replaceable>ORIGIN</replaceable></literal> "
+#| "option exists and if so this value is taken. The value in the Release "
+#| "file can be overridden with <literal>Acquire::Changelogs::URI::Override::"
+#| "Label::<replaceable>LABEL</replaceable></literal> or <literal>Acquire::"
+#| "Changelogs::URI::Override::Origin::<replaceable>ORIGIN</replaceable></"
+#| "literal>.  The value should be a normal URI to a text file, except that "
+#| "package specific data is replaced with the placeholder "
+#| "<literal>@CHANGEPATH@</literal>. The value for it is: 1. if the package "
+#| "is from a component (e.g. <literal>main</literal>)  this is the first "
+#| "part otherwise it is omitted, 2. the first letter of source package name, "
+#| "except if the source package name starts with '<literal>lib</literal>' in "
+#| "which case it will be the first four letters. 3. The complete source "
+#| "package name. 4. the complete name again and 5. the source version.  The "
+#| "first (if present), second, third and fourth part are separated by a "
+#| "slash ('<literal>/</literal>')  and between the fourth and fifth part is "
+#| "an underscore ('<literal>_</literal>').  The special value '<literal>no</"
+#| "literal>' is available for this option indicating that this source can't "
+#| "be used to acquire changelog files from. Another source will be tried if "
+#| "available in this case."
+msgid ""
+"Like changelogs, snapshots can only be acquired if an URI is known from "
+"where to get them.  Preferable the Release file indicates this in a "
+"'Snapshots' field. If this isn't available the Label/Origin field of the "
+"Release file is used to check if a <literal>Acquire::Snapshots::URI::Label::"
+"<replaceable>LABEL</replaceable></literal> or <literal>Acquire::Snapshots::"
+"URI::Origin::<replaceable>ORIGIN</replaceable></literal> option exists and "
+"if so this value is taken. The value in the Release file can be overridden "
+"with <literal>Acquire::Snapshots::URI::Override::Label::<replaceable>LABEL</"
+"replaceable></literal> or <literal>Acquire::Snapshots::URI::Override::"
+"Origin::<replaceable>ORIGIN</replaceable></literal>.  The value should be a "
+"normal URI to a directory, except that the snapshot ID replaced with the "
+"placeholder <literal>@SNAPSHOTID</literal>.  The special value '<literal>no</"
+"literal>' is available for this option indicating that this source cannot be "
+"used to acquire snapshots from. Another source will be tried if available in "
+"this case."
 msgstr ""
 "Changelogs können nur beschafft werden, falls ein URI bekannt ist, von dem "
 "sie geholt werden können. Vorzugsweise gibt die Release-Datei ihn in einem "
@@ -8630,6 +8815,35 @@ msgstr ""
 "InRelease-Datei probiert und der Rückgriff auf <filename>Release</filename>-"
 "Dateien wird deaktiviert."
 
+#. type: Content of: <refentry><refsect1><para><itemizedlist><listitem><para>
+#: sources.list.5.xml
+msgid ""
+"<option>Snapshot</option> (<option>snapshot</option>)  allows selecting an "
+"earlier version of the archive from the snapshot service. Supported values "
+"are:"
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><para><itemizedlist><listitem><itemizedlist><listitem><para>
+#: sources.list.5.xml
+msgid ""
+"<literal>enable</literal> to allow selecting a snapshot with the <option>--"
+"snapshot</option> option, or"
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><para><itemizedlist><listitem><itemizedlist><listitem><para>
+#: sources.list.5.xml
+msgid "a snapshot ID to select a specific snapshot."
+msgstr ""
+
+#. type: Content of: <refentry><refsect1><para><itemizedlist><listitem><para>
+#: sources.list.5.xml
+msgid ""
+"Snapshot IDs are usually timestamps in the form of "
+"<literal>YYYYMMDDTHHMMSSZ</literal>, such as <literal>20220102T030405Z</"
+"literal> which is the January 2nd, 2022 at 03:04:05 UTC, servers may however "
+"support additional types of IDs, and APT does not perform any checks so far."
+msgstr ""
+
 #. type: Content of: <refentry><refsect1><title>
 #: sources.list.5.xml
 msgid "URI Specification"
@@ -11808,6 +12022,20 @@ msgstr "wählt Pakete aus, die in keinen Depots mehr existieren."
 
 #. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
 #: apt-patterns.7.xml
+#, fuzzy
+#| msgid "<code>?false</code>"
+msgid "<code>?phasing</code>"
+msgstr "<code>?false</code>"
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-patterns.7.xml
+#, fuzzy
+#| msgid "Selects packages that no longer exist in repositories."
+msgid "Selects packages that will be kept back in upgrades due to phasing."
+msgstr "wählt Pakete aus, die in keinen Depots mehr existieren."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
+#: apt-patterns.7.xml
 msgid "<code>?upgradable</code>"
 msgstr "<code>?upgradable</code>"
 
@@ -12020,6 +12248,23 @@ msgid "Selects versions where the Priority string equals the given name."
 msgstr ""
 "wählt Versionen aus, bei denen die Versionszeichenkette auf den angegebenen "
 "regulären Ausdruck passt."
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><term>
+#: apt-patterns.7.xml
+#, fuzzy
+#| msgid "<code>?false</code>"
+msgid "<code>?security</code>"
+msgstr "<code>?false</code>"
+
+#. type: Content of: <refentry><refsect1><variablelist><varlistentry><listitem><para>
+#: apt-patterns.7.xml
+#, fuzzy
+#| msgid "Selects packages that can be upgraded (have a newer candidate)."
+msgid ""
+"Selects packages that are a security update or succeed a security update."
+msgstr ""
+"wählt Pakete aus, bei denen ein Upgrade durchgeführt werden kann (die einen "
+"neueren Kandidaten haben)."
 
 #. type: Content of: <refentry><refsect1><title>
 #: apt-patterns.7.xml

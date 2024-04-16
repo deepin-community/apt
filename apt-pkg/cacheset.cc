@@ -25,13 +25,13 @@
 #include <apt-pkg/policy.h>
 #include <apt-pkg/versionmatch.h>
 
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
 #include <list>
 #include <string>
 #include <vector>
 #include <regex.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
 
 #include <apti18n.h>
 									/*}}}*/
@@ -491,10 +491,13 @@ bool VersionContainerInterface::FromString(VersionContainerInterface * const vci
 			V = Match.Find(P);
 			helper.setLastVersionMatcher(ver);
 			if (V.end()) {
+				bool errors = true;
+				errors = helper.showErrors(true);
 				if (verIsRel == true)
 					V = helper.canNotGetVersion(CacheSetHelper::RELEASE, Cache, P);
 				else
 					V = helper.canNotGetVersion(CacheSetHelper::VERSIONNUMBER, Cache, P);
+				helper.showErrors(errors);
 			}
 		}
 		if (V.end() == true)

@@ -22,12 +22,12 @@
 #include <apt-pkg/upgrade.h>
 
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <set>
 #include <vector>
-#include <stdlib.h>
-#include <string.h>
 
 #include <apt-private/acqprogress.h>
 #include <apt-private/private-cachefile.h>
@@ -36,6 +36,7 @@
 #include <apt-private/private-install.h>
 #include <apt-private/private-json-hooks.h>
 #include <apt-private/private-output.h>
+#include <apt-private/private-update.h>
 
 #include <apti18n.h>
 									/*}}}*/
@@ -110,8 +111,39 @@ static void RemoveDownloadNeedingItemsFromFetcher(pkgAcquire &Fetcher, bool &Tra
       I = Fetcher.ItemsBegin();
    }
 }
+#ifdef REQUIRE_MERGED_USR
+// \brief Issues a warning about usrmerge when destructed so we can call it after install finished or failed or whatever.
+struct WarnUsrMerge {
+   CacheFile &Cache;
+   WarnUsrMerge(CacheFile &Cache) : Cache(Cache) {
+
+   }
+   void warn() {
+      auto usrmergePkg = Cache->FindPkg("usrmerge");
+      if (not APT::Configuration::isChroot() && _config->FindDir("Dir") == std::string("/") &&
+	  not usrmergePkg.end() && not usrmergePkg.VersionList().end() &&
+	  not Cache[usrmergePkg].Install() && not APT::Configuration::checkUsrMerged())
+      {
+	 _error->Warning(_("Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr system."));
+	 for (auto VF = usrmergePkg.VersionList().FileList(); not VF.end(); ++VF)
+	    if (VF.File().Origin() != nullptr && VF.File().Origin() == std::string("Debian"))
+	    {
+	       // TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
+	       _error->Notice(_("See %s for more details."), "https://www.debian.org/releases/bookworm/amd64/release-notes/ch-information.en.html#a-merged-usr-is-now-required");
+	       break;
+	    }
+      }
+   }
+   ~WarnUsrMerge() {
+      warn();
+   }
+};
+#endif
 bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, bool ShwKept, bool Ask, bool Safety, std::string const &Hook, CommandLine const &CmdL)
 {
+#ifdef REQUIRE_MERGED_USR
+   WarnUsrMerge warnUsrMerge(Cache);
+#endif
    if (not RunScripts("APT::Install::Pre-Invoke"))
       return false;
    if (_config->FindB("APT::Get::Purge", false) == true)
@@ -178,11 +210,26 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	 return false;
    }
 
+   APT::PackageVector PhasingPackages;
+   APT::PackageVector NotPhasingHeldBackPackages;
+   for (auto const &Pkg : HeldBackPackages)
+   {
+      if (Cache->PhasingApplied(Pkg))
+	 PhasingPackages.push_back(Pkg);
+      else
+	 NotPhasingHeldBackPackages.push_back(Pkg);
+   }
+
    // Show all the various warning indicators
    ShowDel(c1out,Cache);
    ShowNew(c1out,Cache);
    if (ShwKept == true)
-      ShowKept(c1out,Cache, HeldBackPackages);
+   {
+      ShowPhasing(c1out, Cache, PhasingPackages);
+      ShowKept(c1out, Cache, NotPhasingHeldBackPackages);
+      if (not PhasingPackages.empty() && not NotPhasingHeldBackPackages.empty())
+	 _error->Notice("Some packages may have been kept back due to phasing.");
+   }
    bool const Hold = not ShowHold(c1out,Cache);
    if (_config->FindB("APT::Get::Show-Upgraded",true) == true)
       ShowUpgraded(c1out,Cache);
@@ -213,6 +260,10 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
    // No remove flag
    if (Cache->DelCount() != 0 && _config->FindB("APT::Get::Remove",true) == false)
       return _error->Error(_("Packages need to be removed but remove is disabled."));
+
+#ifdef REQUIRE_MERGED_USR
+   warnUsrMerge.warn();
+#endif
 
    // Fail safe check
    bool const Fail = (Essential || Downgrade || Hold);
@@ -633,6 +684,9 @@ bool DoCacheManipulationFromCommandLine(CommandLine &CmdL, std::vector<PseudoPkg
       fallback = MOD_REMOVE;
    }
 
+   // We need to MarkAndSweep before parsing commandline so that ?garbage pattern works correctly.
+   Cache->MarkAndSweep();
+
    std::list<APT::VersionSet::Modifier> mods;
    mods.push_back(APT::VersionSet::Modifier(MOD_INSTALL, "+",
 		APT::VersionSet::Modifier::POSTFIX, APT::CacheSetHelper::CANDIDATE));
@@ -852,6 +906,10 @@ struct PkgIsExtraInstalled {
 bool DoInstall(CommandLine &CmdL)
 {
    CacheFile Cache;
+
+   if (_config->FindB("APT::Update") && not DoUpdate())
+      return false;
+
    Cache.InhibitActionGroups(true);
    if (Cache.BuildSourceList() == false)
       return false;

@@ -73,7 +73,7 @@
 #include <string>
 #include <vector>
 
-#include <stddef.h>
+#include <cstddef>
 #include <sys/select.h>
 #include <sys/time.h>
 
@@ -278,7 +278,7 @@ class APT_PUBLIC pkgAcquire
     *  methods on #Log to report on the progress of the download.
     *
     *  \param PulseInterval The method pkgAcquireStatus::Pulse will be
-    *  invoked on #Log at intervals of PulseInterval milliseconds.
+    *  invoked on #Log at intervals of PulseInterval microseconds.
     *
     *  \return the result of the download.
     */
@@ -330,6 +330,14 @@ class APT_PUBLIC pkgAcquire
     *  \return \b true if the directory exists and is readable.
     */
    bool Clean(std::string Dir);
+   
+   /** Deletes each package list and index file in the given directory.
+    *
+    *  \param Dir The directory to be cleaned.
+    *
+    *  \return \b true if the directory exists and is readable.
+    */
+   bool CleanLists(std::string const &Dir);
 
    /** \return the total size in bytes of all the items included in
     *  this download.
