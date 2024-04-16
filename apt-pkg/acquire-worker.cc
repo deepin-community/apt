@@ -38,6 +38,7 @@
 
 #include <apti18n.h>
 									/*}}}*/
+#include "smartmirrors.h"
 
 using namespace std;
 
@@ -812,6 +813,7 @@ bool pkgAcquire::Worker::QueueItem(pkgAcquire::Queue::QItem *Item)
 
    Item->SyncDestinationFiles();
 
+   Item->URI = SmartMirrors::GuestURI(Item->URI);
    string Message = "600 URI Acquire\n";
    Message.reserve(300);
    URI URL(Item->URI);

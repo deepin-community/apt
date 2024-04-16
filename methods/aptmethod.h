@@ -73,6 +73,16 @@ public:
       strprintf(confpn, "Debug::Acquire::%s", pni.c_str());
       return _config->FindB(confln,_config->FindB(confsn, _config->FindB(confpn, false)));
    }
+   std::string ConfigFindSmartMirrors(char const * const postfix, std::string const &defValue) const APT_NONNULL(2)
+   {
+     std::string conf;
+     strprintf(conf, "Acquire::SmartMirrors::%s", postfix);
+     auto const value = _config->Find(conf);
+     if (value.empty() == false)
+        return value;
+
+      return defValue;
+   }
    std::string ConfigFind(char const * const postfix, std::string const &defValue) const APT_NONNULL(2)
    {
       for (auto name = methodNames.rbegin(); name != methodNames.rend(); ++name)
