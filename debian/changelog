@@ -1,3 +1,9 @@
+apt (2.7.12deepin1) UNRELEASED; urgency=medium
+
+  * Apply deepin changes.
+
+ -- Tianyu Chen <sweetyfish@deepin.org>  Tue, 16 Apr 2024 14:01:46 +0800
+
 apt (2.7.12) unstable; urgency=medium
 
   [ Kenyon Ralph ]
