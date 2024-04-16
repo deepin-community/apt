@@ -12,9 +12,9 @@
 #include <apt-private/private-cmndline.h>
 #include <apt-private/private-main.h>
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include <algorithm>
@@ -88,6 +88,7 @@ static bool addArgumentsAPTCache(std::vector<CommandLine::Args> &Args, char cons
    addArg('g', "generate", "APT::Cache::Generate", 0);
    addArg('t', "target-release", "APT::Default-Release", CommandLine::HasArg);
    addArg('t', "default-release", "APT::Default-Release", CommandLine::HasArg);
+   addArg('S', "snapshot", "APT::Snapshot", CommandLine::HasArg);
 
    addArg('p', "pkg-cache", "Dir::Cache::pkgcache", CommandLine::HasArg);
    addArg('s', "src-cache", "Dir::Cache::srcpkgcache", CommandLine::HasArg);
@@ -189,13 +190,15 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
       addArg(0, "reinstall", "APT::Get::ReInstall", 0);
       addArg(0, "solver", "APT::Solver", CommandLine::HasArg);
       addArg(0, "planner", "APT::Planner", CommandLine::HasArg);
+      addArg('U', "update", "APT::Update", 0);
       if (CmdMatches("upgrade"))
       {
          addArg(0, "new-pkgs", "APT::Get::Upgrade-Allow-New", 
                 CommandLine::Boolean);
       }
    }
-   else if (CmdMatches("update"))
+
+   else if (CmdMatches("update") || CmdMatches("install"))
    {
       addArg(0, "list-cleanup", "APT::Get::List-Cleanup", 0);
       addArg(0, "allow-insecure-repositories", "Acquire::AllowInsecureRepositories", 0);
@@ -211,6 +214,7 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
    }
    else if (CmdMatches("source"))
    {
+      addArg('a', "host-architecture", "APT::Get::Host-Architecture", CommandLine::HasArg);
       addArg('b', "compile", "APT::Get::Compile", 0);
       addArg('b', "build", "APT::Get::Compile", 0);
       addArg('P', "build-profiles", "APT::Build-Profiles", CommandLine::HasArg);
@@ -239,14 +243,15 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
       addArg(0,"format","APT::Get::IndexTargets::Format", CommandLine::HasArg);
       addArg(0,"release-info","APT::Get::IndexTargets::ReleaseInfo", 0);
    }
-   else if (CmdMatches("clean", "autoclean", "auto-clean", "check", "download", "changelog") ||
+   else if (CmdMatches("clean", "autoclean", "auto-clean", "distclean", "dist-clean", "check", "download", "changelog") ||
 	    CmdMatches("markauto", "unmarkauto")) // deprecated commands
       ;
    else if (CmdMatches("moo"))
       addArg(0, "color", "APT::Moo::Color", 0);
 
    if (CmdMatches("install", "reinstall", "remove", "purge", "upgrade", "dist-upgrade",
-	    "dselect-upgrade", "autoremove", "auto-remove", "autopurge", "clean", "autoclean", "auto-clean", "check",
+	    "dselect-upgrade", "autoremove", "auto-remove", "autopurge", "check",
+	    "clean", "autoclean", "auto-clean", "distclean", "dist-clean",
 	    "build-dep", "satisfy", "full-upgrade", "source"))
    {
       addArg('s', "simulate", "APT::Get::Simulate", 0);
@@ -267,6 +272,7 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
    addArg('m',"ignore-missing","APT::Get::Fix-Missing",0);
    addArg('t',"target-release","APT::Default-Release",CommandLine::HasArg);
    addArg('t',"default-release","APT::Default-Release",CommandLine::HasArg);
+   addArg('S', "snapshot", "APT::Snapshot", CommandLine::HasArg);
    addArg(0,"download","APT::Get::Download",0);
    addArg(0,"fix-missing","APT::Get::Fix-Missing",0);
    addArg(0,"ignore-hold","APT::Ignore-Hold",0);

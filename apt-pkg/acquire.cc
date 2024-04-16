@@ -29,19 +29,20 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>
 
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
 #include <pwd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -825,11 +826,11 @@ pkgAcquire::Worker *pkgAcquire::WorkerStep(Worker *I)
    return I->NextAcquire;
 }
 									/*}}}*/
-// Acquire::Clean - Cleans a directory					/*{{{*/
+// CleanDir - Cleans a directory					/*{{{*/
 // ---------------------------------------------------------------------
 /* This is a bit simplistic, it looks at every file in the dir and sees
-   if it is part of the download set. */
-bool pkgAcquire::Clean(string Dir)
+   if it matches the predicate or not. */
+static bool CleanDir(std::string const &Dir, std::function<bool(std::string_view)> const &Keep, char const * const Caller)
 {
    // non-existing directories are by definition clean…
    if (DirectoryExists(Dir) == false)
@@ -853,20 +854,45 @@ bool pkgAcquire::Clean(string Dir)
 	  strcmp(E->d_name, "auxfiles") == 0 ||
 	  strcmp(E->d_name, "lost+found") == 0 ||
 	  strcmp(E->d_name, ".") == 0 ||
-	  strcmp(E->d_name, "..") == 0)
+	  strcmp(E->d_name, "..") == 0 ||
+	  Keep(E->d_name))
 	 continue;
-
-      // Look in the get list and if not found nuke
-      if (std::any_of(Items.cbegin(), Items.cend(),
-	     [&E](pkgAcquire::Item const * const I) {
-		return flNotDir(I->DestFile) == E->d_name;
-	     }) == false)
-      {
-	 RemoveFileAt("pkgAcquire::Clean", dirfd, E->d_name);
-      }
+      RemoveFileAt(Caller, dirfd, E->d_name);
    }
    closedir(D);
    return true;
+}
+									/*}}}*/
+// Acquire::Clean - Cleans a directory of downloaded files             /*{{{*/
+// ---------------------------------------------------------------------
+/* This is a bit simplistic, it looks at every file in the dir and sees
+   if it is part of the download set. */
+bool pkgAcquire::Clean(std::string Dir)
+{
+   return CleanDir(
+      Dir,
+      // Look in the get list and if found then keep
+      [this](std::string_view const FName) {
+         return std::any_of(Items.cbegin(), Items.cend(),
+            [FName](pkgAcquire::Item const * const I) {
+               return flNotDir(I->DestFile) == FName;
+            });
+      },
+      "pkgAcquire::Clean"
+   );
+}
+                           /*}}}*/
+// Acquire::CleanLists - Cleans a directory of list files		/*{{{*/
+bool pkgAcquire::CleanLists(std::string const &Dir)
+{
+   std::regex const KeepPattern(".*_(Release|Release\\.gpg|InRelease)");
+   return CleanDir(
+      Dir,
+      [&KeepPattern](std::string_view const FName) noexcept {
+         return std::regex_match(FName.begin(), FName.end(), KeepPattern);
+      },
+      "pkgAcquire::CleanLists"
+   );
 }
 									/*}}}*/
 // Acquire::TotalNeeded - Number of bytes to fetch			/*{{{*/

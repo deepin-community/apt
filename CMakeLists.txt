@@ -2,14 +2,15 @@
 # Licensed under the same terms as APT; i.e. GPL 2 or later.
 
 # set minimum version
+cmake_minimum_required(VERSION 3.13)
 project(apt)
-cmake_minimum_required(VERSION 3.4.0)
 # Generic header locations
 include_directories(${PROJECT_BINARY_DIR}/include)
 
 
 enable_testing()
 
+option(REQUIRE_MERGED_USR "Require merged-usr." ON)
 option(WITH_DOC "Build all documentation." ON)
 include(CMakeDependentOption)
 cmake_dependent_option(WITH_DOC_MANPAGES "Force building manpages." OFF "NOT WITH_DOC" OFF)
@@ -205,7 +206,7 @@ endif()
 # Configure some variables like package, version and architecture.
 set(PACKAGE ${PROJECT_NAME})
 set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-set(PACKAGE_VERSION "2.6.0")
+set(PACKAGE_VERSION "2.7.12")
 string(REGEX MATCH "^[0-9.]+" PROJECT_VERSION ${PACKAGE_VERSION})
 
 if (NOT DEFINED DPKG_DATADIR)

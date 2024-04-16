@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.4~beta1\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"POT-Creation-Date: 2024-02-13 16:31+0100\n"
 "PO-Revision-Date: 2020-08-09 22:43+0200\n"
 "Last-Translator: Aleix Vidal i Gaya <aleix@softcatala.org>\n"
 "Language-Team: Catalan <debian-l10n-catalan@lists.debian.org>\n"
@@ -1918,6 +1918,19 @@ msgstr "Paquets trencats"
 
 #: apt-private/private-install.cc
 msgid ""
+"Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
+"system."
+msgstr ""
+
+#. TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Selected %s for removal.\n"
+msgid "See %s for more details."
+msgstr "Seleccionat %s per eliminar.\n"
+
+#: apt-private/private-install.cc
+msgid ""
 "Unable to fetch some archives, maybe run apt-get update or try with --fix-"
 "missing?"
 msgstr ""
@@ -2251,6 +2264,12 @@ msgid "The following packages will be REMOVED:"
 msgstr "Se SUPRIMIRAN els paquets següents:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "The following upgrades have been deferred due to phasing:"
+msgstr "S'han mantingut els paquets següents:"
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "S'han mantingut els paquets següents:"
 
@@ -2575,6 +2594,12 @@ msgid ""
 msgstr ""
 "És preferible l'ús de %s abans que incrustar la informació d'inici de sessió "
 "directament a l'entrada %s per «%s»"
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
+msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
 
 #: apt-private/private-update.cc
 #, c-format

@@ -13,7 +13,7 @@
    &apt-email;
    &apt-product;
    <!-- The last update date -->
-   <date>2020-04-05T00:00:00Z</date>
+   <date>2023-12-28T00:00:00Z</date>
  </refentryinfo>
  
  <refmeta>
@@ -140,10 +140,10 @@
      <varlistentry><term><option>list</option></term>
      <listitem><para><option>list</option> is somewhat similar to <command>dpkg-query --list</command>
 	   in that it can display a list of packages satisfying certain
-	   criteria.  It supports &glob; patterns for matching package names as
-	   well as options to list installed (<option>--installed</option>),
-	   upgradeable (<option>--upgradeable</option>) or all available
-	   (<option>--all-versions</option>) versions.
+	   criteria.  It supports &glob; patterns for matching package names,
+	   &apt-patterns;, as well as options to list installed
+	   (<option>--installed</option>), upgradeable (<option>--upgradeable</option>)
+	   or all available (<option>--all-versions</option>) versions.
      </para></listitem>
      </varlistentry>
 
@@ -154,7 +154,8 @@
      </para></listitem>
      </varlistentry>
 
-
+     <varlistentry><term><option>showsrc, depends, rdepends, policy</option> (summarised in &apt-cache;)</term><listitem><simpara></simpara></listitem></varlistentry>
+     <varlistentry><term><option>source, build-dep, download, changelog, clean, distclean, autoclean</option> (summarised in &apt-get;)</term><listitem><simpara></simpara></listitem></varlistentry>
    </variablelist>
  </refsect1>
 
@@ -175,7 +176,7 @@
 
  <refsect1><title>See Also</title>
    <para>&apt-get;, &apt-cache;, &sources-list;,
-   &apt-conf;, &apt-config;,
+   &apt-conf;, &apt-config;, &apt-patterns;,
    The APT User's guide in &guidesdir;, &apt-preferences;, the APT Howto.</para>
  </refsect1>
 

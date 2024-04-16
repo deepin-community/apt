@@ -55,9 +55,13 @@ APT
   Build-Profiles "<STRING_OR_LIST>";
 
   NeverAutoRemove "<LIST>";  // list of package name regexes
+  NeverAutoRemove::KernelCount "<INT>"; // Keep the configured amount of kernels
   LastInstalledKernel "<STRING>"; // last installed kernel version
   VersionedKernelPackages "<LIST>"; // regular expressions to be protected from autoremoval (kernel uname will be appended)
   Protect-Kernels "<BOOL>"; // whether to protect installed kernels against autoremoval (default: true)
+
+  // Currently active snapshot
+  Snapshot "<STRING>";
 
   // Options for apt-get
   Get
@@ -127,6 +131,7 @@ APT
         {
            APTAuth "<BOOL>";
            NonFreeFirmware "<BOOL>";
+           SignedBy "<BOOL>";
         };
      };
   };
@@ -170,7 +175,7 @@ APT
      DropTranslation "<BOOL>";
   };
 
-  Update
+  Update "<BOOL>"
   {
      Pre-Invoke {"touch /var/lib/apt/pre-update-stamp"; };
      Post-Invoke {"touch /var/lib/apt/post-update-stamp"; };
@@ -398,6 +403,15 @@ Acquire
     Override::Origin::* "<STRING>";
     Override::Label::* "<STRING>";
   };
+  Snapshots::URI
+  {
+    Host::* "<STRING>";
+    // Origin::Debian "https://snapshot.debian.org/snapshot/@SNAPSHOTID@/";
+    Origin::* "<STRING>";
+    Label::* "<STRING>";
+    Override::Origin::* "<STRING>";
+    Override::Label::* "<STRING>";
+  };
   Changelogs::AlwaysOnline "<BOOL>"; // even if the changelog file exists get it online (as the file is incomplete)
   Changelogs::AlwaysOnline::Origin::* "<BOOL>";
 };
@@ -527,7 +541,7 @@ DPkg
 
    // controls if apt will apport on the first dpkg error or if it 
    // tries to install as many packages as possible
-   StopOnError "true";
+   StopOnError "<BOOL>";
 
    Progress-Fancy {
       progress-fg "<STRING>";

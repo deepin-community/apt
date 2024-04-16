@@ -51,7 +51,11 @@ bool DoUpdate(CommandLine &CmdL)
 {
    if (CmdL.FileSize() != 1)
       return _error->Error(_("The update command takes no arguments"));
+   return DoUpdate();
+}
 
+bool DoUpdate()
+{
    CacheFile Cache;
 
    // Get the source list
@@ -226,6 +230,20 @@ bool DoUpdate(CommandLine &CmdL)
 	 }
 	 if (suggest_non_free_firmware)
 	    suggestDebianNonFreeFirmware("Debian bookworm", "firmware component", "non-free", "non-free-firmware");
+      }
+   }
+
+   if (_config->FindB("APT::Get::Update::SourceListWarnings::SignedBy", SLWarnings))
+   {
+      for (auto *S : *List)
+      {
+	 if (not S->HasFlag(metaIndex::Flag::DEB822) || not S->GetSignedBy().empty())
+	    continue;
+
+	 URI uri(S->GetURI());
+	 // TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+	 _error->Notice(_("Missing Signed-By in the %s entry for '%s'"),
+			"sources.list(5)", URI::ArchiveOnly(uri).c_str());
       }
    }
 

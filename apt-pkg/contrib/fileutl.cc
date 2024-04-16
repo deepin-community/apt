@@ -35,28 +35,27 @@
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/strutl.h>
 
+#include <cctype>
+#include <cerrno>
+#include <csignal>
+#include <cstdarg>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <glob.h>
 #include <grp.h>
 #include <pwd.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -81,8 +80,8 @@
 #ifdef HAVE_SYSTEMD
 #include <systemd/sd-bus.h>
 #endif
+#include <cstdint>
 #include <endian.h>
-#include <stdint.h>
 
 #if __gnu_linux__
 #include <sys/prctl.h>
@@ -486,12 +485,14 @@ std::vector<string> GetListOfFilesInDir(string const &Dir, std::vector<string> c
       {
 	 if (RealFileExists(File) == false)
 	 {
+	    string d_ext = flExtension(Ent->d_name);
 	    // do not show ignoration warnings for directories
-	    if (
+	    if ((
 #ifdef _DIRENT_HAVE_D_TYPE
-		Ent->d_type == DT_DIR ||
+		   Ent->d_type == DT_DIR ||
 #endif
-		DirectoryExists(File) == true)
+		   DirectoryExists(File) == true) &&
+		(d_ext.empty() || std::find(Ext.begin(), Ext.end(), d_ext) == Ext.end()))
 	       continue;
 	    if (SilentIgnore.Match(Ent->d_name) == false)
 	       _error->Notice(_("Ignoring '%s' in directory '%s' as it is not a regular file"), Ent->d_name, Dir.c_str());

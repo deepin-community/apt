@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2023-03-06 12:29+0000\n"
+"POT-Creation-Date: 2024-02-13 16:31+0100\n"
 "PO-Revision-Date: 2008-11-17 02:33-0200\n"
 "Last-Translator: Felipe Augusto van de Wiel (faw) <faw@debian.org>\n"
 "Language-Team: Brazilian Portuguese <debian-l10n-portuguese@lists.debian."
@@ -1810,6 +1810,18 @@ msgstr "Pacotes quebrados"
 
 #: apt-private/private-install.cc
 msgid ""
+"Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
+"system."
+msgstr ""
+
+#. TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
+#: apt-private/private-install.cc
+#, c-format
+msgid "See %s for more details."
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid ""
 "Unable to fetch some archives, maybe run apt-get update or try with --fix-"
 "missing?"
 msgstr ""
@@ -2133,6 +2145,12 @@ msgid "The following packages will be REMOVED:"
 msgstr "Os pacotes a seguir serão REMOVIDOS:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "The following upgrades have been deferred due to phasing:"
+msgstr "Os pacotes a seguir serão mantidos em suas versões atuais:"
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "Os pacotes a seguir serão mantidos em suas versões atuais:"
 
@@ -2440,6 +2458,12 @@ msgstr "O comando update não leva argumentos"
 msgid ""
 "Usage of %s should be preferred over embedding login information directly in "
 "the %s entry for '%s'"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
+msgid "Missing Signed-By in the %s entry for '%s'"
 msgstr ""
 
 #: apt-private/private-update.cc
