@@ -3,7 +3,7 @@
 <!-- Some common paths.. -->
 <!ENTITY docdir "/usr/share/doc/apt/">
 <!ENTITY guidesdir "/usr/share/doc/apt-doc/">
-<!ENTITY configureindex "<filename>&docdir;examples/configure-index.gz</filename>">
+<!ENTITY configureindex "<filename>&docdir;examples/configure-index</filename>">
 <!ENTITY aptconfdir "<filename>/etc/apt.conf</filename>">
 <!ENTITY statedir "/var/lib/apt">
 <!ENTITY cachedir "/var/cache/apt">
@@ -274,7 +274,7 @@
 ">
 
 <!-- this will be updated by 'prepare-release' -->
-<!ENTITY apt-product-version "2.7.12">
+<!ENTITY apt-product-version "2.9.1">
 
 <!-- (Code)names for various things used all over the place -->
 <!ENTITY debian-oldstable-codename "bullseye">
@@ -282,7 +282,6 @@
 <!ENTITY debian-testing-codename "trixie">
 <!ENTITY debian-stable-version "12">
 <!ENTITY ubuntu-codename "lunar">
-<!ENTITY deepin-codename "beige">
 
 <!-- good and bad just refers to matching and not matching a pattern…
      It is not a remark about the specific perl version.
