@@ -1,8 +1,12 @@
 apt (2.9.1deepin1) UNRELEASED; urgency=medium
 
   * Revert 64-bit time_t transition changes.
+  * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
+    juliank: it is one of the t64 workarounds to force libnettle8t64 to be
+    installed and apt to be upgraded rather than both being kept back
+  * Apply deepin changes.
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Wed, 17 Apr 2024 11:12:18 +0800
+ -- Tianyu Chen <sweetyfish@deepin.org>  Wed, 17 Apr 2024 11:24:13 +0800
 
 apt (2.9.1) unstable; urgency=medium
 
