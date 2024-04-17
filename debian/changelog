@@ -1,6 +1,6 @@
 apt (2.9.1deepin1) UNRELEASED; urgency=medium
 
-  *
+  * Revert 64-bit time_t transition changes.
 
  -- Tianyu Chen <sweetyfish@deepin.org>  Wed, 17 Apr 2024 11:12:18 +0800
 
