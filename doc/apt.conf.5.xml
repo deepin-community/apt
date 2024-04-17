@@ -19,7 +19,7 @@
    &apt-email;
    &apt-product;
    <!-- The last update date -->
-   <date>2024-02-20T00:00:00Z</date>
+   <date>2024-02-21T00:00:00Z</date>
  </refentryinfo>
  
  <refmeta>
@@ -1068,16 +1068,6 @@ APT::Compressor::rev {
 	 <para>
 	   Output information about the process of accessing
 	   collections of packages stored on CD-ROMs.
-	 </para>
-       </listitem>
-     </varlistentry>
-
-     <varlistentry>
-       <term><option>Debug::BuildDeps</option></term>
-       <listitem>
-	 <para>
-	   Describes the process of resolving build-dependencies in
-	   &apt-get;.
 	 </para>
        </listitem>
      </varlistentry>
