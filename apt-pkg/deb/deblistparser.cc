@@ -522,7 +522,17 @@ const char *debListParser::ConvertRelation(const char *I,unsigned int &Op)
       Op = pkgCache::Dep::Equals;
       I++;
       break;
-      
+
+      // != is unsupported packaging
+      case '!':
+      if (*(I + 1) == '=')
+      {
+	 I = I + 2;
+	 Op = pkgCache::Dep::NotEquals;
+	 break;
+      }
+      [[fallthrough]];
+
       // HACK around bad package definitions
       default:
       Op = pkgCache::Dep::Equals;
@@ -598,7 +608,7 @@ const char *debListParser::ParseDepends(const char *Start, const char *Stop,
    {
       // Skip the '('
       for (I++; I != Stop && isspace_ascii(*I) != 0 ; I++);
-      if (I + 3 >= Stop)
+      if (I + 3 > Stop)
 	 return 0;
       I = ConvertRelation(I,Op);
       
