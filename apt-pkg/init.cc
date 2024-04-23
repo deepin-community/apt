@@ -131,6 +131,7 @@ bool pkgInitConfig(Configuration &Cnf)
       Cnf.Set("APT::Build-Essential::", "build-essential");
    Cnf.CndSet("APT::Install-Recommends", true);
    Cnf.CndSet("APT::Install-Suggests", false);
+   Cnf.CndSet("APT::Key::Assert-Pubkey-Algo", ">=rsa2048,ed25519,ed448");
    Cnf.CndSet("Dir","/");
    
    // State
@@ -146,6 +147,8 @@ bool pkgInitConfig(Configuration &Cnf)
 
    // Configuration
    Cnf.CndSet("Dir::Etc", &CONF_DIR[1]);
+   Cnf.CndSet("Dir::Boot", "boot");
+   Cnf.CndSet("Dir::Usr", "usr");
    Cnf.CndSet("Dir::Etc::sourcelist","sources.list");
    Cnf.CndSet("Dir::Etc::sourceparts","sources.list.d");
    Cnf.CndSet("Dir::Etc::main","apt.conf");
