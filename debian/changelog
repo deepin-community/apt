@@ -1,4 +1,4 @@
-apt (2.9.2deepin1) UNRELEASED; urgency=medium
+apt (2.9.2deepin1) unstable; urgency=medium
 
   * Revert 64-bit time_t transition changes.
   * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
@@ -6,7 +6,7 @@ apt (2.9.2deepin1) UNRELEASED; urgency=medium
     installed and apt to be upgraded rather than both being kept back
   * Apply deepin changes.
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Tue, 23 Apr 2024 09:53:16 +0800
+ -- Tianyu Chen <sweetyfish@deepin.org>  Tue, 23 Apr 2024 09:53:59 +0800
 
 apt (2.9.2) unstable; urgency=medium
 
