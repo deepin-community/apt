@@ -1,8 +1,84 @@
-apt (2.7.12deepin1) unstable; urgency=medium
+apt (2.8.0) noble; urgency=medium
 
-  * Apply deepin changes.
+  [ Julian Andres Klode ]
+  * Revert "Temporarily downgrade key assertions to "soon worthless""
+    We temporarily downgraded the errors to warnings to give the
+    launchpad PPAs time to be fixed, but warnings are not safe:
+    Untrusted keys could be hiding on your system, but just not
+    used at the moment. Hence revert this so we get the errors we
+    want. (LP: #2060721)
+  * Branch off the stable 2.8.y branch for noble:
+    - CI: Test in ubuntu:noble images for 2.8.y
+    - debian/gbp.conf: Point at the 2.8.y branch
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Tue, 16 Apr 2024 14:01:46 +0800
+  [ David Kalnischkies ]
+  * Test suite fixes:
+    - Avoid subshell hiding failure report from testfilestats
+    - Ignore umask of leftover diff_Index in failed pdiff test
+  * Documentation translation fixes:
+    - Fix and unfuzzy previous VCG/Graphviz URI change
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 16 Apr 2024 16:59:14 +0200
+
+apt (2.7.14) unstable; urgency=medium
+
+  [ Steve Langasek ]
+  * Support building without gnutls
+  * Add an artificial Conflicts: against libnettle8
+    to force upgrades in launchpad buildd chroots
+
+  [ David Kalnischkies ]
+  * Handle EINTR in the static FileFd::Write overload
+  * Remove non-existent Debug::BuildDeps from apt.conf(5)
+  * Parse unsupported != relation in dependencies
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1065513)
+  * Dutch manpages translation update (Closes: #1065517)
+
+  [ Wesley Schwengle ]
+  * Update documentation for apt-get upgrade with pkg arg (Closes: #1065831)
+  * Update documentation for apt upgrade with pkg arg (Closes: #1065831)
+  * Include Dutch translation for apt/apt-get upgrade documenation update
+  * Update Graphviz URL to https://graphviz.org/
+  * Update VCG tool URI to new location
+  * s#http://bugs.debian.org/src/#https://bugs.debian.org/src#
+
+  [ Julian Andres Klode ]
+  * pkgTagFile::Jump: Use lookback buffer to rejump to current position
+    (Closes: #1067440)
+  * debrecords: Do not reparse if given same location (Closes: #1067440)
+  * Revert "debrecords: Do not reparse if given same location"
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 22 Mar 2024 11:11:44 +0100
+
+apt (2.7.13) unstable; urgency=medium
+
+  * Acknowledge NMU; thank you, Steve!
+
+  [ Wesley Schwengle ]
+  * Show correct location of configure-index in man page
+
+  [ Yuan Tao ]
+  * Fix spelling mistake in zh_CN.po
+
+  [ Julian Andres Klode ]
+  * gpgv: Surface [GNUPG:] ERROR and [GNUPG:] WARNING status messages
+  * gpgv: Add a reason to worthless signers
+  * Implement gpgv --assert-pubkey-algo=>=rsa2048,ed25519,ed448 (LP: #2055193)
+  * Rename 'weak digest algorithm' to 'weak algorithm'
+  * Temporarily downgrade key assertions to "soon worthless"
+  * Do not require versioned dpkg-dev on CI
+  * prepare-release: Adjust for t64 suffix
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 28 Feb 2024 19:48:27 +0100
+
+apt (2.7.12+nmu1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.  Closes: #1061896
+
+ -- Steve Langasek <vorlon@debian.org>  Wed, 28 Feb 2024 01:20:31 +0000
 
 apt (2.7.12) unstable; urgency=medium
 
