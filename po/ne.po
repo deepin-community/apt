@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-02-13 16:31+0100\n"
+"POT-Creation-Date: 2024-04-16 17:00+0200\n"
 "PO-Revision-Date: 2006-06-12 14:35+0545\n"
 "Last-Translator: Shiva Pokharel <pokharelshiva@hotmail.com>\n"
 "Language-Team: Nepali <info@mpp.org.np>\n"
@@ -3710,6 +3710,11 @@ msgstr "क्वेरी"
 msgid "Unable to invoke "
 msgstr "आह्वान गर्न असक्षम भयो"
 
+#: methods/gpgv.cc
+#, c-format
+msgid "untrusted public key algorithm: %s"
+msgstr ""
+
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
 #: methods/gpgv.cc
 #, c-format
@@ -3745,7 +3750,7 @@ msgstr ""
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
 #, c-format
-msgid "Signature by key %s uses weak digest algorithm (%s)"
+msgid "Signature by key %s uses weak algorithm (%s)"
 msgstr ""
 
 #: methods/gpgv.cc
