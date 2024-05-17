@@ -974,21 +974,6 @@ void HttpMethod::SendReq(FetchItem *Itm)
    Req << "User-Agent: " << ConfigFind("User-Agent",
 		"Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")");
 
-    std::string domain;
-    auto const found = ProperHost.substr(0, ProperHost.find_last_of(".")).find_last_of(".");
-
-    if (found != string::npos)
-        domain = ProperHost.substr(found+1, ProperHost.length());
-    else
-        domain = ProperHost;
-
-    Configuration::MatchAgainstConfig DomainList("Acquire::SmartMirrors::DomainList");
-
-    if (DomainList.Match(domain) == true)
-    { 
-	 Req << "\r\n";
-        Req << "X-Repo-Token: " << ConfigFindSmartMirrors("Token", "");
-    } 
 #ifdef HAVE_SYSTEMD
    if (ConfigFindB("User-Agent-Non-Interactive", false))
    {
