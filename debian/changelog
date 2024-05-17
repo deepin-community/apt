@@ -1,14 +1,126 @@
-apt (2.8.0deepin1) unstable; urgency=medium
+apt (2.9.3) unstable; urgency=medium
 
-  * Revert 64-bit time_t transition changes.
-  * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
-    juliank: it is one of the t64 workarounds to force libnettle8t64 to be
-    installed and apt to be upgraded rather than both being kept back
-  * Apply deepin changes.
+  [ Julian Andres Klode ]
+  * Initial implementation ("alpha") of the 3.0 solver:
+    This new solver is available using the --solver 3.0 option.
+    Highlights:
+    - Fully backtracking solver, think DPLL without pure literal elimination
+    - Manually installed packages are not offered up for removal
+    - New --no-strict-pinning option allows APT to fallback to non-candidate
+      versions, e.g. apt install --no-strict-pinning foo/experimental installs
+      foo from experimental and will switch dependencies where needed.
+    - Autoremove is more aggressive and only keeps the strongest automatically
+      installed package. For example, gcc-<version> will now be offered for
+      removal and no longer kept around due libtool Depends: gcc | c-compiler
+      and gcc-<version> Provides: c-compiler, as `gcc` is already satisfied.
+    Caveats right now:
+    - Test suite is not yet passing
+    - The list of automatically removable packages is not displayed
+      when automatically installed packages are not removed
+    - Error information gets lost on backtracking (see Debug::APT::Solver=2)
+    - Error information is just rendered as A -> B implication graphs,
+      with some nodes perhaps containing a "not".
+    - The logic for replacing obsolete manually installed packages with
+      new replacement packages (think Conflits/Replaces/Provides) is not
+      yet implemented.
+    - Conflict-driven clause learning is not implemented, so backtracking
+      is technically pretty inefficient.
+  * Solver3 integration fixes:
+    - test: Ignore progress output in comparing output..
+    - test-allow-scores-for-all-dependency-types: Adjust for solver3
+    - EDSP: Add "solver3" alias for apt-internal-solver
+  * UI work:
+    - Highlight essential removals with action::remove color
+    - The text of notices and audits shall not be bold
+    - Separate columns by 2 spaces in lists (Closes: #1070064)
+  * Support src:name shortcuts in showsrc, source, build-dep commands
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Mon, 06 May 2024 14:34:27 +0800
+  [ David Kalnischkies ]
+  * Do not ignore if a cmake execute_process fails
+  * Avoid figuring which kept pkgs are phased if we don't display it
+  * Match version constraints before saving garbage packages
+  * Do not upgrade rev-deps ear-marked for removal
+  * Drop sudo-related envvars in testing framework
+  * Add test for dealing with unsat Suggests promoted to Recommends
+  * Allow parsing an empty Provides line (Closes: #1069874)
 
-apt (2.8.0) noble; urgency=medium
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1070142)
+  * Dutch manpages translation update (Closes: #1070143)
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 14 May 2024 13:01:31 +0200
+
+apt (2.9.2) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Output customization and color refactoring:
+    - Also respect an APT_NO_COLOR variable
+    - Add a --color, --no-color option
+    - Add APT::Configuration::color helper to colorize things
+    - Use APT::Configuration::color to apply color to output
+    - Configure individual action colors using APT::Color::Action
+    - apt.conf(5): Document the APT::Color scope
+  * Introduce the new --audit error level
+    - Add an "audit" error level, and change the default to notice
+    - Add an --audit option to switch on audit logging
+    - Add an audit message for missing InRelease files
+  * Change the rendering for notices, warnings, errors:
+    - i18n: Use Error:/Warning:/Notice: instead of E:/W:/N:
+    - Render notices without (yellow) color, just in bold
+    - Keep the entire error/warning/notice message bold
+  * Other UI changes:
+    - apt update: Show upgradable package count in bold
+    - show: Highlight field names and colorize package name
+    - Remove spurious newline inside `apt autoremove` message
+    - Insert blank line following simulation note
+    - Show "Upgrading:" before other sections
+    - Only erase OpProgress lines in output version 3.0
+  * Test fixes:
+    - test: configuration: color: reset _config after tests
+    - build: test: Silence warnings in GTest code
+
+  [ Miroslav Kure ]
+  * Czech program translation update (Closes: #1068943)
+
+  [ Boyuan Yang ]
+  * Simplified Chinese program translation update (Closes: #1069118)
+
+  [ David Kalnischkies ]
+  * Allow no spaces for the last dependency in ParseDepends, too (LP: #2061834)
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 22 Apr 2024 19:36:30 +0200
+
+apt (2.9.1) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Further UX improvements for apt(8)
+    - Estimate free space and issue warnings if exceeded, incl. /boot
+      + Rename "Installed size:" to "Space needed:"
+      + Space needed: Show space available in /usr
+      + Show space estimate for /boot, if separate; or estimate initrd for /usr
+      + Add warnings if space estimate exceeds free space
+    - Show downgrades as yellow
+    - Use "Continue anyway?" if a warning is queued, and default to N
+    - Use unicode install progress bar on UTF-8 locales
+  * Hide some of the output formatting and details from translatable strings,
+    do expect some more translation churn in upcoming uploads.
+
+  [ Rafael ]
+  * Remove duplicate sentence "Changing held packages:"
+
+ -- Julian Andres Klode <jak@debian.org>  Sun, 14 Apr 2024 18:45:28 +0200
+
+apt (2.9.0) unstable; urgency=medium
+
+  * Welcome to the APT 3.0 development series. It has a new UI for
+    apt(8). It has colors, columnar display, some more padding, and
+    shows removals last (Closes: #755088), making the output more
+    easy to quickly scan.
+
+  [ David Kalnischkies ]
+  * Avoid subshell hiding failure report from testfilestats
+  * Ignore umask of leftover diff_Index in failed pdiff test
+  * Fix and unfuzzy previous VCG/Graphviz URI change
 
   [ Julian Andres Klode ]
   * Revert "Temporarily downgrade key assertions to "soon worthless""
@@ -16,19 +128,19 @@ apt (2.8.0) noble; urgency=medium
     launchpad PPAs time to be fixed, but warnings are not safe:
     Untrusted keys could be hiding on your system, but just not
     used at the moment. Hence revert this so we get the errors we
-    want. (LP: #2060721)
-  * Branch off the stable 2.8.y branch for noble:
-    - CI: Test in ubuntu:noble images for 2.8.y
-    - debian/gbp.conf: Point at the 2.8.y branch
+    want.
+    This reverts commit 66998ed3d299bede651ad40368bdb270f5f5b0f9. (LP: #2060721)
+  * columnar: Fix floating point exception (list is empty if -V)
+  * OpProgress: Erase lines when done
+  * apt: Introduce the new terse apt output format 3.0
+  * Show Recommends/Suggests for upgrades too, move them down
+  * Only show Recommends/Suggests for new installs, not upgrades
+  * Use the same words for the summary
 
-  [ David Kalnischkies ]
-  * Test suite fixes:
-    - Avoid subshell hiding failure report from testfilestats
-    - Ignore umask of leftover diff_Index in failed pdiff test
-  * Documentation translation fixes:
-    - Fix and unfuzzy previous VCG/Graphviz URI change
+  [ Christian Blichmann ]
+  * Columnar output for package lists similar to 'ls'
 
- -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 16 Apr 2024 16:59:14 +0200
+ -- Julian Andres Klode <jak@debian.org>  Fri, 12 Apr 2024 20:17:34 +0200
 
 apt (2.7.14) unstable; urgency=medium
 

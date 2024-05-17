@@ -1,7 +1,0 @@
-<!-- details about the keys used by the distribution -->
-<!ENTITY keyring-distro "Uos">
-<!ENTITY keyring-package "<package>deepin-keyring</package>">
-<!ENTITY keyring-filename "">
-<!ENTITY keyring-removed-filename "">
-<!ENTITY keyring-master-filename "">
-<!ENTITY keyring-uri "">
