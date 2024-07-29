@@ -1,0 +1,343 @@
+# SOME DESCRIPTIVE TITLE.
+# This file is put in the public domain.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: apt 2.8.0\n"
+"Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cmdline/apt-sortpkgs.cc:94
+msgid "Unknown package record!"
+msgstr ""
+
+#: cmdline/apt-sortpkgs.cc:139
+msgid ""
+"Usage: apt-sortpkgs [options] file1 [file2 ...]\n"
+"\n"
+"apt-sortpkgs is a simple tool to sort package information files.\n"
+"By default it sorts by binary package information, but the -s option\n"
+"can be used to switch to source package ordering instead.\n"
+msgstr ""
+
+#: cmdline/apt-extracttemplates.cc:220
+msgid ""
+"Usage: apt-extracttemplates file1 [file2 ...]\n"
+"\n"
+"apt-extracttemplates is used to extract config and template files\n"
+"from debian packages. It is used mainly by debconf(1) to prompt for\n"
+"configuration questions before installation of packages.\n"
+msgstr ""
+
+#: cmdline/apt-extracttemplates.cc:275
+msgid "Cannot get debconf version. Is debconf installed?"
+msgstr ""
+
+#: cmdline/apt-internal-solver.cc:46
+msgid ""
+"Usage: apt-internal-solver\n"
+"\n"
+"apt-internal-solver is an interface to use the current internal\n"
+"resolver for the APT family like an external one, for debugging or\n"
+"the like.\n"
+msgstr ""
+
+#: cmdline/apt-dump-solver.cc:37
+msgid ""
+"Usage: apt-dump-solver\n"
+"\n"
+"apt-dump-solver is an interface to store an EDSP scenario in\n"
+"a file and optionally forwards it to another solver.\n"
+msgstr ""
+
+#: cmdline/apt-dump-solver.cc:167
+#, c-format
+msgid "Waited for %s but it wasn't there"
+msgstr ""
+
+#: cmdline/apt-internal-planner.cc:46
+msgid ""
+"Usage: apt-internal-planner\n"
+"\n"
+"apt-internal-planner is an interface to use the current internal\n"
+"installation planner for the APT family like an external one,\n"
+"for debugging or the like.\n"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:208 ftparchive/apt-ftparchive.cc:375
+msgid "Package extension list is too long"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:210 ftparchive/apt-ftparchive.cc:222
+#: ftparchive/apt-ftparchive.cc:245 ftparchive/apt-ftparchive.cc:294
+#: ftparchive/apt-ftparchive.cc:304 ftparchive/apt-ftparchive.cc:326
+#, c-format
+msgid "Error processing directory %s"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:292
+msgid "Source extension list is too long"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:401
+msgid "Error writing header to contents file"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:431
+#, c-format
+msgid "Error processing contents %s"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:621
+msgid ""
+"Usage: apt-ftparchive [options] command\n"
+"Commands: packages binarypath [overridefile [pathprefix]]\n"
+"          sources srcpath [overridefile [pathprefix]]\n"
+"          contents path\n"
+"          release path\n"
+"          generate config [groups]\n"
+"          clean config\n"
+"\n"
+"apt-ftparchive generates index files for Debian archives. It supports\n"
+"many styles of generation from fully automated to functional replacements\n"
+"for dpkg-scanpackages and dpkg-scansources\n"
+"\n"
+"apt-ftparchive generates Package files from a tree of .debs. The\n"
+"Package file contains the contents of all the control fields from\n"
+"each package as well as the MD5 hash and filesize. An override file\n"
+"is supported to force the value of Priority and Section.\n"
+"\n"
+"Similarly apt-ftparchive generates Sources files from a tree of .dscs.\n"
+"The --source-override option can be used to specify a src override file\n"
+"\n"
+"The 'packages' and 'sources' command should be run in the root of the\n"
+"tree. BinaryPath should point to the base of the recursive search and \n"
+"override file should contain the override flags. Pathprefix is\n"
+"appended to the filename fields if present. Example usage from the \n"
+"Debian archive:\n"
+"   apt-ftparchive packages dists/potato/main/binary-i386/ > \\\n"
+"               dists/potato/main/binary-i386/Packages\n"
+"\n"
+"Options:\n"
+"  -h    This help text\n"
+"  --md5 Control MD5 generation\n"
+"  -s=?  Source override file\n"
+"  -q    Quiet\n"
+"  -d=?  Select the optional caching database\n"
+"  --no-delink Enable delinking debug mode\n"
+"  --contents  Control contents file generation\n"
+"  -c=?  Read this configuration file\n"
+"  -o=?  Set an arbitrary configuration option"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:817
+msgid "No selections matched"
+msgstr ""
+
+#: ftparchive/apt-ftparchive.cc:897
+#, c-format
+msgid "Some files are missing in the package file group `%s'"
+msgstr ""
+
+#: ftparchive/cachedb.cc:64
+#, c-format
+msgid "DB was corrupted, file renamed to %s.old"
+msgstr ""
+
+#: ftparchive/cachedb.cc:82
+#, c-format
+msgid "DB is old, attempting to upgrade %s"
+msgstr ""
+
+#: ftparchive/cachedb.cc:93
+msgid ""
+"DB format is invalid. If you upgraded from an older version of apt, please "
+"remove and re-create the database."
+msgstr ""
+
+#: ftparchive/cachedb.cc:98
+#, c-format
+msgid "Unable to open DB file %s: %s"
+msgstr ""
+
+#: ftparchive/cachedb.cc:181
+#, c-format
+msgid "Failed to stat %s"
+msgstr ""
+
+#: ftparchive/cachedb.cc:323
+msgid "Failed to read .dsc"
+msgstr ""
+
+#: ftparchive/cachedb.cc:356
+msgid "Archive has no control record"
+msgstr ""
+
+#: ftparchive/cachedb.cc:545
+msgid "Unable to get a cursor"
+msgstr ""
+
+#: ftparchive/contents.cc:352 ftparchive/contents.cc:383
+msgid "realloc - Failed to allocate memory"
+msgstr ""
+
+#: ftparchive/multicompress.cc:51
+#, c-format
+msgid "Unknown compression algorithm '%s'"
+msgstr ""
+
+#: ftparchive/multicompress.cc:98
+#, c-format
+msgid "Compressed output %s needs a compression set"
+msgstr ""
+
+#: ftparchive/multicompress.cc:153
+msgid "Failed to create IPC pipe to subprocess"
+msgstr ""
+
+#: ftparchive/multicompress.cc:176
+msgid "Failed to fork"
+msgstr ""
+
+#: ftparchive/multicompress.cc:189
+msgid "Compress child"
+msgstr ""
+
+#: ftparchive/multicompress.cc:212
+#, c-format
+msgid "Internal error, failed to create %s"
+msgstr ""
+
+#: ftparchive/multicompress.cc:285
+msgid "IO to subprocess/file failed"
+msgstr ""
+
+#: ftparchive/multicompress.cc:323
+msgid "Failed to read while computing MD5"
+msgstr ""
+
+#: ftparchive/multicompress.cc:352
+#, c-format
+msgid "Failed to rename %s to %s"
+msgstr ""
+
+#: ftparchive/override.cc:37 ftparchive/override.cc:141
+#, c-format
+msgid "Unable to open %s"
+msgstr ""
+
+#. skip spaces
+#. find end of word
+#: ftparchive/override.cc:67
+#, c-format
+msgid "Malformed override %s line %llu (%s)"
+msgstr ""
+
+#: ftparchive/override.cc:126 ftparchive/override.cc:200
+#, c-format
+msgid "Failed to read the override file %s"
+msgstr ""
+
+#: ftparchive/override.cc:165
+#, c-format
+msgid "Malformed override %s line %llu #1"
+msgstr ""
+
+#: ftparchive/override.cc:177
+#, c-format
+msgid "Malformed override %s line %llu #2"
+msgstr ""
+
+#: ftparchive/override.cc:190
+#, c-format
+msgid "Malformed override %s line %llu #3"
+msgstr ""
+
+#: ftparchive/writer.cc:105
+#, c-format
+msgid "W: Unable to read directory %s\n"
+msgstr ""
+
+#: ftparchive/writer.cc:110
+#, c-format
+msgid "W: Unable to stat %s\n"
+msgstr ""
+
+#: ftparchive/writer.cc:169
+msgid "E: "
+msgstr ""
+
+#: ftparchive/writer.cc:171
+msgid "W: "
+msgstr ""
+
+#: ftparchive/writer.cc:178
+msgid "E: Errors apply to file "
+msgstr ""
+
+#: ftparchive/writer.cc:196 ftparchive/writer.cc:235
+#, c-format
+msgid "Failed to resolve %s"
+msgstr ""
+
+#: ftparchive/writer.cc:209
+msgid "Tree walking failed"
+msgstr ""
+
+#: ftparchive/writer.cc:243
+#, c-format
+msgid "Failed to open %s"
+msgstr ""
+
+#: ftparchive/writer.cc:304
+#, c-format
+msgid " DeLink %s [%s]\n"
+msgstr ""
+
+#: ftparchive/writer.cc:312
+#, c-format
+msgid "Failed to readlink %s"
+msgstr ""
+
+#: ftparchive/writer.cc:322
+#, c-format
+msgid "*** Failed to link %s to %s"
+msgstr ""
+
+#: ftparchive/writer.cc:332
+#, c-format
+msgid " DeLink limit of %sB hit.\n"
+msgstr ""
+
+#: ftparchive/writer.cc:438
+msgid "Archive had no package field"
+msgstr ""
+
+#: ftparchive/writer.cc:446 ftparchive/writer.cc:694
+#, c-format
+msgid "  %s has no override entry\n"
+msgstr ""
+
+#: ftparchive/writer.cc:509 ftparchive/writer.cc:859
+#, c-format
+msgid "  %s maintainer is %s not %s\n"
+msgstr ""
+
+#: ftparchive/writer.cc:709
+#, c-format
+msgid "  %s has no source override entry\n"
+msgstr ""
+
+#: ftparchive/writer.cc:713
+#, c-format
+msgid "  %s has no binary override entry either\n"
+msgstr ""

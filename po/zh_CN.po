@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 2.5.3\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
-"PO-Revision-Date: 2022-10-05 17:20-0400\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"PO-Revision-Date: 2024-07-29 16:12+0800\n"
 "Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
 "Language-Team: Chinese (simplified) <debian-l10n-chinese@lists.debian.org>\n"
 "Language: zh_CN\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.1\n"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
@@ -1699,6 +1699,14 @@ msgstr "软件包 %s 未安装，所以不会被卸载\n"
 #, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "注意，选中 '%s' 而非 '%s'\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
+"请使用 `apt dist-upgrade' 更新系统，使用 `apt upgrade' 可能造成系统更新不完"
+"整。"
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"

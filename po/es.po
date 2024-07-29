@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 0.8.10\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2016-01-26 01:51+0100\n"
 "Last-Translator: Manuel \"Venturi\" Porras Peralta <venturi@openmailbox."
 "org>\n"
@@ -1873,6 +1873,12 @@ msgstr "El paquete «%s» no está instalado, no se eliminará\n"
 #, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Nota, seleccionando «%s» en lugar de «%s»\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"
@@ -4184,8 +4190,8 @@ msgstr "Los ficheros vacíos no pueden ser archivos válidos"
 #~ "Unable to find expected entry '%s' in Release file (Wrong sources.list "
 #~ "entry or malformed file)"
 #~ msgstr ""
-#~ "No se pudo encontrar la entrada esperada «%s» en el archivo "
-#~ "«Release» (entrada incorrecta en «sources.list» o fichero mal formado)"
+#~ "No se pudo encontrar la entrada esperada «%s» en el archivo «Release» "
+#~ "(entrada incorrecta en «sources.list» o fichero mal formado)"
 
 #~ msgid "Unmet dependencies. Try using --fix-broken."
 #~ msgstr "Dependencias incumplidas. Pruebe de nuevo utilizando --fix-broken."
