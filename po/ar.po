@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2006-10-20 21:28+0300\n"
 "Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
 "Language-Team: Arabic <support@arabeyes.org>\n"
@@ -1674,6 +1674,12 @@ msgstr "الحزمة %s غير مُثبّتة، لذلك لن تُزال\n"
 #, fuzzy, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "لاحظ، تحديد %s بدلاً من %s\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"

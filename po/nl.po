@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 2.7.12\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2024-02-26 20:56+0100\n"
 "Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
 "Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
@@ -1814,6 +1814,12 @@ msgstr "Pakket '%s' is niet geïnstalleerd, en wordt dus niet verwijderd\n"
 #, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Let op, '%s' wordt geselecteerd in plaats van '%s'\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"

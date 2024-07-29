@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2006-10-10 09:48+0700\n"
 "Last-Translator: Khoem Sokhem <khoemsokhem@khmeros.info>\n"
 "Language-Team: Khmer <support@khmeros.info>\n"
@@ -1693,6 +1693,12 @@ msgstr "មិនទាន់បានដំឡើង​កញ្ចប់​ %s
 #, fuzzy, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "ចំណាំ កំពុង​ជ្រើស​ %s ជំនួស​ %s\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"

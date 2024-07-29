@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2010-08-30 02:31+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -1710,6 +1710,12 @@ msgstr "%s 패키지를 설치하지 않았으므로, 지우지 않습니다\n"
 #, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "주의, '%2$s' 대신에 '%1$s' 패키지를 선택합니다\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"

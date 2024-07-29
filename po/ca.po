@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.4~beta1\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-04-16 17:00+0200\n"
+"POT-Creation-Date: 2024-07-29 16:08+0800\n"
 "PO-Revision-Date: 2020-08-09 22:43+0200\n"
 "Last-Translator: Aleix Vidal i Gaya <aleix@softcatala.org>\n"
 "Language-Team: Catalan <debian-l10n-catalan@lists.debian.org>\n"
@@ -1803,6 +1803,12 @@ msgstr "El paquet «%s» no està instal·lat, així que no se suprimirà\n"
 #, c-format
 msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Tingueu en compte que s'està seleccionant «%s» en lloc de «%s»\n"
+
+#: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
 
 #: apt-private/private-cmndline.cc
 msgid "Most used commands:"
