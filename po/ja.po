@@ -1793,6 +1793,12 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "注意、'%2$s' の代わりに '%1$s' を選択します\n"
 
 #: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
+
+#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr "最も使用されているコマンド:"
 

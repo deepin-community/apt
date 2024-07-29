@@ -1755,6 +1755,12 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Ghi chú: đang chọn “%s” thay cho “%s”\n"
 
 #: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
+
+#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 

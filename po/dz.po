@@ -1701,6 +1701,12 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "%s་གི་ཚབ་ལུ་%s་སེལ་འཐུ་འབད་ནི་སེམས་ཁར་བཞག\n"
 
 #: apt-private/private-cmndline.cc
+msgid ""
+"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
+"may result in incomplete upgrades."
+msgstr ""
+
+#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
