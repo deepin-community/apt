@@ -1,3 +1,9 @@
+apt (2.8.0deepin2) unstable; urgency=medium
+
+  * add a warning regarding `apt upgrade' usage.
+
+ -- LiChengGang <lichenggang@uniontech.com>  Mon, 29 Jul 2024 17:16:50 +0800
+
 apt (2.8.0deepin1) unstable; urgency=medium
 
   * Revert 64-bit time_t transition changes.
