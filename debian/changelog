@@ -1,3 +1,9 @@
+apt (2.8.0deepin3) unstable; urgency=medium
+
+  * support immutable.
+
+ -- xinpeng.wang <wangxinpeng@uniontech.com>  Sun, 29 Sep 2024 14:51:45 +0800
+
 apt (2.8.0deepin2) unstable; urgency=medium
 
   * add a warning regarding `apt upgrade' usage.

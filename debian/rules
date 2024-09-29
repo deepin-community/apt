@@ -17,6 +17,8 @@ else
 	configure_test_flags =
 endif
 
+D := $(CURDIR)/debian/tmp
+
 %:
 	dh $@ --buildsystem=cmake+ninja
 
@@ -25,6 +27,10 @@ override_dh_clean:
 	dh_clean
 
 override_dh_install-arch:
+	mv $(D)/usr/bin/apt $(D)/usr/bin/apt.real
+	mv $(D)/usr/bin/apt-get $(D)/usr/bin/apt-get.real
+	install -m 755 debian/apt-immutable.sh $(D)/usr/bin/apt
+	install -m 755 debian/aptget-immutable.sh $(D)/usr/bin/apt-get
 	dh_install -papt-utils -X/dump
 	dh_install -papt -Xmethods/curl -Xmethods/curl+https -Xmethods/curl+http
 	dh_install --remaining

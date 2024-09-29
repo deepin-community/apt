@@ -1,12 +1,15 @@
+debian/apt-immutable.cfg usr/share/apt/
 debian/*.service /usr/lib/systemd/system/
 debian/*.timer /usr/lib/systemd/system/
 debian/apt.systemd.daily usr/lib/apt
 etc/apt/
 usr/bin/apt
+usr/bin/apt.real
 usr/bin/apt-cache
 usr/bin/apt-cdrom
 usr/bin/apt-config
 usr/bin/apt-get
+usr/bin/apt-get.real
 usr/bin/apt-key
 usr/bin/apt-mark
 usr/lib/*/libapt-private.so*
