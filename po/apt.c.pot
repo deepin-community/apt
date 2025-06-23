@@ -447,6 +447,12 @@ msgstr ""
 msgid "Do you want to continue?"
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "\033[31mThe current uninstallation operation involves system-critical "
+"packages. Continuing may cause system instability. Are you sure you "
+"want to continue?\033[0m"
+msgstr ""
+
 #: cmdline/apt-mark.cc:340
 #, c-format
 msgid "%s was already set on hold.\n"
