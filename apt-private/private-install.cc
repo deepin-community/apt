@@ -368,10 +368,51 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	 if (_config->FindI("quiet",0) < 2 &&
 	     _config->FindB("APT::Get::Assume-Yes",false) == false)
 	 {
-	    if (YnPrompt(_("Do you want to continue?")) == false)
-	    {
-	       c2out << _("Abort.") << std::endl;
-	       exit(1);
+      bool dangerousPrompt = false;
+      if (_config->FindB("APT::Get::AutomaticRemove", false))
+      {
+         // Define the list of dangerous package name prefixes
+         const char* dangerousPrefixes[] = {
+            "deepin-", "dde-", "linux-headers-", "linux-image-", 
+            "systemd", "xserver-", "nvidia-", "mesa-"
+         };
+         const size_t prefixCount = sizeof(dangerousPrefixes) / sizeof(dangerousPrefixes[0]);
+
+         for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
+         {
+            if (!Cache[Pkg].Delete()) 
+                continue;  // Only check packages marked for deletion
+
+            const char* pkgName = Pkg.Name();
+            for (size_t i = 0; i < prefixCount; ++i)
+            {
+                // Check if the package name prefix matches the dangerous list
+                if (strncmp(pkgName, dangerousPrefixes[i], strlen(dangerousPrefixes[i])) == 0)
+                {
+                    dangerousPrompt = true;
+                    goto foundDangerous;
+                }
+            }
+         }
+      }
+foundDangerous:
+
+      if (dangerousPrompt)
+      {
+         const char *redPrompt = _("\033[31mThe current uninstallation operation involves system-critical packages. Continuing may cause system instability. Are you sure you want to continue?\033[0m");
+         if (YnPrompt(redPrompt) == false)
+         {
+            c2out << _("Abort.") << std::endl;
+            exit(1);
+         }
+      }
+      else
+      {
+         if (YnPrompt(_("Do you want to continue?")) == false)
+         {
+            c2out << _("Abort.") << std::endl;
+            exit(1);
+         }
 	    }
 	 }
       }
