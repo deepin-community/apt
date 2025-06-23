@@ -42,6 +42,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <dirent.h>
 
 #include <sys/stat.h>
 
@@ -61,45 +62,11 @@ class DefaultRootSetFunc2 : public pkgDepCache::DefaultRootSetFunc
 
    public:
    DefaultRootSetFunc2(pkgCache *cache) : Kernels(APT::KernelAutoRemoveHelper::GetProtectedKernelsFilter(cache)){};
-   virtual ~DefaultRootSetFunc2(){};
+   ~DefaultRootSetFunc2() override = default;
 
-   bool InRootSet(const pkgCache::PkgIterator &pkg) APT_OVERRIDE { return pkg.end() == false && ((*Kernels)(pkg) || DefaultRootSetFunc::InRootSet(pkg)); };
+   bool InRootSet(const pkgCache::PkgIterator &pkg) override { return pkg.end() == false && ((*Kernels)(pkg) || DefaultRootSetFunc::InRootSet(pkg)); };
 };
 
-									/*}}}*/
-// helper for Install-Recommends-Sections and Never-MarkAuto-Sections	/*{{{*/
-// FIXME: Has verbatim copy in cmdline/apt-mark.cc
-static bool ConfigValueInSubTree(const char* SubTree, std::string_view const needle)
-{
-   if (needle.empty())
-      return false;
-   Configuration::Item const *Opts = _config->Tree(SubTree);
-   if (Opts != nullptr && Opts->Child != nullptr)
-   {
-      Opts = Opts->Child;
-      for (; Opts != nullptr; Opts = Opts->Next)
-      {
-	 if (Opts->Value.empty())
-	    continue;
-	 if (needle == Opts->Value)
-	    return true;
-      }
-   }
-   return false;
-}
-static bool SectionInSubTree(char const * const SubTree, std::string_view Needle)
-{
-   if (ConfigValueInSubTree(SubTree, Needle))
-      return true;
-   auto const sub = Needle.rfind('/');
-   if (sub == std::string_view::npos)
-   {
-      std::string special{"/"};
-      special.append(Needle);
-      return ConfigValueInSubTree(SubTree, special);
-   }
-   return ConfigValueInSubTree(SubTree, Needle.substr(sub + 1));
-}
 									/*}}}*/
 pkgDepCache::ActionGroup::ActionGroup(pkgDepCache &cache) :		/*{{{*/
   d(NULL), cache(cache), released(false)
@@ -143,6 +110,7 @@ struct pkgDepCache::Private
    std::unique_ptr<InRootSetFunc> inRootSetFunc;
    std::unique_ptr<APT::CacheFilter::Matcher> IsAVersionedKernelPackage, IsProtectedKernelPackage;
    std::string machineID;
+   unsigned long iUpgradeCount{0};
 };
 pkgDepCache::pkgDepCache(pkgCache *const pCache, Policy *const Plcy) : group_level(0), Cache(pCache), PkgState(0), DepState(0),
 								       iUsrSize(0), iDownloadSize(0), iInstCount(0), iDelCount(0), iKeepCount(0),
@@ -181,6 +149,7 @@ bool pkgDepCache::CheckConsistency(char const *const msgtag)		/*{{{*/
    auto const origUsrSize = iUsrSize;
    auto const origDownloadSize = iDownloadSize;
    auto const origInstCount = iInstCount;
+   auto const origUpgradeCount = d->iUpgradeCount;
    auto const origDelCount = iDelCount;
    auto const origKeepCount = iKeepCount;
    auto const origBrokenCount = iBrokenCount;
@@ -241,6 +210,7 @@ bool pkgDepCache::CheckConsistency(char const *const msgtag)		/*{{{*/
    iUsrSize = origUsrSize;
    iDownloadSize = origDownloadSize;
    iInstCount = origInstCount;
+   d->iUpgradeCount = origUpgradeCount;
    iDelCount = origDelCount;
    iKeepCount = origKeepCount;
    iBrokenCount = origBrokenCount;
@@ -665,7 +635,11 @@ void pkgDepCache::AddStates(const PkgIterator &Pkg, bool const Invert)
    else if (State.Mode == ModeKeep)
       iKeepCount += Add;
    else if (State.Mode == ModeInstall)
+   {
       iInstCount += Add;
+      if (Pkg->CurrentVer != 0 && State.Status > 0)
+	 d->iUpgradeCount += Add;
+   }
 }
 									/*}}}*/
 // DepCache::BuildGroupOrs - Generate the Or group dep data		/*{{{*/
@@ -795,6 +769,7 @@ void pkgDepCache::PerformDependencyPass(OpProgress * const Prog)
    iUsrSize = 0;
    iDownloadSize = 0;
    iInstCount = 0;
+   d->iUpgradeCount = 0;
    iDelCount = 0;
    iKeepCount = 0;
    iBrokenCount = 0;
@@ -1067,7 +1042,7 @@ bool pkgDepCache::MarkDelete(PkgIterator const &Pkg, bool rPurge,
 	 // We do not check for or-groups here as we don't know which package takes care of
 	 // providing the feature the user likes e.g.:  browser1 | browser2 | browser3
 	 // Temporary removals are effected by this as well, which is bad, but unlikely in practice
-	 bool const PinNeverMarkAutoSection = (PV->Section != 0 && SectionInSubTree("APT::Never-MarkAuto-Sections", PV.Section()));
+	 bool const PinNeverMarkAutoSection = (PV->Section != 0 && _config->SectionInSubTree("APT::Never-MarkAuto-Sections", PV.Section()));
 	 if (PinNeverMarkAutoSection)
 	 {
 	    for (DepIterator D = PV.DependsList(); D.end() != true; ++D)
@@ -1462,7 +1437,7 @@ static bool MarkInstall_RemoveConflictsIfNotUpgradeable(pkgDepCache &Cache, bool
    return not failedToRemoveSomething;
 }
 									/*}}}*/
-static bool MarkInstall_CollectReverseDepends(pkgDepCache &Cache, bool const DebugAutoInstall, pkgCache::VerIterator const &PV, unsigned long Depth, APT::PackageVector &toUpgrade) /*{{{*/
+static bool MarkInstall_CollectReverseDepends(pkgDepCache &Cache, bool const DebugAutoInstall, pkgCache::VerIterator const &PV, unsigned long Depth, APT::PackageVector &toUpgrade, APT::PackageVector const &delayedRemove) /*{{{*/
 {
    auto CurrentVer = PV.ParentPkg().CurrentVer();
    if (CurrentVer.end())
@@ -1472,6 +1447,9 @@ static bool MarkInstall_CollectReverseDepends(pkgDepCache &Cache, bool const Deb
       auto ParentPkg = D.ParentPkg();
       // Skip non-installed versions and packages already marked for upgrade
       if (ParentPkg.CurrentVer() != D.ParentVer() || Cache[ParentPkg].Install())
+	 continue;
+      // Skip rev-depends we already tagged for removal
+      if (Cache[ParentPkg].Delete() || std::find(delayedRemove.begin(), delayedRemove.end(), ParentPkg) != delayedRemove.end())
 	 continue;
       // We only handle important positive dependencies, RemoveConflictsIfNotUpgradeable handles negative
       if (not Cache.IsImportantDep(D) || D.IsNegative())
@@ -1721,7 +1699,7 @@ bool pkgDepCache::MarkInstall(PkgIterator const &Pkg, bool AutoInst,
 	    return false;
 	 hasFailed = true;
       }
-      if (not MarkInstall_CollectReverseDepends(*this, DebugAutoInstall, PV, Depth, toUpgrade))
+      if (not MarkInstall_CollectReverseDepends(*this, DebugAutoInstall, PV, Depth, toUpgrade, delayedRemove))
       {
 	 if (failEarly)
 	    return false;
@@ -1778,8 +1756,8 @@ bool pkgDepCache::MarkInstall(PkgIterator const &Pkg, bool AutoInst,
       VerIterator const CurVer = Pkg.CurrentVer();
       if (not CurVer.end() && CurVer->Section != 0 && strcmp(CurVer.Section(), PV.Section()) != 0)
       {
-	 bool const CurVerInMoveSection = SectionInSubTree("APT::Move-Autobit-Sections", CurVer.Section());
-	 bool const InstVerInMoveSection = SectionInSubTree("APT::Move-Autobit-Sections", PV.Section());
+	 bool const CurVerInMoveSection = _config->SectionInSubTree("APT::Move-Autobit-Sections", CurVer.Section());
+	 bool const InstVerInMoveSection = _config->SectionInSubTree("APT::Move-Autobit-Sections", PV.Section());
 	 return (not CurVerInMoveSection && InstVerInMoveSection);
       }
       return false;
@@ -2271,7 +2249,7 @@ bool pkgDepCache::Policy::IsImportantDep(DepIterator const &Dep) const
       // FIXME: this is a meant as a temporary solution until the
       //        recommends are cleaned up
       const char *sec = Dep.ParentVer().Section();
-      if (sec && SectionInSubTree("APT::Install-Recommends-Sections", sec))
+      if (sec && _config->SectionInSubTree("APT::Install-Recommends-Sections", sec))
 	 return true;
    }
    else if(Dep->Type == pkgCache::Dep::Suggests)
@@ -2451,6 +2429,25 @@ static bool MarkPackage(pkgCache::PkgIterator const &Pkg,
 
       if (not unsatisfied_choice)
 	 fullyExplored[T->ID] = true;
+
+      // do not follow newly installed providers if we have already installed providers
+      if (providers_by_source.size() >= 2)
+      {
+	 if (std::any_of(providers_by_source.begin(), providers_by_source.end(), [](auto const PV) {
+			 return std::any_of(PV.second.begin(), PV.second.end(), [](auto const &Prv) {
+			   auto const PP = Prv.ParentPkg();
+			   return not PP.end() && PP->CurrentVer != 0;
+			 });}))
+	 {
+	    for (auto &providers : providers_by_source)
+	       providers.second.erase(std::remove_if(providers.second.begin(), providers.second.end(),
+			[](auto const &Prv) {
+			   auto const PP = Prv.ParentPkg();
+			   return not PP.end() && PP->CurrentVer == 0;
+			}), providers.second.end());
+	 }
+      }
+
       for (auto const &providers : providers_by_source)
       {
 	 for (auto const &PV : providers.second)
@@ -2473,7 +2470,7 @@ static bool MarkPackage(pkgCache::PkgIterator const &Pkg,
 // pkgDepCache::MarkRequired - the main mark algorithm			/*{{{*/
 bool pkgDepCache::MarkRequired(InRootSetFunc &userFunc)
 {
-   if (_config->Find("APT::Solver", "internal") != "internal")
+   if (_config->Find("APT::Solver", "internal") != "internal" && _config->Find("APT::Solver") != "3.0")
       return true;
 
    // init the states
@@ -2611,5 +2608,132 @@ bool pkgDepCache::PhasingApplied(pkgCache::PkgIterator Pkg) const
       return false;
 
    return true;
+}
+									/*}}}*/
+
+// DepCache::BootSize						/*{{{*/
+unsigned long long pkgDepCache::BootSize(bool initrdOnly)
+{
+   int BootCount = 0;
+   auto VirtualKernelPkg = FindPkg("$kernel", "any");
+   if (VirtualKernelPkg.end())
+      return 0;
+
+   for (pkgCache::PrvIterator Prv = VirtualKernelPkg.ProvidesList(); Prv.end() == false; ++Prv)
+   {
+      auto Pkg = Prv.OwnerPkg();
+      if ((*this)[Pkg].NewInstall())
+	 BootCount++;
+   }
+   if (BootCount == 0)
+      return 0;
+
+   DIR *boot = opendir(_config->FindDir("Dir::Boot").c_str());
+   if (not boot)
+      return 0;
+
+   enum
+   {
+      VMLINUZ,
+      INITRD,
+      MAP,
+      MAX_ARTEFACT,
+   } type;
+   off_t sizes[MAX_ARTEFACT]{};
+   while (struct dirent *ent = readdir(boot))
+   {
+      if (APT::String::Startswith(ent->d_name, "initrd.img-"))
+	 type = INITRD;
+      else if (APT::String::Startswith(ent->d_name, "System.map-"))
+	 type = MAP;
+      else if (not initrdOnly && APT::String::Startswith(ent->d_name, "vmlinuz-"))
+	 type = VMLINUZ;
+      else
+	 continue;
+
+      if (struct stat st; fstatat(dirfd(boot), ent->d_name, &st, 0) == 0)
+	 sizes[type] = std::max(sizes[type], st.st_size);
+   }
+   closedir(boot);
+   return std::accumulate(sizes, sizes + MAX_ARTEFACT, off_t{0}) * BootCount * 110 / 100;
+}
+									/*}}}*/
+// pkgDepCache::UpgradeCount						/*{{{*/
+unsigned long pkgDepCache::UpgradeCount()
+{
+   return d->iUpgradeCount;
+}
+									/*}}}*/
+// pkgDepCache::Transaction						/*{{{*/
+struct pkgDepCache::Transaction::Private
+{
+   template <typename T>
+   static T *copyArray(T *array, size_t count)
+   {
+      auto out = new T[count];
+      memcpy(&out[0], &array[0], sizeof(T) * count);
+      return out;
+   }
+   // State information
+   pkgDepCache &cache;
+   Behavior behavior;
+   std::unique_ptr<StateCache[]> PkgState{copyArray(cache.PkgState, cache.GetCache().Head().PackageCount)};
+   std::unique_ptr<unsigned char[]> DepState{copyArray(cache.DepState, cache.GetCache().Head().DependsCount)};
+   signed long long iUsrSize{cache.iUsrSize};
+   unsigned long long iDownloadSize{cache.iDownloadSize};
+   unsigned long iInstCount{cache.iInstCount};
+   unsigned long iUpgradeCount{cache.d->iUpgradeCount};
+   unsigned long iDelCount{cache.iDelCount};
+   unsigned long iKeepCount{cache.iKeepCount};
+   unsigned long iBrokenCount{cache.iBrokenCount};
+   unsigned long iPolicyBrokenCount{cache.iPolicyBrokenCount};
+   unsigned long iBadCount{cache.iBadCount};
+
+   void rollback()
+   {
+      memcpy(&cache.PkgState[0], &PkgState[0], sizeof(PkgState[0]) * cache.GetCache().Head().PackageCount);
+      memcpy(&cache.DepState[0], &DepState[0], sizeof(DepState[0]) * cache.GetCache().Head().DependsCount);
+
+      cache.iUsrSize = iUsrSize;
+      cache.iDownloadSize = iDownloadSize;
+      cache.iInstCount = iInstCount;
+      cache.d->iUpgradeCount = iUpgradeCount;
+      cache.iDelCount = iDelCount;
+      cache.iKeepCount = iKeepCount;
+      cache.iBrokenCount = iBrokenCount;
+      cache.iPolicyBrokenCount = iPolicyBrokenCount;
+      cache.iBadCount = iBadCount;
+   }
+};
+
+pkgDepCache::Transaction::Transaction(pkgDepCache &cache, Behavior behavior) : d(new Private{cache, behavior}) {}
+
+void pkgDepCache::Transaction::temporaryRollback()
+{
+   d->rollback();
+}
+
+void pkgDepCache::Transaction::commit()
+{
+   d.reset();
+}
+
+void pkgDepCache::Transaction::rollback()
+{
+   if (d == nullptr)
+      return;
+
+   temporaryRollback();
+   d.reset();
+}
+
+pkgDepCache::Transaction::~Transaction()
+{
+   if (not d)
+      return;
+   if (d->behavior == Behavior::ROLLBACK || (d->behavior == Behavior::AUTO && d->cache.iBrokenCount > d->iBrokenCount))
+      rollback();
+   else
+      commit();
 }
 									/*}}}*/

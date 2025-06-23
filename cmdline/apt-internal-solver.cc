@@ -51,7 +51,7 @@ static bool ShowHelp(CommandLine &)					/*{{{*/
 	return true;
 }
 									/*}}}*/
-APT_NORETURN static void DIE(std::string const &message) {		/*{{{*/
+[[noreturn]] static void DIE(std::string const &message) {		/*{{{*/
 	std::cerr << "ERROR: " << message << std::endl;
 	_error->DumpErrors(std::cerr);
 	exit(EXIT_FAILURE);
@@ -119,7 +119,10 @@ int main(int argc,const char *argv[])					/*{{{*/
 		_config->Set("Debug::EDSP::WriteSolution", true);
 
 	_config->Set("APT::System", "Debian APT solver interface");
-	_config->Set("APT::Solver", "internal");
+	if (strcmp(basename(argv[0]), "solver3") == 0)
+	   _config->Set("APT::Solver", "3.0");
+	else if (_config->Find("APT::Solver") != "3.0")
+	   _config->Set("APT::Solver", "internal");
 	_config->Set("edsp::scenario", "/nonexistent/stdin");
 	_config->Clear("Dir::Log");
 	FileFd output;

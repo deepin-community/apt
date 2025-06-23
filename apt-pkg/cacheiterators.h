@@ -1,17 +1,17 @@
 // -*- mode: cpp; mode: fold -*-
 // Description								/*{{{*/
 /* ######################################################################
-   
+
    Cache Iterators - Iterators for navigating the cache structure
-   
+
    The iterators all provides ++,==,!=,->,* and end for their type.
    The end function can be used to tell if the list has been fully
    traversed.
-   
+
    Unlike STL iterators these contain helper functions to access the data
    that is being iterated over. This is because the data structures can't
    be formed in a manner that is intuitive to use and also mmapable.
-   
+
    For each variable in the target structure that would need a translation
    to be accessed correctly a translating function of the same name is
    present in the iterator. If applicable the translating function will
@@ -22,9 +22,9 @@
    structure passed to the constructor, which should be the structure
    that has the depends pointer as a member. The provide iterator has the
    same system.
-   
+
    This header is not user includable, please use apt-pkg/pkgcache.h
-   
+
    ##################################################################### */
 									/*}}}*/
 #ifndef PKGLIB_CACHEITERATORS_H
@@ -37,7 +37,7 @@
 #include <iosfwd>
 #include <iterator>
 #include <string>
-#include <apt-pkg/string_view.h>
+#include <string_view>
 
 #include <cstring>
 
@@ -123,7 +123,7 @@ class APT_PUBLIC pkgCache::GrpIterator: public Iterator<Group, GrpIterator> {
 	inline const char *Name() const {return S->Name == 0?0:Owner->StrP + S->Name;}
 	inline PkgIterator PackageList() const;
 	inline VerIterator VersionsInSource() const;
-	PkgIterator FindPkg(APT::StringView Arch = APT::StringView("any", 3)) const;
+	PkgIterator FindPkg(std::string_view Arch = {"any", 3}) const;
 	/** \brief find the package with the "best" architecture
 
 	    The best architecture is either the "native" or the first
@@ -177,8 +177,8 @@ class APT_PUBLIC pkgCache::PkgIterator: public Iterator<Package, PkgIterator> {
 	OkState State() const APT_PURE;
 	const char *CurVersion() const APT_PURE;
 
-	//Nice printable representation
-	APT_DEPRECATED_MSG("Use APT::PrettyPkg instead") friend std::ostream& operator <<(std::ostream& out, PkgIterator i);
+	// for a nice printable representation you likely want APT::PrettyPkg instead
+	friend std::ostream& operator<<(std::ostream& out, PkgIterator i);
 	std::string FullName(bool const &Pretty = false) const;
 
 	// Constructors
@@ -189,6 +189,31 @@ class APT_PUBLIC pkgCache::PkgIterator: public Iterator<Package, PkgIterator> {
 	inline PkgIterator() : Iterator<Package, PkgIterator>(), HashIndex(0) {}
 };
 									/*}}}*/
+// SourceVersion Iterator						/*{{{*/
+class APT_PUBLIC pkgCache::SrcVerIterator : public Iterator<SourceVersion, SrcVerIterator>
+{
+   public:
+   inline SourceVersion *OwnerPointer() const
+   {
+      return (Owner != 0) ? Owner->SrcVerP : 0;
+   }
+#if 0
+	// Iteration
+	inline SrcVerIterator& operator++() {if (S != Owner->SrcVerP) S = Owner->SrcVerP + S->NextSourceVersion; return *this;}
+	inline SrcVerIterator operator++(int) { SrcVerIterator const tmp(*this); operator++(); return tmp; }
+#endif
+   inline APT_PURE GrpIterator Group() const { return GrpIterator(*Owner, Owner->GrpP + S->Group); }
+   inline const char *VerStr() const { return S->VerStr == 0 ? 0 : Owner->StrP + S->VerStr; }
+
+   inline SrcVerIterator(pkgCache &Owner, SourceVersion *Trg = 0) : Iterator<SourceVersion, SrcVerIterator>(Owner, Trg)
+   {
+      if (S == 0)
+	 S = OwnerPointer();
+   }
+   inline SrcVerIterator() : Iterator<SourceVersion, SrcVerIterator>() {}
+};
+									/*}}}*/
+
 // Version Iterator							/*{{{*/
 class APT_PUBLIC pkgCache::VerIterator : public Iterator<Version, VerIterator> {
 	public:
@@ -220,12 +245,15 @@ class APT_PUBLIC pkgCache::VerIterator : public Iterator<Version, VerIterator> {
 	// Accessors
 	inline const char *VerStr() const {return S->VerStr == 0?0:Owner->StrP + S->VerStr;}
 	inline const char *Section() const {return S->Section == 0?0:Owner->StrP + S->Section;}
-	/** \brief source package name this version comes from
-	   Always contains the name, even if it is the same as the binary name */
-	inline const char *SourcePkgName() const {return Owner->StrP + S->SourcePkgName;}
 	/** \brief source version this version comes from
 	   Always contains the version string, even if it is the same as the binary version */
-	inline const char *SourceVerStr() const {return Owner->StrP + S->SourceVerStr;}
+	SrcVerIterator SourceVersion() const { return SrcVerIterator(*Owner, Owner->SrcVerP + S->SourceVersion); }
+	/** \brief source package name this version comes from
+	   Always contains the name, even if it is the same as the binary name */
+	inline const char *SourcePkgName() const { return SourceVersion().Group().Name(); }
+	/** \brief source version this version comes from
+	   Always contains the version string, even if it is the same as the binary version */
+	inline const char *SourceVerStr() const { return SourceVersion().VerStr(); }
 	inline const char *Arch() const {
 		if ((S->MultiArch & pkgCache::Version::All) == pkgCache::Version::All)
 			return "all";
@@ -234,7 +262,7 @@ class APT_PUBLIC pkgCache::VerIterator : public Iterator<Version, VerIterator> {
 	inline PkgIterator ParentPkg() const {return PkgIterator(*Owner,Owner->PkgP + S->ParentPkg);}
 
 	inline DescIterator DescriptionList() const;
-	DescIterator TranslatedDescriptionForLanguage(APT::StringView lang) const;
+	DescIterator TranslatedDescriptionForLanguage(std::string_view lang) const;
 	DescIterator TranslatedDescription() const;
 	inline DepIterator DependsList() const;
 	inline PrvIterator ProvidesList() const;
@@ -330,6 +358,7 @@ class APT_PUBLIC pkgCache::DepIterator : public Iterator<Dependency, DepIterator
 	   but change architecture nonetheless as a Conflicts: foo does applies for all archs */
 	bool IsImplicit() const APT_PURE;
 
+	bool IsSatisfied(PkgIterator const &Pkg) const APT_PURE;
 	bool IsSatisfied(VerIterator const &Ver) const APT_PURE;
 	bool IsSatisfied(PrvIterator const &Prv) const APT_PURE;
 	void GlobOr(DepIterator &Start,DepIterator &End);
@@ -364,8 +393,8 @@ class APT_PUBLIC pkgCache::DepIterator : public Iterator<Dependency, DepIterator
 		S2 = static_cast<DependencyData *>(newMap) + (S2 - static_cast<DependencyData const *>(oldMap));
 	}
 
-	//Nice printable representation
-	APT_DEPRECATED_MSG("Use APT::PrettyDep instead") friend std::ostream& operator <<(std::ostream& out, DepIterator D);
+	// for a nice printable representation you likely want APT::PrettyDep instead
+	friend std::ostream& operator<<(std::ostream& out, DepIterator D);
 
 	inline DepIterator(pkgCache &Owner, Dependency *Trg, Version* = 0) :
 		Iterator<Dependency, DepIterator>(Owner, Trg), Type(DepVer), S2(Trg == 0 ? Owner.DepDataP : (Owner.DepDataP + Trg->DependencyData)) {

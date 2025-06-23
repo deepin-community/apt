@@ -7,7 +7,7 @@
 #include <cstring>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "common.h"
 
 static void parseDependency(bool const StripMultiArch,  bool const ParseArchFlags, bool const ParseRestrictionsList, std::string Arch)
 {
@@ -277,4 +277,89 @@ test:
    runner++;
    if (runner < 8)
       goto test; // this is the prove: tests are really evil ;)
+}
+
+TEST(ParseDependsTest, SpaceHate)
+{
+   auto const *const Depends = "no(=1), some(<<1),some (<<1),some( <<1),some(<< 1),some(<<1 ),some(<<1) ,last (=1)";
+   const char* const End = Depends + strlen(Depends);
+
+   const char* Start = Depends;
+   std::string Package;
+   std::string Version;
+   unsigned int Op = 29;
+
+   Start = debListParser::ParseDepends(Start, End, Package, Version, Op);
+   EXPECT_NE(nullptr, Start);
+   EXPECT_EQ("no", Package);
+   EXPECT_EQ("1", Version);
+   EXPECT_EQ(pkgCache::Dep::Equals, Op);
+
+   for (int i = 0; i < 6; ++i)
+   {
+      SCOPED_TRACE(i);
+      Start = debListParser::ParseDepends(Start, End, Package, Version, Op);
+      EXPECT_NE(nullptr, Start);
+      EXPECT_EQ("some", Package);
+      EXPECT_EQ("1", Version);
+      EXPECT_EQ(pkgCache::Dep::Less, Op);
+   }
+
+   Start = debListParser::ParseDepends(Start, End, Package, Version, Op);
+   EXPECT_EQ(End, Start);
+   EXPECT_EQ("last", Package);
+   EXPECT_EQ("1", Version);
+   EXPECT_EQ(pkgCache::Dep::Equals, Op);
+}
+
+static void ArchLimitSpaceTesting(char const * const Depends)
+{
+   SCOPED_TRACE(Depends);
+   _config->Set("APT::Architecture", "amd64");
+   const char* const End = Depends + strlen(Depends);
+   const char* Start = Depends;
+   std::string Package;
+   std::string Version;
+   unsigned int Op = 29;
+
+   Start = debListParser::ParseDepends(Start, End, Package, Version, Op, true, false, true, "amd64");
+   EXPECT_NE(nullptr, Start);
+   EXPECT_EQ("foobar", Package);
+   EXPECT_EQ("", Version);
+   EXPECT_EQ(pkgCache::Dep::NoOp, Op);
+
+   Start = debListParser::ParseDepends(Start, End, Package, Version, Op, true, false, true, "amd64");
+   EXPECT_NE(nullptr, Start);
+   EXPECT_EQ("", Package);
+   EXPECT_EQ("", Version);
+   EXPECT_EQ(pkgCache::Dep::NoOp, Op);
+
+   Start = debListParser::ParseDepends(Start, End, Package, Version, Op, true, false, true, "amd64");
+   EXPECT_EQ(End, Start);
+   EXPECT_EQ("baz", Package);
+   EXPECT_EQ("", Version);
+   EXPECT_EQ(pkgCache::Dep::NoOp, Op);
+}
+TEST(ParseDependsTest, ArchLimitSpaceNormal)
+{
+   ArchLimitSpaceTesting("foobar [i386 armhf armel amd64], blah [!arm64 !x32 !amd64], baz");
+}
+TEST(ParseDependsTest, ArchLimitSpaceLove)
+{
+   ArchLimitSpaceTesting("foobar  [  i386 armhf  armel  amd64  ]  ,  blah  [  !arm64 !x32  !amd64  ]  ,  baz");
+}
+TEST(ParseDependsTest, ArchLimitSpaceNoLove)
+{
+   ArchLimitSpaceTesting("foobar[i386 armhf armel amd64],blah[!arm64 !x32 !amd64],baz");
+}
+TEST(ParseDependsTest, ArchLimitBadSyntax)
+{
+   std::string Package;
+   std::string Version;
+   unsigned int Op = 29;
+   for (auto const * const Depends : { "foobar [! amd64]", "foobar []", "foobar [ ]" })
+   {
+      SCOPED_TRACE(Depends);
+      EXPECT_EQ(nullptr, debListParser::ParseDepends(Depends, Depends + strlen(Depends), Package, Version, Op, true, false, true, "amd64"));
+   }
 }

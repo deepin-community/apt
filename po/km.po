@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"POT-Creation-Date: 2025-03-09 17:32+0000\n"
 "PO-Revision-Date: 2006-10-10 09:48+0700\n"
 "Last-Translator: Khoem Sokhem <khoemsokhem@khmeros.info>\n"
 "Language-Team: Khmer <support@khmeros.info>\n"
@@ -55,8 +55,8 @@ msgstr "ថត​ %s ត្រូវបាន​បង្វែរ"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -124,13 +124,14 @@ msgstr ""
 #, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -186,8 +187,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr ""
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -198,7 +198,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -220,6 +220,13 @@ msgstr "បរាជ័យ​ក្នុង​ការ​ទៅ​ប្រម
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -236,13 +243,6 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "កំពុង​តភ្ជាប់​ទៅ​កាន់​ %s (%s)"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -626,6 +626,30 @@ msgstr "កំហុសវាក្យ​សម្ពន្ធ %s:%u ៖ សេ
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "កំហុស​វាក្យសម្ពន្ធ %s:%u ៖ សារឥតបានការ​បន្ថែម ដែលនៅខាងចុង​ឯកសារ"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr ""
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr ""
+
 #: apt-pkg/contrib/extracttar.cc
 #, fuzzy, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -735,11 +759,11 @@ msgstr "ដំណើរការ​រង​ %s បានត្រឡប់​�
 msgid "Sub-process %s exited unexpectedly"
 msgstr "ដំណើរការ​រង​ %s បានចេញ ដោយ​មិន​រំពឹង​ទុក​ "
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "ការអាន​មានកំហុស"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "ការសរសេរ​មានកំហុស"
 
@@ -1047,6 +1071,12 @@ msgstr "មិន​អាច​ចាក់​សោ​ថត​បញ្ជី
 msgid "Not locked"
 msgstr ""
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1228,6 +1258,16 @@ msgstr ""
 msgid "External solver failed without a proper error message"
 msgstr ""
 
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "កំពុង​គណនា​ការ​ធ្វើ​ឲ្យ​ប្រសើរ"
+
+#: apt-pkg/edsp.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Solving dependencies"
+msgstr "ភាព​អាស្រ័យ​សរុប ៖ "
+
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
 msgstr ""
@@ -1317,8 +1357,8 @@ msgid ""
 "you really want to do it, activate the APT::Force-LoopBreak option."
 msgstr ""
 "ការរត់​ការដំឡើង​នេះ នឹងទាមទារ​ឲ្យយកកញ្ចប់ចាំបាច់ %s បណ្ដោះអាសន្ន ដោយសារ រង្វិល ការប៉ះទង្គិច/"
-"ភាពអាស្រ័យជាមុន ។ ជាញឹកញាប់គឺ មិនត្រឹមត្រូវ ប៉ុន្តែ ប្រសិនបើអ្នក​ពិតជាចង់ធ្វើវា ធ្វើឲ្យជម្រើស APT::"
-"Force-LoopBreak សកម្ម ។"
+"ភាពអាស្រ័យជាមុន ។ ជាញឹកញាប់គឺ មិនត្រឹមត្រូវ ប៉ុន្តែ ប្រសិនបើអ្នក​ពិតជាចង់ធ្វើវា ធ្វើឲ្យជម្រើស "
+"APT::Force-LoopBreak សកម្ម ។"
 
 #: apt-pkg/pkgcache.cc
 msgid "Empty package cache"
@@ -1526,10 +1566,6 @@ msgid ""
 msgstr ""
 "ឯកសារ​លិបិក្រម​មួយ​ចំនួន​បាន​បរាជ័យ​ក្នុង​ការ​​ទាញ​យក ​ពួកវាត្រូវបាន​មិន​អើពើ​ ឬ ប្រើ​​ឯកសារ​ចាស់​ជំនួសវិញ ​​។"
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "កំពុង​គណនា​ការ​ធ្វើ​ឲ្យ​ប្រសើរ"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1695,12 +1731,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "ចំណាំ កំពុង​ជ្រើស​ %s ជំនួស​ %s\n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
@@ -1805,6 +1835,12 @@ msgid "Broken packages"
 msgstr "កញ្ចប់​ដែល​បាន​ខូច​"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "ការសរសេរ​មានកំហុស"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1858,12 +1894,23 @@ msgstr "កំហុស​ខាងក្នុង​ ការ​រៀប​�
 msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr "យី អី​ក៏​ចម្លែង​ម្លេះ.. ទំហំ​មិន​ដូច​គ្នា​ឡើយ ។ សូម​ផ្ញើ​អ៊ីមែល​ទៅ apt@packages.debian.org"
 
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "  Installed: "
+msgid "  Download size: %sB / %sB\n"
+msgstr "  បាន​ដំឡើង ៖ "
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "ត្រូវការ​​យក​ %sB/%sB នៃ​ប័ណ្ណសារ ។​\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr ""
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1872,12 +1919,54 @@ msgstr "ត្រូវការ​​យក​ %sB/%sB នៃ​ប័ណ្ណ
 msgid "Need to get %sB of archives.\n"
 msgstr "ត្រូវ​ការយក​ %sB នៃ​ប័ណ្ណសារ ។\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, fuzzy, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr "បន្ទាប់​ពី​ពន្លា​ %sB នៃ​ការ​បន្ថែម​​ទំហំ​ថាស​ត្រូវ​បាន​ប្រើ ។\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Stored label: %s\n"
+msgid "  Freed space: %sB\n"
+msgstr "បានទុក​ស្លាក ៖ %s \n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1896,19 +1985,18 @@ msgid ""
 "break the system."
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr ""
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 #, fuzzy
 msgid "Do you want to continue?"
 msgstr "តើ​អ្នក​ចង់​បន្តឬ​ [បាទ ចាស/ទេ​] ? "
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -1964,6 +2052,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "កំហុស​ខាងក្នុង អ្នក​ដោះស្រាយ​បញ្ហា​បានធ្វើឲ្យខូច​ឧបករណ៍"
 
 #: apt-private/private-install.cc
+#, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: apt-private/private-install.cc
 #, fuzzy
 msgid ""
 "The following package was automatically installed and is no longer required:"
@@ -1982,16 +2077,8 @@ msgstr[0] "កញ្ចប់​ថ្មី​ខាងក្រោម​នឹ
 msgstr[1] "កញ្ចប់​ថ្មី​ខាងក្រោម​នឹង​ត្រូវ​បាន​ដំឡើង​ ៖"
 
 #: apt-private/private-install.cc
-#, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] ""
-msgstr[1] ""
-
-#: apt-private/private-install.cc
-#, fuzzy
-msgid "The following additional packages will be installed:"
-msgstr "កញ្ចប់​បន្ថែម​ដូចតទៅនេះ នឹងត្រូវបាន​ដំឡើង ៖"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2000,6 +2087,11 @@ msgstr "កញ្ចប់​ដែល​បាន​ផ្ដល់​យោប
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "កញ្ចប់​ដែល​បាន​ផ្ដល់​អនុសាសន៍ ៖"
+
+#: apt-private/private-install.cc
+#, fuzzy
+msgid "The following additional packages will be installed:"
+msgstr "កញ្ចប់​បន្ថែម​ដូចតទៅនេះ នឹងត្រូវបាន​ដំឡើង ៖"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2131,8 +2223,29 @@ msgid "The following packages have unmet dependencies:"
 msgstr "កញ្ចប់​ខាងក្រោម​មាន​ភាពអាស្រ័យ​ដែល​ខុស​គ្នា ៖"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Failed to satisfy %s dependency for %s: %s"
+msgid "Unsatisfied dependencies:"
+msgstr "បរាជ័យ​ក្នុងការ​តម្រូវចិត្តភាពអាស្រ័យ %s សម្រាប់ %s: %s"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "កញ្ចប់​ថ្មី​ខាងក្រោម​នឹង​ត្រូវ​បាន​ដំឡើង​ ៖"
+
+#: apt-private/private-output.cc
+#, fuzzy
+msgid "Installing:"
+msgstr "បាន​ដំឡើង %s"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Installing dependencies:"
+msgstr "ភាព​អាស្រ័យ​សរុប ៖ "
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr ""
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2145,6 +2258,16 @@ msgid "The following upgrades have been deferred due to phasing:"
 msgstr "​កញ្ចប់​ខាង​ក្រោម​ត្រូវ​បាន​យក​ត្រឡប់​មក​វិញ ៖"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "Not upgrading yet due to phasing:"
+msgstr "​កញ្ចប់​ខាង​ក្រោម​ត្រូវ​បាន​យក​ត្រឡប់​មក​វិញ ៖"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "​កញ្ចប់​ខាង​ក្រោម​ត្រូវ​បាន​យក​ត្រឡប់​មក​វិញ ៖"
 
@@ -2153,8 +2276,22 @@ msgid "The following packages will be upgraded:"
 msgstr "កញ្ចប់​ខាងក្រោម​នឹង​​ត្រូវ​បាន​​ធ្វើ​ឲ្យប្រសើ​ឡើង ៖"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr "កញ្ចប់​ខាងក្រោម​នឹង​​ត្រូវ​បាន​បន្ទាប ៖"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Pinned packages:"
+msgid "Changing held packages:"
+msgstr "កញ្ចប់​ដែល​បាន​ខ្ទាស់ ៖"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2174,14 +2311,28 @@ msgstr ""
 "ការយកចេញ​នេះ​មិន​ត្រូវ​បានធ្វើ​ទេ​លុះត្រា​តែ​អ្នកដឹង​ថា​​អ្នក​កំពុង​ធ្វើ​អ្វីឲ្យប្រាកដ !"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr ""
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu ត្រូវ​បាន​ធ្វើ​ឲ្យ​ប្រសើរ %lu ត្រូវ​បានដំឡើង​ថ្មី "
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "បាន​ដំឡើង %s"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu reinstalled, "
 msgstr "%lu ត្រូវ​បាន​ដំឡើង​ឡើង​វិញ "
+
+#: apt-private/private-output.cc
+#, fuzzy, c-format
+msgid "Reinstalling: %lu, "
+msgstr "បាន​ដំឡើង %s"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2190,8 +2341,18 @@ msgstr "%lu ​ត្រូវបានបន្ទាប់ "
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Downgrading: %lu, "
+msgstr ""
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu ដែលត្រូវ​យក​ចេញ​ ហើយ​ %lu មិន​​បាន​ធ្វើ​ឲ្យ​ប្រសើរឡើយ ។\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr ""
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2220,7 +2381,7 @@ msgid "Y"
 msgstr "Y"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr ""
 
@@ -2394,8 +2555,8 @@ msgstr "%s មិនមានភាពអាស្រ័យ​ស្ថាបន
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
 
 #: apt-private/private-source.cc
@@ -2432,6 +2593,11 @@ msgstr "បរាជ័យ​ក្នុង​ការ​ប្តូរ​ឈ
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr ""
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr ""
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2452,7 +2618,32 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
 msgstr ""
 
 #: apt-private/private-update.cc
@@ -2500,6 +2691,12 @@ msgstr "  កញ្ចប់​និម្មិត​លាយ ៖ "
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  បាត់បង់ ៖ "
+
+#: cmdline/apt-cache.cc
+#, fuzzy
+#| msgid "Total distinct versions: "
+msgid "Total distinct source versions: "
+msgstr "កំណែ​ផ្សេងៗ​សរុប ៖ "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -2834,6 +3031,12 @@ msgid "concatenate files, with automatic decompression"
 msgstr ""
 
 #: cmdline/apt-helper.cc
+#, fuzzy
+#| msgid "Problem hashing file"
+msgid "hash file"
+msgstr "បញ្ហា​ធ្វើឲ្យខូច​ឯកសារ"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr ""
 
@@ -3080,6 +3283,10 @@ msgid "edit the source information file"
 msgstr "បញ្ចូល​​ព័ត៌មាន​ដែលមាន​ចូល​គ្នា"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ""
+
+#: cmdline/apt.cc
 #, fuzzy
 #| msgid "Failed to satisfy %s dependency for %s: %s"
 msgid "satisfy dependency strings"
@@ -3284,7 +3491,7 @@ msgstr "មិន​ស្គាល់​ក្បួន​ដោះស្រា
 msgid "Compressed output %s needs a compression set"
 msgstr "​ទិន្នផល​ដែល​បាន​បង្ហាប់​​ %s ត្រូវ​ការ​កំណត់​ការបង្ហាប់​"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "បរាជ័យ​ក្នុង​ការ​បង្កើត​បំពង់​ IPC សម្រាប់​ដំណើរ​ការ​រង​"
 
@@ -3403,23 +3610,23 @@ msgstr "ប័ណ្ណសារ​គ្មាន​វាល​កញ្ចប
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "  %s គ្មាន​ធាតុធាតុបញ្ចូល​​បដិសេធឡើយ\n"
+msgid "  %.*s has no override entry\n"
+msgstr "  %.*s គ្មាន​ធាតុធាតុបញ្ចូល​​បដិសេធឡើយ\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "  អ្នក​ថែទាំ %s គឺ %s មិនមែន​ %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "  អ្នក​ថែទាំ %.*s គឺ %.*s មិនមែន​ %s\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "  %s គ្មាន​ធាតុ​បដិសេធ​ប្រភព\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "  %.*s គ្មាន​ធាតុ​បដិសេធ​ប្រភព\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "  %s គ្មាន​ធាតុប​ដិសេធគោល​ពីរ​ដែរ\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "  %.*s គ្មាន​ធាតុប​ដិសេធគោល​ពីរ​ដែរ\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3457,7 +3664,7 @@ msgstr "ទិន្នន័យ​បឋមកថា​ខូច"
 msgid "Connection failed"
 msgstr "ការតភ្ជាប់​បាន​បរាជ័យ​"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3499,7 +3706,7 @@ msgstr "មិនអាចអាន់ម៉ោន ស៊ីឌី​-រ៉ូ�
 msgid "Disk not found."
 msgstr "រក​ថាសមិ​ន​ឃើញ​ ។"
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "រកឯកសារ​មិន​ឃើញ​"
 
@@ -3535,7 +3742,7 @@ msgstr "មិន​អាច​បង្កើត​រន្ធ​សម្រ
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "មិនអាច​ចាប់ផ្ដើម​ការតភ្ជាប់​​ទៅ​កាន់​ %s:%s (%s) បានឡើយ ។"
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "បាន​បរាជ័យ"
 
@@ -3549,9 +3756,7 @@ msgstr "មិន​អាច​តភ្ជាប់​ទៅកាន់​ %s
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr "មិន​អាច​តភ្ជាប់​ទៅ​កាន់​ %s:%s (%s) បានឡើយ ការ​តភ្ជាប់​បានអស់​ពេល​"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "កំពុង​តភ្ជាប់​ទៅកាន់ %s"
@@ -3589,147 +3794,14 @@ msgstr "បរាជ័យ​ក្នុងការថ្លែង"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "URI មិនត្រឹមត្រូវ​ URIS មូលដ្ឋានមិនត្រូវ​ចាប់ផ្តើម​ជាមួយ​ // ឡើយ"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "កំពុង​ចូល​"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "មិន​អាច​កំណត់ឈ្មោះដែលត្រូវបង្ហាញ​បានឡើយ​"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "មិន​អាច​កំណត់ឈ្មោះមូលដ្ឋាន​បានឡើយ"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "ម៉ាស៊ីន​បម្រើបានបដិសេធ​ការតភ្ជាប់ ហើយ​ បាននិយាយ ៖ %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "USER បរាជ័យ​ ម៉ាស៊ីន​បម្រើបាន​​និយាយ ៖ %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "PASS បានបរាជ័យ​ ម៉ាស៊ីន​បម្រើបាន​​និយាយ ៖ %s"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"ម៉ាស៊ីន​បម្រើ​ប្រូកស៊ី​ត្រូវ​បាន​បញ្ជាក់​ ប៉ុន្តែ​គ្មាន​ស្គ្រីប​ចូល​ទេ Acquire::ftp::ProxyLogin គឺ ទទេ ។"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr "ពាក្យ​បញ្ជា​ស្គ្រីប​ចូល​ '%s' បានបរាជ័យ ម៉ាស៊ីន​បម្រើ​បាននិយាយ ៖ %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "TYPE បានបរាជ័យ​ ម៉ាស៊ីន​បម្រើ​បាននិយាយ​ ៖ %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "អស់ពេល​ក្នុងការតភ្ជាប់​"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "ម៉ាស៊ីន​បម្រើ​បាន​បិទ​ការតភ្ជាប់​"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "ឆ្លើយតប​សតិ​បណ្តោះអាសន្ន​​អស់ចំណុះ ។"
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "ការបង្ខូច​ពិធីការ​"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "មិន​អាច​បង្កើត​រន្ធបានឡើយ"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr "មិន​អាច​តភ្ជាប់​​រន្ធទិន្នន័យ​បានឡើយ អស់​ពេល​ក្នុងការតភ្ជាប់​"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "មិនអាចតភ្ជាប់​​រន្ធអកម្ម​​បានឡើយ ។"
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "getaddrinfo មិន​អាច​​ទទួល​យក​រន្ធ​សម្រាប់​ស្តាប់​​បានឡើយ"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "មិន​អាច​ចងរន្ធ​បានបានឡើយ​"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "មិនអាច​ស្ដាប់នៅលើរន្ធ​បានឡើយ"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "មិន​អាច​កំណត់​ឈ្មោះរបស់​រន្ធ​បានឡើយ"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "មិនអាច​ផ្ញើពាក្យ​បញ្ជា​ PORT បានឡើយ"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "មិន​ស្គាល់​អាសយដ្ឋាន​គ្រួសារ​ %u (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "EPRT បរាជ័យ​ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ ៖ %s"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "ការតភ្ជាប់​រន្ធ​​ទិន្នន័បានអស់ពេល​"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "មិនអាច​ទទួលយក​ការតភ្ជាប់​បានឡើយ"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "បញ្ហា​ធ្វើឲ្យខូច​ឯកសារ"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "មិន​អាច​ទៅ​ប្រមូល​យក​ឯកសារ​បានឡើយ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ​ '%s'"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "រន្ធ​ទិន្នន័យ​បាន​អស់​ពេល​"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "បរាជ័យក្នុងការ​ផ្ទេរ​ទិន្នន័យ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ​ '%s'"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "សំណួរ​"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "មិន​អាច​ហៅ​ "
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
+msgstr ""
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
 msgstr ""
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
@@ -3750,19 +3822,14 @@ msgstr "កំហុស​ខាងក្នុង​ ៖ ហត្ថលេខ
 
 #: methods/gpgv.cc
 #, fuzzy
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr "មិន​អាច​ប្រតិបត្តិ '%s' ដើម្បី​ផ្ទៀងផ្ទាត់​ហត្ថលេខា (តើ gnupg ត្រូវ​បាន​ដំឡើង​ឬនៅ ?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
+#, fuzzy
+#| msgid "Unknown error executing apt-key"
+msgid "Unknown error executing gpgv"
 msgstr "មិនស្គាល់កំហុស ក្នុងការប្រតិបត្តិ apt-key"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
@@ -3800,17 +3867,127 @@ msgstr "ជ្រើស​បាន​បរាជ័យ​"
 msgid "Connection timed out"
 msgstr "ការតភ្ជាប់​បាន​អស់ពេល​"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "បញ្ហា​ធ្វើឲ្យខូច​ឯកសារ"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "បរាជ័យក្នុងការកំណត់​ពេលវេលា​ការកែប្រែ​"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "បាន​បិទ​ការ​តភ្ជាប់​មុន​ពេល"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr ""
+
+#~ msgid "Logging in"
+#~ msgstr "កំពុង​ចូល​"
+
+#~ msgid "Unable to determine the peer name"
+#~ msgstr "មិន​អាច​កំណត់ឈ្មោះដែលត្រូវបង្ហាញ​បានឡើយ​"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "មិន​អាច​កំណត់ឈ្មោះមូលដ្ឋាន​បានឡើយ"
+
+#, c-format
+#~ msgid "The server refused the connection and said: %s"
+#~ msgstr "ម៉ាស៊ីន​បម្រើបានបដិសេធ​ការតភ្ជាប់ ហើយ​ បាននិយាយ ៖ %s"
+
+#, c-format
+#~ msgid "USER failed, server said: %s"
+#~ msgstr "USER បរាជ័យ​ ម៉ាស៊ីន​បម្រើបាន​​និយាយ ៖ %s"
+
+#, c-format
+#~ msgid "PASS failed, server said: %s"
+#~ msgstr "PASS បានបរាជ័យ​ ម៉ាស៊ីន​បម្រើបាន​​និយាយ ៖ %s"
+
+#~ msgid ""
+#~ "A proxy server was specified but no login script, "
+#~ "Acquire::ftp::ProxyLogin is empty."
+#~ msgstr ""
+#~ "ម៉ាស៊ីន​បម្រើ​ប្រូកស៊ី​ត្រូវ​បាន​បញ្ជាក់​ ប៉ុន្តែ​គ្មាន​ស្គ្រីប​ចូល​ទេ Acquire::ftp::ProxyLogin គឺ ទទេ ។"
+
+#, c-format
+#~ msgid "Login script command '%s' failed, server said: %s"
+#~ msgstr "ពាក្យ​បញ្ជា​ស្គ្រីប​ចូល​ '%s' បានបរាជ័យ ម៉ាស៊ីន​បម្រើ​បាននិយាយ ៖ %s"
+
+#, c-format
+#~ msgid "TYPE failed, server said: %s"
+#~ msgstr "TYPE បានបរាជ័យ​ ម៉ាស៊ីន​បម្រើ​បាននិយាយ​ ៖ %s"
+
+#~ msgid "Connection timeout"
+#~ msgstr "អស់ពេល​ក្នុងការតភ្ជាប់​"
+
+#~ msgid "Server closed the connection"
+#~ msgstr "ម៉ាស៊ីន​បម្រើ​បាន​បិទ​ការតភ្ជាប់​"
+
+#~ msgid "A response overflowed the buffer."
+#~ msgstr "ឆ្លើយតប​សតិ​បណ្តោះអាសន្ន​​អស់ចំណុះ ។"
+
+#~ msgid "Protocol corruption"
+#~ msgstr "ការបង្ខូច​ពិធីការ​"
+
+#~ msgid "Could not create a socket"
+#~ msgstr "មិន​អាច​បង្កើត​រន្ធបានឡើយ"
+
+#~ msgid "Could not connect data socket, connection timed out"
+#~ msgstr "មិន​អាច​តភ្ជាប់​​រន្ធទិន្នន័យ​បានឡើយ អស់​ពេល​ក្នុងការតភ្ជាប់​"
+
+#~ msgid "Could not connect passive socket."
+#~ msgstr "មិនអាចតភ្ជាប់​​រន្ធអកម្ម​​បានឡើយ ។"
+
+#~ msgid "getaddrinfo was unable to get a listening socket"
+#~ msgstr "getaddrinfo មិន​អាច​​ទទួល​យក​រន្ធ​សម្រាប់​ស្តាប់​​បានឡើយ"
+
+#~ msgid "Could not bind a socket"
+#~ msgstr "មិន​អាច​ចងរន្ធ​បានបានឡើយ​"
+
+#~ msgid "Could not listen on the socket"
+#~ msgstr "មិនអាច​ស្ដាប់នៅលើរន្ធ​បានឡើយ"
+
+#~ msgid "Could not determine the socket's name"
+#~ msgstr "មិន​អាច​កំណត់​ឈ្មោះរបស់​រន្ធ​បានឡើយ"
+
+#~ msgid "Unable to send PORT command"
+#~ msgstr "មិនអាច​ផ្ញើពាក្យ​បញ្ជា​ PORT បានឡើយ"
+
+#, c-format
+#~ msgid "Unknown address family %u (AF_*)"
+#~ msgstr "មិន​ស្គាល់​អាសយដ្ឋាន​គ្រួសារ​ %u (AF_*)"
+
+#, c-format
+#~ msgid "EPRT failed, server said: %s"
+#~ msgstr "EPRT បរាជ័យ​ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ ៖ %s"
+
+#~ msgid "Data socket connect timed out"
+#~ msgstr "ការតភ្ជាប់​រន្ធ​​ទិន្នន័បានអស់ពេល​"
+
+#~ msgid "Unable to accept connection"
+#~ msgstr "មិនអាច​ទទួលយក​ការតភ្ជាប់​បានឡើយ"
+
+#, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "មិន​អាច​ទៅ​ប្រមូល​យក​ឯកសារ​បានឡើយ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ​ '%s'"
+
+#~ msgid "Data socket timed out"
+#~ msgstr "រន្ធ​ទិន្នន័យ​បាន​អស់​ពេល​"
+
+#, c-format
+#~ msgid "Data transfer failed, server said '%s'"
+#~ msgstr "បរាជ័យក្នុងការ​ផ្ទេរ​ទិន្នន័យ ម៉ាស៊ីន​បម្រើ​បាន​និយាយ​ '%s'"
+
+#~ msgid "Query"
+#~ msgstr "សំណួរ​"
+
+#~ msgid "Unable to invoke "
+#~ msgstr "មិន​អាច​ហៅ​ "
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "បាន​បិទ​ការ​តភ្ជាប់​មុន​ពេល"
+
+#, fuzzy
+#~| msgid "The following held packages will be changed:"
+#~ msgid "Changing held packages:Changing held packages:"
+#~ msgstr "កញ្ចប់​រង់ចាំ​ខាងក្រោម​នឹង​ត្រូវ​​បានផ្លាស់​​ប្តូរ​ ៖"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "បាទ/ចាស ធ្វើ​ដូច​ដែល​ខ្ញុំ​និយាយ !"

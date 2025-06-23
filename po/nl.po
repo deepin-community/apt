@@ -9,14 +9,14 @@
 # Wannes Soenen <wannes@wannes.cjb.net>, 2002.
 # Frans Pop <elendil@planet.nl>, 2010.
 # Jeroen Schot <schot@a-eskwadraat.nl>, 2011.
-# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2014-2024.
+# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2014-2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.7.12\n"
+"Project-Id-Version: apt 2.9.31\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
-"PO-Revision-Date: 2024-02-26 20:56+0100\n"
+"POT-Creation-Date: 2025-04-04 16:12+0200\n"
+"PO-Revision-Date: 2025-03-09 22:43+0100\n"
 "Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
 "Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
 "Language: nl\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
@@ -62,11 +62,12 @@ msgstr "De pakketbron '%s' heeft niet langer een Release-bestand."
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
-"Normaal gezien is dit niet toegelaten, maar de optie Acquire::"
-"AllowDowngradeToInsecureRepositories werd gegeven om dit te omzeilen."
+"Normaal gezien is dit niet toegelaten, maar de optie "
+"Acquire::AllowDowngradeToInsecureRepositories werd gegeven om dit te "
+"omzeilen."
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -131,10 +132,14 @@ msgstr ""
 "het netwerk authenticatie?)"
 
 #: apt-pkg/acquire-item.cc
-#, c-format
+#, fuzzy, c-format
+#| msgid ""
+#| "An error occurred during the signature verification. The repository is "
+#| "not updated and the previous index files will be used. GPG error: %s: %s"
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 "Er is een fout opgetreden bij de controle van de ondertekening. De "
 "pakketbron is niet bijgewerkt en de oude indexbestanden zullen worden "
@@ -143,8 +148,8 @@ msgstr ""
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
-msgstr "GPG-fout: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
+msgstr ""
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -214,8 +219,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Tegenstrijdige distributie: %s (verwachtte %s, maar kreeg %s)"
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr "Bij pakketbron '%s' is de '%s'-waarde gewijzigd van '%s' naar '%s'"
@@ -228,7 +232,7 @@ msgstr ""
 "%hi."
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -255,6 +259,15 @@ msgstr "Ophalen van %s is mislukt  %s"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+"Pakketbronnen zouden een duidelijk ondertekend InRelease-bestand moeten "
+"leveren, maar er is er geen gevonden op %s."
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -271,16 +284,6 @@ msgstr "Kan geen bron vinden om versie '%s' van '%s' op te halen"
 #, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "Logbestand met veranderingen niet beschikbaar voor %s=%s"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
-"Methode '%s' wordt niet ondersteund en is standaard uitgeschakeld. U "
-"schakelt best over op http(s). Stel Dir::Bin::Methods::%s in op \"%s\" om "
-"deze opnieuw in te schakelen."
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -496,7 +499,7 @@ msgstr "Cd-rom wordt aangekoppeld...\n"
 
 #: apt-pkg/cdrom.cc
 msgid "Identifying... "
-msgstr "Identificatie..."
+msgstr "Identificatie... "
 
 #: apt-pkg/cdrom.cc
 #, c-format
@@ -696,6 +699,30 @@ msgstr ""
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "Syntactische fout %s:%u: extra rommel aan het einde van het bestand"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr "Fout:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr "Waarschuwing:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr "Kennisgeving:"
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr "Controle:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr "Debug:"
+
 #: apt-pkg/contrib/extracttar.cc
 #, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -813,11 +840,11 @@ msgstr "Subproces %s gaf een foutcode terug (%u)"
 msgid "Sub-process %s exited unexpectedly"
 msgstr "Subproces %s sloot onverwacht af"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "Leesfout"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "Schrijffout"
 
@@ -1141,6 +1168,14 @@ msgstr "Kan de beheersmap (%s) niet vergrendelen. Heeft u beheerdersrechten?"
 msgid "Not locked"
 msgstr "Niet vergrendeld"
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+"Het voor dpkg in Dir::Bin::dpkg ingestelde uitvoerbare bestand ontbreekt. Er "
+"wordt teruggevallen op de standaardinstelling dpkg."
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1256,7 +1291,7 @@ msgid ""
 "error"
 msgstr ""
 "Er is geen apport-verslag weggeschreven omdat de foutmelding als oorzaak een "
-"volle schijf opgeeft."
+"volle schijf opgeeft"
 
 #: apt-pkg/deb/dpkgpm.cc
 msgid ""
@@ -1264,7 +1299,7 @@ msgid ""
 "error"
 msgstr ""
 "Er is geen apport-verslag weggeschreven omdat de foutmelding als oorzaak "
-"onvoldoende-geheugen opgeeft."
+"onvoldoende-geheugen opgeeft"
 
 #: apt-pkg/deb/dpkgpm.cc
 msgid ""
@@ -1272,14 +1307,14 @@ msgid ""
 "local system"
 msgstr ""
 "Er is geen apport-verslag weggeschreven omdat de foutmelding een probleem op "
-"het lokale systeem signaleert."
+"het lokale systeem signaleert"
 
 #: apt-pkg/deb/dpkgpm.cc
 msgid ""
 "No apport report written because the error message indicates a dpkg I/O error"
 msgstr ""
 "Er is geen apport-verslag weggeschreven omdat de foutmelding een fout van "
-"dpkg I/O signaleert."
+"dpkg I/O signaleert"
 
 #: apt-pkg/depcache.cc
 msgid "Building dependency tree"
@@ -1332,6 +1367,14 @@ msgstr "Instellen op het ontvangen van een oplossing"
 #: apt-pkg/edsp.cc
 msgid "External solver failed without a proper error message"
 msgstr "Externe oplosser faalde zonder passende foutmelding"
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "Opwaardering wordt doorgerekend"
+
+#: apt-pkg/edsp.cc
+msgid "Solving dependencies"
+msgstr "Vereisten oplossen"
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1644,10 +1687,6 @@ msgstr ""
 "Ophalen van sommige indexbestanden is mislukt. Deze zijn of genegeerd, of er "
 "zijn oudere versies van gebruikt."
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "Opwaardering wordt doorgerekend"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1766,7 +1805,7 @@ msgstr " [Geïnstalleerd]"
 
 #: apt-private/private-cacheset.cc
 msgid " [Not candidate version]"
-msgstr "[Niet de kandidaat-versie]"
+msgstr " [Niet de kandidaat-versie]"
 
 #: apt-private/private-cacheset.cc
 msgid "You should explicitly select one to install."
@@ -1816,12 +1855,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Let op, '%s' wordt geselecteerd in plaats van '%s'\n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr "Meest gebruikte commando's:"
 
@@ -1838,8 +1871,8 @@ msgid ""
 "Security details are available in apt-secure(8).\n"
 msgstr ""
 "Configuratieopties en syntaxis worden gespecificeerd in apt.conf(5).\n"
-"Informatie over het configureren van pakketbronnen vindt u in sources."
-"list(5).\n"
+"Informatie over het configureren van pakketbronnen vindt u in "
+"sources.list(5).\n"
 "Keuzes voor pakketten en versies kunnen geuit worden via "
 "apt_preferences(5).\n"
 "Details over beveiliging zijn te vinden in apt-secure(8).\n"
@@ -1935,6 +1968,12 @@ msgid "Broken packages"
 msgstr "Niet-werkende pakketten"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "Schrijffout"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1975,7 +2014,7 @@ msgstr ""
 #: apt-private/private-install.cc
 msgid "Packages were downgraded and -y was used without --allow-downgrades."
 msgstr ""
-"Er werden pakketten gedegradeerd en -y was gebruikt zonder --allow-"
+"Er werden pakketten gedowngraded en -y was gebruikt zonder --allow-"
 "downgrades."
 
 #: apt-private/private-install.cc
@@ -1993,8 +2032,13 @@ msgstr "Interne fout. Rangschikken is niet voltooid"
 #: apt-private/private-install.cc
 msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr ""
-"Merkwaardig... De groottes kwamen niet overeen. Gelieve apt@packages.debian."
-"org te mailen"
+"Merkwaardig... De groottes kwamen niet overeen. Gelieve "
+"apt@packages.debian.org te mailen"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB / %sB\n"
+msgstr "  Downloadgrootte: %sB / %sB\n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
@@ -2003,6 +2047,11 @@ msgstr ""
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "Er moeten %sB/%sB aan archieven opgehaald worden.\n"
 
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr "  Downloadgrootte: %sB\n"
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
@@ -2010,12 +2059,56 @@ msgstr "Er moeten %sB/%sB aan archieven opgehaald worden.\n"
 msgid "Need to get %sB of archives.\n"
 msgstr "Er moeten %sB aan archieven opgehaald worden.\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr "Na deze bewerking zal er %sB extra schijfruimte gebruikt worden.\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr "Benodigde ruimte: %sB / %sB beschikbaar\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+"Meer ruimte nodig dan beschikbaar: %sB > %sB, de installatie kan mislukken"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr "in %s:  %sB / %sB beschikbaar\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+"Meer ruimte nodig in %s dan beschikbaar: %sB > %sB, de installatie kan "
+"mislukken"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr "Benodigde ruimte: %sB\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Freed space: %sB\n"
+msgstr "  Vrijgemaakte ruimte: %sB\n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -2036,18 +2129,17 @@ msgstr ""
 "Het verwijderen van essentiële voor het systeem kritieke pakketten is niet "
 "toegestaan. Dit kan het systeem onklaar maken."
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr "Toch doorgaan?"
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr "Doorgaan?"
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 msgid "Do you want to continue?"
 msgstr "Wilt u doorgaan?"
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -2108,6 +2200,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "Interne fout. AutoRemover heeft dingen stukgemaakt"
 
 #: apt-private/private-install.cc
+#, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] "Gebruik '%s' om het te verwijderen."
+msgstr[1] "Gebruik '%s' om ze te verwijderen."
+
+#: apt-private/private-install.cc
 msgid ""
 "The following package was automatically installed and is no longer required:"
 msgid_plural ""
@@ -2129,15 +2228,8 @@ msgstr[1] ""
 "%lu pakketten waren automatisch geïnstalleerd en zijn niet langer nodig.\n"
 
 #: apt-private/private-install.cc
-#, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] "Gebruik '%s' om het te verwijderen."
-msgstr[1] "Gebruik '%s' om ze te verwijderen."
-
-#: apt-private/private-install.cc
-msgid "The following additional packages will be installed:"
-msgstr "De volgende extra pakketten zullen geïnstalleerd worden:"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2146,6 +2238,10 @@ msgstr "Voorgestelde pakketten:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "Aanbevolen pakketten:"
+
+#: apt-private/private-install.cc
+msgid "The following additional packages will be installed:"
+msgstr "De volgende extra pakketten zullen geïnstalleerd worden:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2197,7 +2293,7 @@ msgstr "Bezig met oplijsten"
 msgid "There is %i additional version. Please use the '-a' switch to see it"
 msgid_plural ""
 "There are %i additional versions. Please use the '-a' switch to see them."
-msgstr[0] "Er is %i bijkomende versie. Gebruik schakelaar '-a' om het te zien."
+msgstr[0] "Er is %i bijkomende versie. Gebruik schakelaar '-a' om het te zien"
 msgstr[1] ""
 "Er zijn %i bijkomende versies. Gebruik schakelaar '-a' om ze te zien."
 
@@ -2284,8 +2380,24 @@ msgid "The following packages have unmet dependencies:"
 msgstr "De volgende pakketten hebben niet-voldane vereisten:"
 
 #: apt-private/private-output.cc
+msgid "Unsatisfied dependencies:"
+msgstr "Niet-voldane vereisten:"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "De volgende NIEUWE pakketten zullen geïnstalleerd worden:"
+
+#: apt-private/private-output.cc
+msgid "Installing:"
+msgstr "Installeren:"
+
+#: apt-private/private-output.cc
+msgid "Installing dependencies:"
+msgstr "Installeren van vereisten:"
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr "VERWIJDEREN:"
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2296,6 +2408,14 @@ msgid "The following upgrades have been deferred due to phasing:"
 msgstr "De volgende opwaarderingen zijn uitgesteld vanwege fasering:"
 
 #: apt-private/private-output.cc
+msgid "Not upgrading yet due to phasing:"
+msgstr "Nog niet opgewaardeerd vanwege fasering:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr "Niet opgewaardeerd:"
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "De volgende pakketten zijn achtergehouden:"
 
@@ -2304,8 +2424,20 @@ msgid "The following packages will be upgraded:"
 msgstr "De volgende pakketten zullen opgewaardeerd worden:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr "Opwaarderen:"
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr "DOWNGRADEN:"
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
-msgstr "De volgende pakketten zullen GEDEGRADEERD worden:"
+msgstr "De volgende pakketten zullen GEDOWNGRADED worden:"
+
+#: apt-private/private-output.cc
+msgid "Changing held packages:"
+msgstr "Veranderen vastgehouden pakketten:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2325,9 +2457,18 @@ msgstr ""
 "Dit dient NIET gedaan te worden tenzij u precies weet wat u doet!"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr "Samenvatting:"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu opgewaardeerd, %lu nieuw geïnstalleerd, "
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "Opwaarderen: %lu, Installeren: %lu, "
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2336,13 +2477,28 @@ msgstr "%lu opnieuw geïnstalleerd, "
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Reinstalling: %lu, "
+msgstr "Opnieuw installeren: %lu, "
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu downgraded, "
-msgstr "%lu gedegradeerd, "
+msgstr "%lu gedowngraded, "
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Downgrading: %lu, "
+msgstr "Downgraden: %lu, "
 
 #: apt-private/private-output.cc
 #, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu te verwijderen en %lu niet opgewaardeerd.\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr "Verwijderen: %lu, Niet opwaarderen: %lu\n"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2371,7 +2527,7 @@ msgid "Y"
 msgstr "J"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr "N"
 
@@ -2556,8 +2712,8 @@ msgstr "%s heeft geen bouwvereisten.\n"
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
 "Er is geen architectuurinformatie beschikbaar voor %s. Raadpleeg apt.conf(5) "
 "APT::Architectures om dit te configureren"
@@ -2600,6 +2756,11 @@ msgstr "Verwerken van %s is mislukt. Opnieuw bewerken? "
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr "Uw bestand '%s' is gewijzigd. Voer 'apt-get update' uit.\n"
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr "Bronnen van %zu herschrijven?"
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2622,8 +2783,42 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+"De vermelding %s voor '%s' moet worden opgewaardeerd naar deb822 .sources"
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
 msgstr "Ontbrekende Signed-By in het item %s voor '%s'"
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+"Overweeg om alle items van sources.list(5) om te zetten naar de indeling "
+"deb822 .sources"
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+"De indeling deb822 .sources ondersteunt zowel ingebouwde als externe OpenPGP-"
+"sleutels"
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+"Zie apt-secure(8) voor aanbevolen procedures voor het configureren van de "
+"ondertekening van pakketbronnen."
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
+msgstr ""
+"Sommige bronnen kunnen gemoderniseerd worden. Voer 'apt modernize-sources' "
+"uit om dit te doen."
 
 #: apt-private/private-update.cc
 #, c-format
@@ -2673,6 +2868,10 @@ msgstr "  Gemengde virtuele pakketten: "
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  Ontbrekend: "
+
+#: cmdline/apt-cache.cc
+msgid "Total distinct source versions: "
+msgstr "Totaal aantal verschillende bronversies: "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -3031,6 +3230,10 @@ msgid "concatenate files, with automatic decompression"
 msgstr "bestanden samenvoegen, met automatische decompressie"
 
 #: cmdline/apt-helper.cc
+msgid "hash file"
+msgstr "hash-bestand"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr "proxy opzoeken met behulp van apt.conf"
 
@@ -3277,6 +3480,10 @@ msgid "edit the source information file"
 msgstr "het bestand met informatie over de pakketbronnen bewerken"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ".list-bestanden moderniseren naar .sources-bestanden"
+
+#: cmdline/apt.cc
 msgid "satisfy dependency strings"
 msgstr "voldoen aan vereistentekenreeksen"
 
@@ -3485,7 +3692,7 @@ msgstr "Onbekend compressie-algoritme '%s'"
 msgid "Compressed output %s needs a compression set"
 msgstr "Gecomprimeerde uitvoer %s vereist dat een compressie ingesteld is"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "Aanmaken van IPC-pijp naar subproces is mislukt"
 
@@ -3604,23 +3811,23 @@ msgstr "Archief heeft geen 'package'-veld"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "  %s heeft geen voorrangsvermelding\n"
+msgid "  %.*s has no override entry\n"
+msgstr "  %.*s heeft geen voorrangsvermelding\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "  %s beheerder is %s, niet %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "  %.*s beheerder is %.*s, niet %s\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "  %s heeft geen voorrangsvermelding voor bronpakketten\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "  %.*s heeft geen voorrangsvermelding voor bronpakketten\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "  %s heeft ook geen voorrangsvermelding voor binaire pakketten\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "  %.*s heeft ook geen voorrangsvermelding voor binaire pakketten\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3658,7 +3865,7 @@ msgstr "Foute headerdata"
 msgid "Connection failed"
 msgstr "Verbinding mislukt"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3705,7 +3912,7 @@ msgstr ""
 msgid "Disk not found."
 msgstr "Schijf niet gevonden."
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "Bestand niet gevonden"
 
@@ -3740,7 +3947,7 @@ msgstr "Kon de socket voor %s (f=%u t=%u p=%u) niet aanmaken"
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "Kan de verbinding met %s:%s (%s) niet aangaan."
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "Mislukt"
 
@@ -3754,9 +3961,7 @@ msgstr "Kon geen verbinding maken met %s:%s (%s)."
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr "Kon geen verbinding maken met %s:%s (%s); de verbinding verliep"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "Er wordt verbinding gemaakt met %s"
@@ -3794,150 +3999,15 @@ msgstr "Kon status niet bepalen"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "Ongeldige URI. Lokale URI's mogen niet beginnen met //"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "Bezig met aanmelden"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "Kan de naam van de peer niet vaststellen"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "Kan de lokale naam niet vaststellen"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "De verbinding is door de server geweigerd met bericht: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "USER (gebruiker) mislukt; bericht van de server: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "PASS (wachtwoord) mislukt; bericht van de server: %s"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"Er was een proxy-server opgegeven, maar geen aanmeldscript. Acquire::ftp::"
-"ProxyLogin is leeg."
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr ""
-"Opdracht '%s' uit het aanmeldscript is mislukt; bericht van de server: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "TYPE mislukt; bericht van de server: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "De verbinding is verlopen"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "De verbinding is verbroken door de server"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "Een reactie deed de buffer overlopen."
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "Protocolfouten"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "Kon geen socket aanmaken"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr "Kon de datasocket niet verbinden. De verbinding verliep"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "Kon de passieve socket niet verbinden."
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "getaddrinfo kon geen luistersocket verkrijgen"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "Kon geen socket binden"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "Kon niet luisteren op de socket"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "Kon de socketnaam niet vaststellen"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "Kan PORT-commando niet verzenden"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "Onbekende adresfamilie %u (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "EPRT is mislukt; bericht van de server: %s"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "Verbinding met de datasocket is verlopen"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "Kan de verbinding niet aanvaarden"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "Probleem bij het frommelen van het bestand"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "Kan het bestand niet ophalen; bericht van de server: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "Datasocket verliep"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "Datatransfer is mislukt; bericht van de server: %s"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "Zoekopdracht"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "Mislukking bij aanroepen van "
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
-msgstr ""
+msgstr "niet-vertrouwd openbaar sleutelalgoritme: %s"
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
+msgstr "%s zal worden uitgefaseerd in een toekomstige release"
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
 #: methods/gpgv.cc
@@ -3960,33 +4030,20 @@ msgstr ""
 "niet bepalen?!"
 
 #: methods/gpgv.cc
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
-"Kon 'apt-key' niet uitvoeren om ondertekening te verifiëren (is gnupg "
+"Kon 'gpgv' niet uitvoeren om ondertekening te verifiëren (is gnupg "
 "geïnstalleerd?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
-msgstr "Onbekende fout bij het uitvoeren van apt-key"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
-"De sleutel wordt opgeslagen in de uitgefaseerde sleutelbos (%s) in trusted."
-"gpg, raadpleeg de afdeling UITFASERING (DEPRECATION) in apt-key(8) voor "
-"details."
+msgid "Unknown error executing gpgv"
+msgstr "Onbekende fout bij het uitvoeren van gpgv"
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
-#, fuzzy, c-format
-#| msgid "Signature by key %s uses weak digest algorithm (%s)"
+#, c-format
 msgid "Signature by key %s uses weak algorithm (%s)"
-msgstr ""
-"De ondertekening door sleutel %s maakt gebruik van een zwak hash-algoritme "
-"(%s)"
+msgstr "Handtekening met sleutel %s gebruikt een zwak algoritme (%s)"
 
 #: methods/gpgv.cc
 msgid "The following signatures were invalid:\n"
@@ -4021,14 +4078,18 @@ msgstr "Selectie is mislukt"
 msgid "Connection timed out"
 msgstr "Verbinding verliep"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "Probleem bij het frommelen van het bestand"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "Instellen van de aanpassingstijd is mislukt"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "Verbinding werd voortijdig afgebroken"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr "Lege bestanden kunnen geen geldige archieven zijn"
+
+#, c-format
+#~ msgid "GPG error: %s: %s"
+#~ msgstr "GPG-fout: %s: %s"

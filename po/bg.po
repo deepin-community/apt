@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 0.7.21\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"POT-Creation-Date: 2025-03-09 17:32+0000\n"
 "PO-Revision-Date: 2012-06-25 17:23+0300\n"
 "Last-Translator: Damyan Ivanov <dmn@debian.org>\n"
 "Language-Team: Bulgarian <dict@fsa-bg.org>\n"
@@ -55,8 +55,8 @@ msgstr "Директорията %s е отклонена"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -123,7 +123,8 @@ msgstr ""
 #, fuzzy, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 "Грешка при проверка на цифровия подпис. Хранилището не е обновено и ще се "
 "използват старите индексни файлове. Грешка от GPG: %s: %s\n"
@@ -131,8 +132,8 @@ msgstr ""
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
-msgstr "Грешка от GPG: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
+msgstr ""
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -194,8 +195,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Конфликт в дистрибуцията: %s (очаквана: %s, намерена: %s)"
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -206,7 +206,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -228,6 +228,13 @@ msgstr "Неуспех при изтеглянето на %s  %s"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -244,13 +251,6 @@ msgstr "Не е открит източник, от който да се изт�
 #, fuzzy, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "Журнал на промените в %s (%s)"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -654,6 +654,30 @@ msgstr ""
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "Синтактична грешка %s:%u: Излишни символи в края на файла"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr ""
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr ""
+
 #: apt-pkg/contrib/extracttar.cc
 #, fuzzy, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -766,11 +790,11 @@ msgstr "Подпроцесът %s върна код за грешка (%u)"
 msgid "Sub-process %s exited unexpectedly"
 msgstr "Подпроцесът %s завърши неочаквано"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "Грешка при четене"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "Грешка при запис"
 
@@ -1096,6 +1120,12 @@ msgstr ""
 msgid "Not locked"
 msgstr "Без заключване"
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1289,6 +1319,16 @@ msgid "External solver failed without a proper error message"
 msgstr ""
 "Външната програма за удовлетворяване на зависимости се провали без да изведе "
 "съобщение за грешка"
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "Изчисляване на актуализацията"
+
+#: apt-pkg/edsp.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Solving dependencies"
+msgstr "Общо зависимости: "
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1602,10 +1642,6 @@ msgstr ""
 "Някои индексни файлове не можаха да бъдат изтеглени. Те са пренебрегнати или "
 "са използвани по-стари."
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "Изчисляване на актуализацията"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1774,12 +1810,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Избиране на „%s“ вместо „%s“\n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
@@ -1884,6 +1914,12 @@ msgid "Broken packages"
 msgstr "Счупени пакети"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "Грешка при запис"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1938,12 +1974,24 @@ msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr ""
 "Странно... Размерите не съвпадат, изпратете е-поща на apt@packages.debian.org"
 
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Downloading %s %s"
+msgid "  Download size: %sB / %sB\n"
+msgstr "Изтегляне на %s %s"
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "Необходимо е да се изтеглят %sB/%sB архиви.\n"
+
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Downloading %s %s"
+msgid "  Download size: %sB\n"
+msgstr "Изтегляне на %s %s"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1952,14 +2000,56 @@ msgstr "Необходимо е да се изтеглят %sB/%sB архиви.
 msgid "Need to get %sB of archives.\n"
 msgstr "Необходимо е да се изтеглят %sB архиви.\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr ""
 "След тази операция ще бъде използвано %sB допълнително дисково "
 "пространство.\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Stored label: %s\n"
+msgid "  Freed space: %sB\n"
+msgstr "Запазен етикет: %s \n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1978,18 +2068,17 @@ msgid ""
 "break the system."
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr ""
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 msgid "Do you want to continue?"
 msgstr "Искате ли да продължите?"
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -2050,6 +2139,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "Вътрешна грешка, AutoRemover счупи нещо в системата"
 
 #: apt-private/private-install.cc
+#, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] "Използвайте „%s“ за да го премахнете."
+msgstr[1] "Използвайте „%s“ за да ги премахнете."
+
+#: apt-private/private-install.cc
 msgid ""
 "The following package was automatically installed and is no longer required:"
 msgid_plural ""
@@ -2069,16 +2165,8 @@ msgstr[1] ""
 "%lu пакета са били инсталирани автоматично и вече не са необходими:\n"
 
 #: apt-private/private-install.cc
-#, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] "Използвайте „%s“ за да го премахнете."
-msgstr[1] "Използвайте „%s“ за да ги премахнете."
-
-#: apt-private/private-install.cc
-#, fuzzy
-msgid "The following additional packages will be installed:"
-msgstr "Следните допълнителни пакети ще бъдат инсталирани:"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2087,6 +2175,11 @@ msgstr "Предложени пакети:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "Препоръчвани пакети:"
+
+#: apt-private/private-install.cc
+#, fuzzy
+msgid "The following additional packages will be installed:"
+msgstr "Следните допълнителни пакети ще бъдат инсталирани:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2223,8 +2316,30 @@ msgid "The following packages have unmet dependencies:"
 msgstr "Следните пакети имат неудовлетворени зависимости:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Failed to satisfy %s dependency for %s: %s"
+msgid "Unsatisfied dependencies:"
+msgstr "Неуспех при удовлетворяването на зависимост %s за пакета %s: %s"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "Следните НОВИ пакети ще бъдат инсталирани:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Installing %s"
+msgid "Installing:"
+msgstr "Инсталиране на %s"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Installing dependencies:"
+msgstr "Общо зависимости: "
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr ""
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2237,6 +2352,16 @@ msgid "The following upgrades have been deferred due to phasing:"
 msgstr "Следните пакети няма да бъдат променени:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "Not upgrading yet due to phasing:"
+msgstr "Следните пакети няма да бъдат променени:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "Следните пакети няма да бъдат променени:"
 
@@ -2245,8 +2370,22 @@ msgid "The following packages will be upgraded:"
 msgstr "Следните пакети ще бъдат актуализирани:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr "Следните пакети ще бъдат ВЪРНАТИ КЪМ ПО-СТАРА ВЕРСИЯ:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Pinned packages:"
+msgid "Changing held packages:"
+msgstr "Отбити пакети:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2266,9 +2405,19 @@ msgstr ""
 "Това НЕ би трябвало да става освен ако знаете точно какво правите!"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr ""
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu актуализирани, %lu нови инсталирани, "
+
+#: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "Инсталиране на %s"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2276,14 +2425,31 @@ msgid "%lu reinstalled, "
 msgstr "%lu преинсталирани, "
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Reinstalling: %lu, "
+msgstr "Инсталиране на %s"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu downgraded, "
 msgstr "%lu върнати към по-стара версия, "
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Downloading %s %s"
+msgid "Downgrading: %lu, "
+msgstr "Изтегляне на %s %s"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu за премахване и %lu без промяна.\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr ""
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2312,7 +2478,7 @@ msgid "Y"
 msgstr "Y"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr "N"
 
@@ -2495,11 +2661,11 @@ msgstr "%s няма зависимости за компилиране.\n"
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
-"Липсва информация за архитектурата %s. Прегледайте информацията за APT::"
-"Architectures в apt.conf(5)."
+"Липсва информация за архитектурата %s. Прегледайте информацията за "
+"APT::Architectures в apt.conf(5)."
 
 #: apt-private/private-source.cc
 msgid "Must specify at least one package to check builddeps for"
@@ -2536,6 +2702,11 @@ msgstr "Неуспех при преименуването на %s на %s"
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr ""
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr ""
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2556,7 +2727,32 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
 msgstr ""
 
 #: apt-private/private-update.cc
@@ -2603,6 +2799,12 @@ msgstr "  Смесени виртуални пакети: "
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  Липсващи: "
+
+#: cmdline/apt-cache.cc
+#, fuzzy
+#| msgid "Total distinct versions: "
+msgid "Total distinct source versions: "
+msgstr "Общо уникални версии: "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -2937,6 +3139,12 @@ msgid "concatenate files, with automatic decompression"
 msgstr ""
 
 #: cmdline/apt-helper.cc
+#, fuzzy
+#| msgid "Problem hashing file"
+msgid "hash file"
+msgstr "Проблем при хеширане на файла"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr ""
 
@@ -3187,6 +3395,10 @@ msgid "edit the source information file"
 msgstr "Четене на информацията за състоянието"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ""
+
+#: cmdline/apt.cc
 #, fuzzy
 #| msgid "Failed to satisfy %s dependency for %s: %s"
 msgid "satisfy dependency strings"
@@ -3394,7 +3606,7 @@ msgstr "Непознат алгоритъм за компресия „%s“"
 msgid "Compressed output %s needs a compression set"
 msgstr "Компресираният изход %s изисква настройка за компресирането"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "Неуспех при създаването на IPC pipe към подпроцеса"
 
@@ -3513,23 +3725,23 @@ msgstr "Архивът няма поле „package“"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "  %s няма запис „override“\n"
+msgid "  %.*s has no override entry\n"
+msgstr "  %.*s няма запис „override“\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "  поддържащия пакета %s е %s, а не %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "  поддържащия пакета %.*s е %.*s, а не %s\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "  %s няма запис „source override“\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "  %.*s няма запис „source override“\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "  %s няма също и запис „binary override“\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "  %.*s няма също и запис „binary override“\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3567,7 +3779,7 @@ msgstr "Невалидни данни на заглавната част"
 msgid "Connection failed"
 msgstr "Неуспех при свързването"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3609,7 +3821,7 @@ msgstr "Неуспех при демонтирането на CD-ROM в %s, мо
 msgid "Disk not found."
 msgstr "Дискът не е намерен."
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "Файлът не е намерен"
 
@@ -3645,7 +3857,7 @@ msgstr "Неуспех при създаването на гнездо за %s (
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "Не може да се започне свързване с %s:%s (%s)."
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "Неуспех"
 
@@ -3659,9 +3871,7 @@ msgstr "Неуспех при свързване с %s:%s (%s)."
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr "Неуспех при свързване с %s:%s (%s), допустимото време изтече"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "Свързване с %s"
@@ -3699,150 +3909,14 @@ msgstr "Неуспех при получаването на атрибути"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "Невалиден адрес-URI, локалните адреси-URI не трябва да започват с „//“"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "Влизане"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "Неуспех при установяването на името на отдалечения сървър"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "Неуспех при установяването на локалното име"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "Сървърът отказа свързване и съобщи: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "USER се провали, сървърът съобщи: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "PASS се провали, сървърът съобщи: %s"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"Беше указан сървър-посредник, но няма скрипт за влизане, Acquire::ftp::"
-"ProxyLogin е празен."
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr "Командата „%s“ на скрипта за влизане се провали, сървърът съобщи: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "TYPE се провали, сървърът съобщи: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "Допустимото време за свързването изтече"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "Сървърът разпадна връзката"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "Отговорът препълни буфера."
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "Развален протокол"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "Неуспех при създаването на гнездо"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr ""
-"Неуспех при свързването на гнездо за данни, допустимото време за свързване "
-"изтече"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "Неуспех при свързването на пасивно гнездо."
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "getaddrinfo не успя да се добере до слушащо гнездо"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "Неуспех при свързването на гнездо"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "Неуспех при слушането на гнездото"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "Неуспех при определянето на името на гнездото"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "Неуспех при изпращането на командата PORT"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "Неизвестно семейство адреси %u (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "EPRT се провали, сървърът съобщи: %s"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "Времето за установяване на връзка с гнездо за данни изтече"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "Невъзможно е да се приеме свързването"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "Проблем при хеширане на файла"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "Неуспех при изтеглянето на файла, сървърът съобщи „%s“"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "Времето за връзка с гнездо за данни изтече"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "Неуспех при прехвърлянето на данни, сървърът съобщи: „%s“"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "Запитване"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "Неуспех при извикването на "
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
+msgstr ""
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
 msgstr ""
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
@@ -3864,21 +3938,19 @@ msgstr ""
 "ключа?!"
 
 #: methods/gpgv.cc
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+#, fuzzy
+#| msgid ""
+#| "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
 "Неуспех при изпълнение на „apt-key“ за проверка на подписа (инсталиран ли е "
 "gnupg?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
+#, fuzzy
+#| msgid "Unknown error executing apt-key"
+msgid "Unknown error executing gpgv"
 msgstr "Неизвестна грешка при изпълнението на apt-key"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
@@ -3918,17 +3990,140 @@ msgstr "Неуспех на избора"
 msgid "Connection timed out"
 msgstr "Допустимото време за свързване изтече"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "Проблем при хеширане на файла"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "Неуспех при задаването на време на промяна"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "Връзката прекъсна преждевременно"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr "Празни файлове не могат да бъдат валидни архиви"
+
+#, c-format
+#~ msgid "GPG error: %s: %s"
+#~ msgstr "Грешка от GPG: %s: %s"
+
+#~ msgid "Logging in"
+#~ msgstr "Влизане"
+
+#~ msgid "Unable to determine the peer name"
+#~ msgstr "Неуспех при установяването на името на отдалечения сървър"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "Неуспех при установяването на локалното име"
+
+#, c-format
+#~ msgid "The server refused the connection and said: %s"
+#~ msgstr "Сървърът отказа свързване и съобщи: %s"
+
+#, c-format
+#~ msgid "USER failed, server said: %s"
+#~ msgstr "USER се провали, сървърът съобщи: %s"
+
+#, c-format
+#~ msgid "PASS failed, server said: %s"
+#~ msgstr "PASS се провали, сървърът съобщи: %s"
+
+#~ msgid ""
+#~ "A proxy server was specified but no login script, "
+#~ "Acquire::ftp::ProxyLogin is empty."
+#~ msgstr ""
+#~ "Беше указан сървър-посредник, но няма скрипт за влизане, "
+#~ "Acquire::ftp::ProxyLogin е празен."
+
+#, c-format
+#~ msgid "Login script command '%s' failed, server said: %s"
+#~ msgstr ""
+#~ "Командата „%s“ на скрипта за влизане се провали, сървърът съобщи: %s"
+
+#, c-format
+#~ msgid "TYPE failed, server said: %s"
+#~ msgstr "TYPE се провали, сървърът съобщи: %s"
+
+#~ msgid "Connection timeout"
+#~ msgstr "Допустимото време за свързването изтече"
+
+#~ msgid "Server closed the connection"
+#~ msgstr "Сървърът разпадна връзката"
+
+#~ msgid "A response overflowed the buffer."
+#~ msgstr "Отговорът препълни буфера."
+
+#~ msgid "Protocol corruption"
+#~ msgstr "Развален протокол"
+
+#~ msgid "Could not create a socket"
+#~ msgstr "Неуспех при създаването на гнездо"
+
+#~ msgid "Could not connect data socket, connection timed out"
+#~ msgstr ""
+#~ "Неуспех при свързването на гнездо за данни, допустимото време за "
+#~ "свързване изтече"
+
+#~ msgid "Could not connect passive socket."
+#~ msgstr "Неуспех при свързването на пасивно гнездо."
+
+#~ msgid "getaddrinfo was unable to get a listening socket"
+#~ msgstr "getaddrinfo не успя да се добере до слушащо гнездо"
+
+#~ msgid "Could not bind a socket"
+#~ msgstr "Неуспех при свързването на гнездо"
+
+#~ msgid "Could not listen on the socket"
+#~ msgstr "Неуспех при слушането на гнездото"
+
+#~ msgid "Could not determine the socket's name"
+#~ msgstr "Неуспех при определянето на името на гнездото"
+
+#~ msgid "Unable to send PORT command"
+#~ msgstr "Неуспех при изпращането на командата PORT"
+
+#, c-format
+#~ msgid "Unknown address family %u (AF_*)"
+#~ msgstr "Неизвестно семейство адреси %u (AF_*)"
+
+#, c-format
+#~ msgid "EPRT failed, server said: %s"
+#~ msgstr "EPRT се провали, сървърът съобщи: %s"
+
+#~ msgid "Data socket connect timed out"
+#~ msgstr "Времето за установяване на връзка с гнездо за данни изтече"
+
+#~ msgid "Unable to accept connection"
+#~ msgstr "Невъзможно е да се приеме свързването"
+
+#, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "Неуспех при изтеглянето на файла, сървърът съобщи „%s“"
+
+#~ msgid "Data socket timed out"
+#~ msgstr "Времето за връзка с гнездо за данни изтече"
+
+#, c-format
+#~ msgid "Data transfer failed, server said '%s'"
+#~ msgstr "Неуспех при прехвърлянето на данни, сървърът съобщи: „%s“"
+
+#~ msgid "Query"
+#~ msgstr "Запитване"
+
+#~ msgid "Unable to invoke "
+#~ msgstr "Неуспех при извикването на "
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "Връзката прекъсна преждевременно"
+
+#, fuzzy, c-format
+#~| msgid "  Installed: "
+#~ msgid "  Installed size: %sB\n"
+#~ msgstr "  Инсталирана: "
+
+#, fuzzy
+#~| msgid "The following held packages will be changed:"
+#~ msgid "Changing held packages:Changing held packages:"
+#~ msgstr "Следните задържани пакети ще бъдат променени:"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "Да, прави каквото казвам!"
@@ -4150,8 +4345,8 @@ msgstr "Празни файлове не могат да бъдат валидн
 #~ "  -q   Премахване на индикатора за напредък.\n"
 #~ "  -i   Показване само на важни зависимости при командата „unmet“.\n"
 #~ "  -c=? Указване на файл с настройки.\n"
-#~ "  -o=? Настройване на произволна конфигурационна опция, например -o dir::"
-#~ "cache=/tmp\n"
+#~ "  -o=? Настройване на произволна конфигурационна опция, например -o "
+#~ "dir::cache=/tmp\n"
 #~ "За повече информация вижте наръчниците apt-cache(8) и apt.conf(5).\n"
 
 #, fuzzy
@@ -4187,8 +4382,8 @@ msgstr "Празни файлове не могат да бъдат валидн
 #~ "Опции:\n"
 #~ "  -h   Този помощен текст.\n"
 #~ "  -c=? Четене на този конфигурационен файл.\n"
-#~ "  -o=? Настройване на произволна конфигурационна опция, т.е. -o dir::"
-#~ "cache=/tmp\n"
+#~ "  -o=? Настройване на произволна конфигурационна опция, т.е. -o "
+#~ "dir::cache=/tmp\n"
 
 #~ msgid ""
 #~ "Options:\n"
@@ -4234,8 +4429,8 @@ msgstr "Празни файлове не могат да бъдат валидн
 #~ "  -h   Този помощен текст.\n"
 #~ "  -s   Използване на сортиране по изходен код.\n"
 #~ "  -c=? Четене на този конфигурационен файл.\n"
-#~ "  -o=? Настройване на произволна конфигурационна опция, т.е. -o dir::"
-#~ "cache=/tmp\n"
+#~ "  -o=? Настройване на произволна конфигурационна опция, т.е. -o "
+#~ "dir::cache=/tmp\n"
 
 #~ msgid "Child process failed"
 #~ msgstr "Процесът-потомък пропадна"
@@ -4364,9 +4559,6 @@ msgstr "Празни файлове не могат да бъдат валидн
 
 #~ msgid "Ignore unavailable target release '%s' of package '%s'"
 #~ msgstr "Игнориране на несъществуващо издание „%s“ на пакета „%s“"
-
-#~ msgid "Downloading %s %s"
-#~ msgstr "Изтегляне на %s %s"
 
 #~ msgid "This is not a valid DEB archive, it has no '%s', '%s' or '%s' member"
 #~ msgstr "Това не е валиден DEB архив, няма елемент „%s“, „%s“ или „%s“"

@@ -7,7 +7,8 @@ Uploaders: Michael Vogt <mvo@debian.org>,
            David Kalnischkies <donkult@debian.org>
 Rules-Requires-Root: no
 Standards-Version: 4.1.1
-Build-Depends: cmake (>= 3.4),
+Build-Depends: dpkg-dev (>= 1.22.5) <!pkg.apt.ci>,
+               cmake (>= 3.4),
                debhelper-compat (= 12),
                docbook-xml <!nodoc>,
                docbook-xsl <!nodoc>,
@@ -16,8 +17,7 @@ Build-Depends: cmake (>= 3.4),
                googletest <!nocheck> | libgtest-dev <!nocheck>,
                libbz2-dev,
                libdb-dev,
-               libgnutls28-dev (>= 3.4.6),
-               libgcrypt20-dev,
+               libssl-dev,
                liblz4-dev (>= 0.0~r126),
                liblzma-dev,
                libseccomp-dev (>= 2.4.2) [amd64 arm64 armel armhf i386 mips mips64el mipsel ppc64el s390x hppa powerpc powerpcspe ppc64 x32],
@@ -28,6 +28,7 @@ Build-Depends: cmake (>= 3.4),
                ninja-build,
                pkg-config,
                po4a (>= 0.34-2) <!nodoc>,
+               sqv (>= 1.3.0) [amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x hurd-amd64 hurd-i386 loong64 powerpc ppc64 sparc64] <!pkg.apt.nosqv> | gpgv,
                triehash,
                xsltproc <!nodoc>,
                zlib1g-dev
@@ -38,8 +39,8 @@ Vcs-Browser: https://salsa.debian.org/apt-team/apt
 Package: apt
 Architecture: any
 Depends: base-passwd (>= 3.6.1) | adduser,
-         gpgv,
-         libapt-pkg6.0 (>= ${binary:Version}),
+         ${openpgp:Depends},
+         libapt-pkg7.0 (>= ${binary:Version}),
          ${apt:keyring},
          ${misc:Depends},
          ${shlibs:Depends}
@@ -47,7 +48,7 @@ Replaces: apt-transport-https (<< 1.5~alpha4~), apt-utils (<< 1.3~exp2~)
 Breaks: apt-transport-https (<< 1.5~alpha4~),
         apt-utils (<< 1.3~exp2~),
         aptitude (<< 0.8.10)
-Conflicts: apt-verify
+Conflicts: apt-verify, libnettle8 (<< 3.9.1-2.2~)
 Provides: apt-transport-https (= ${binary:Version})
 Recommends: ca-certificates
 Suggests: apt-doc,
@@ -68,9 +69,10 @@ Description: commandline package manager
     as well as installable packages
   * apt-cdrom to use removable media as a source for packages
   * apt-config as an interface to the configuration settings
-  * apt-key as an interface to manage authentication keys
+  * apt-extracttemplates is used by debconf to prompt for configuration
+    questions before installation.
 
-Package: libapt-pkg6.0
+Package: libapt-pkg7.0
 Architecture: any
 Multi-Arch: same
 Priority: optional
@@ -78,8 +80,9 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Breaks: appstream (<< 0.9.0-3~), apt (<< 1.6~), aptitude (<< 0.8.9), libapt-inst1.5 (<< 0.9.9~), dpkg (<< 1.20.8)
 Recommends: apt (>= ${binary:Version})
+Conflicts: libnettle8 (<< 3.9.1-2.2~)
 Section: libs
-Provides: libapt-pkg (= ${binary:Version})
+Provides: ${t64:Provides}, libapt-pkg (= ${binary:Version})
 Description: package management runtime library
  This library provides the common functionality for searching and
  managing packages as well as information about packages.
@@ -92,8 +95,8 @@ Description: package management runtime library
     solver or by interfacing with an external one
   * authenticating the sources and validating the retrieved data
   * installation and removal of packages in the system
-  * providing different transports to retrieve data over cdrom, ftp,
-    http(s), rsh as well as an interface to add more transports like
+  * providing different transports to retrieve data over cdrom and
+    http(s) as well as an interface to add more transports like
     tor+http(s) (apt-transport-tor).
 
 Package: apt-doc
@@ -143,8 +146,6 @@ Description: package management related utility programs
  This package contains some less used commandline utilities related
  to package management with APT.
  .
-  * apt-extracttemplates is used by debconf to prompt for configuration
-    questions before installation.
   * apt-ftparchive is used to create Packages and other index files
     needed to publish an archive of Debian packages
   * apt-sortpkgs is a Packages/Sources file normalizer.

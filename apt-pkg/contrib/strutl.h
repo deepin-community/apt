@@ -4,41 +4,50 @@
 /* ######################################################################
 
    String Util - These are some useful string functions
-   
+
    _strstrip is a function to remove whitespace from the front and end
    of a string.
-   
+
    This file had this historic note, but now includes further changes
    under the GPL-2.0+:
 
    This source is placed in the Public Domain, do with it what you will
-   It was originally written by Jason Gunthorpe <jgg@gpu.srv.ualberta.ca>   
-   
+   It was originally written by Jason Gunthorpe <jgg@gpu.srv.ualberta.ca>
+
    ##################################################################### */
 									/*}}}*/
 #ifndef STRUTL_H
 #define STRUTL_H
 
-#include <apt-pkg/string_view.h>
 #include <cstddef>
 #include <cstring>
 #include <ctime>
 #include <iostream>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "macros.h"
 
 
+namespace {
+   struct FreeDeleter {
+      void operator()(void *p) {
+         free(p);
+      }
+   };
+}
+
+
 namespace APT {
    namespace String {
-      APT_PUBLIC std::string Strip(const std::string &s);
-      APT_PUBLIC bool Endswith(const std::string &s, const std::string &ending);
-      APT_PUBLIC bool Startswith(const std::string &s, const std::string &starting);
-      APT_PUBLIC std::string Join(std::vector<std::string> list, const std::string &sep);
+      APT_PUBLIC std::string_view Strip(std::string_view s);
+      APT_PUBLIC bool Endswith(const std::string_view &s, const std::string_view &ending);
+      APT_PUBLIC bool Startswith(const std::string_view &s, const std::string_view &starting);
+      APT_PUBLIC std::string Join(std::vector<std::string> list, const std::string_view &sep);
       // Returns string display length honoring multi-byte characters
-      APT_PUBLIC size_t DisplayLength(StringView str);
+      APT_PUBLIC size_t DisplayLength(std::string_view str);
    }
 }
 
@@ -46,7 +55,6 @@ namespace APT {
 APT_PUBLIC bool UTF8ToCodeset(const char *codeset, const std::string &orig, std::string *dest);
 APT_PUBLIC char *_strstrip(char *String);
 APT_PUBLIC char *_strrstrip(char *String); // right strip only
-APT_DEPRECATED_MSG("Use SubstVar to avoid memory headaches") APT_PUBLIC char *_strtabexpand(char *String,size_t Len);
 APT_PUBLIC bool ParseQuoteWord(const char *&String,std::string &Res);
 APT_PUBLIC bool ParseCWord(const char *&String,std::string &Res);
 APT_PUBLIC std::string QuoteString(const std::string &Str,const char *Bad);
@@ -59,6 +67,7 @@ APT_PUBLIC std::string DeEscapeString(const std::string &input);
 APT_PUBLIC std::string SizeToStr(double Bytes);
 APT_PUBLIC std::string TimeToStr(unsigned long Sec);
 APT_PUBLIC std::string Base64Encode(const std::string &Str);
+APT_PUBLIC std::string Base64Decode(const std::string_view in);
 APT_PUBLIC std::string OutputInDepth(const unsigned long Depth, const char* Separator="  ");
 APT_PUBLIC std::string URItoFileName(const std::string &URI);
 /** returns a datetime string as needed by HTTP/1.1 and Debian files.
@@ -86,8 +95,7 @@ APT_PUBLIC std::string TimeRFC1123(time_t Date, bool const NumericTimezone);
  *    parsing is successful, undefined otherwise.
  * @return \b true if parsing was successful, otherwise \b false.
  */
-APT_PUBLIC bool RFC1123StrToTime(const std::string &str,time_t &time) APT_MUSTCHECK;
-APT_PUBLIC bool FTPMDTMStrToTime(const char* const str,time_t &time) APT_MUSTCHECK;
+[[nodiscard]] APT_PUBLIC bool RFC1123StrToTime(const std::string &str,time_t &time);
 APT_PUBLIC std::string LookupTag(const std::string &Message,const char *Tag,const char *Default = 0);
 APT_PUBLIC int StringToBool(const std::string &Text,int Default = -1);
 APT_PUBLIC bool ReadMessages(int Fd, std::vector<std::string> &List);
@@ -95,13 +103,13 @@ APT_PUBLIC bool StrToNum(const char *Str,unsigned long &Res,unsigned Len,unsigne
 APT_PUBLIC bool StrToNum(const char *Str,unsigned long long &Res,unsigned Len,unsigned Base = 0);
 APT_PUBLIC bool Base256ToNum(const char *Str,unsigned long &Res,unsigned int Len);
 APT_PUBLIC bool Base256ToNum(const char *Str,unsigned long long &Res,unsigned int Len);
-APT_PUBLIC bool Hex2Num(const APT::StringView Str,unsigned char *Num,unsigned int Length);
+APT_PUBLIC bool Hex2Num(const std::string_view Str,unsigned char *Num,unsigned int Length);
 // input changing string split
 APT_PUBLIC bool TokSplitString(char Tok,char *Input,char **List,
 		    unsigned long ListMax);
 
 // split a given string by a char
-APT_PUBLIC std::vector<std::string> VectorizeString(std::string const &haystack, char const &split) APT_PURE;
+APT_PUBLIC std::vector<std::string> VectorizeString(std::string_view const &haystack, char const &split) APT_PURE;
 
 /* \brief Return a vector of strings from string "input" where "sep"
  * is used as the delimiter string.
@@ -112,13 +120,13 @@ APT_PUBLIC std::vector<std::string> VectorizeString(std::string const &haystack,
  *
  * \param maxsplit (optional) The maximum amount of splitting that
  * should be done .
- * 
+ *
  * The optional "maxsplit" argument can be used to limit the splitting,
  * if used the string is only split on maxsplit places and the last
  * item in the vector contains the remainder string.
  */
-APT_PUBLIC std::vector<std::string> StringSplit(std::string const &input,
-                                     std::string const &sep, 
+APT_PUBLIC std::vector<std::string> StringSplit(std::string_view const &input,
+                                     std::string_view const &sep,
                                      unsigned int maxsplit=std::numeric_limits<unsigned int>::max()) APT_PURE;
 
 
@@ -220,7 +228,7 @@ class APT_PUBLIC URI
    std::string Host;
    std::string Path;
    unsigned int Port;
-   
+
    operator std::string();
    inline void operator =(const std::string &From) {CopyFrom(From);}
    inline bool empty() {return Access.empty();};
@@ -238,7 +246,7 @@ struct SubstVar
    const std::string *Contents;
 };
 APT_PUBLIC std::string SubstVar(std::string Str,const struct SubstVar *Vars);
-APT_PUBLIC std::string SubstVar(const std::string &Str,const std::string &Subst,const std::string &Contents);
+APT_PUBLIC std::string SubstVar(const std::string_view &Str,const std::string_view &Subst,const std::string_view &Contents);
 
 struct RxChoiceList
 {
@@ -248,5 +256,16 @@ struct RxChoiceList
 };
 APT_PUBLIC unsigned long RegexChoice(RxChoiceList *Rxs,const char **ListBegin,
 		      const char **ListEnd);
+
+/**
+ * \brief Faster comparison for string views (compare size before data)
+ *
+ * Still stable, but faster than the normal ordering. */
+static inline int StringViewCompareFast(const std::string_view & a, const std::string_view & b) {
+    if (a.size() != b.size())
+        return a.size() - b.size();
+
+    return a.compare(b);
+}
 
 #endif
