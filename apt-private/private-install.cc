@@ -368,7 +368,7 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	 if (_config->FindI("quiet",0) < 2 &&
 	     _config->FindB("APT::Get::Assume-Yes",false) == false)
 	 {
-      bool dangerousPrompt = false;
+      std::vector<std::string> dangerousPackages;
       if (_config->FindB("APT::Get::AutomaticRemove", false))
       {
          // Define the list of dangerous package name prefixes
@@ -389,18 +389,32 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
                 // Check if the package name prefix matches the dangerous list
                 if (strncmp(pkgName, dangerousPrefixes[i], strlen(dangerousPrefixes[i])) == 0)
                 {
-                    dangerousPrompt = true;
-                    goto foundDangerous;
+                    dangerousPackages.push_back(pkgName);
+                    break;
                 }
             }
          }
       }
-foundDangerous:
 
-      if (dangerousPrompt)
+      if (!dangerousPackages.empty())
       {
-         const char *redPrompt = _("\033[31mThe current uninstallation operation involves system-critical packages. Continuing may cause system instability. Are you sure you want to continue?\033[0m");
-         if (YnPrompt(redPrompt) == false)
+         std::string text = _("The current uninstallation operation involves system-critical packages. Continuing may cause system instability.");
+         text += "\n";
+         text += _("The following are critical system packages:");
+         text += "\n";
+         
+         for (const auto& pkg : dangerousPackages) {
+             text += "  • ";
+             text += pkg;
+             text += "\n";
+         }
+         
+         text += _("Do you want to continue?");
+         
+         std::string formattedPrompt = "\033[31m";
+         formattedPrompt += text;
+         formattedPrompt += "\033[0m";
+         if (YnPrompt(formattedPrompt.c_str()) == false)
          {
             c2out << _("Abort.") << std::endl;
             exit(1);
