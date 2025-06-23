@@ -1,6 +1,7 @@
 // Includes								/*{{{*/
 #include <config.h>
 
+#include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/cachefile.h>
 #include <apt-pkg/cacheset.h>
 #include <apt-pkg/cmndline.h>
@@ -32,6 +33,8 @@
 
 #include <apti18n.h>
 									/*}}}*/
+
+using APT::Configuration::color;
 
 pkgRecords::Parser &LookupParser(pkgRecords &Recs, pkgCache::VerIterator const &V, pkgCache::VerFileIterator &Vf) /*{{{*/
 {
@@ -218,6 +221,10 @@ static bool DisplayRecordV2(pkgCacheFile &CacheFile, pkgRecords &Recs, /*{{{*/
    // Check and load the package list file
    pkgCache::PkgFileIterator I = Vf.File();
 
+   // Extract the policy object for use later
+   pkgDepCache::Policy *Policy = CacheFile.GetPolicy();
+   if (Policy == nullptr)
+      return false;
    // find matching sources.list metaindex
    pkgSourceList *SrcList = CacheFile.GetSourceList();
    pkgIndexFile *Index;
@@ -271,7 +278,8 @@ static bool DisplayRecordV2(pkgCacheFile &CacheFile, pkgRecords &Recs, /*{{{*/
    RW.push_back(pkgTagSection::Tag::Remove("Description"));
    RW.push_back(pkgTagSection::Tag::Remove("Description-md5"));
    // improve
-   RW.push_back(pkgTagSection::Tag::Rewrite("Package", V.ParentPkg().FullName(true)));
+   RW.push_back(pkgTagSection::Tag::Rewrite("Package", color("Show::Package", V.ParentPkg().FullName(true))));
+
    RW.push_back(pkgTagSection::Tag::Rewrite("Installed-Size", installed_size));
    RW.push_back(pkgTagSection::Tag::Remove("Size"));
    RW.push_back(pkgTagSection::Tag::Rewrite("Download-Size", package_size));
@@ -279,10 +287,18 @@ static bool DisplayRecordV2(pkgCacheFile &CacheFile, pkgRecords &Recs, /*{{{*/
    if (manual_installed != nullptr)
       RW.push_back(pkgTagSection::Tag::Rewrite("APT-Manual-Installed", manual_installed));
    RW.push_back(pkgTagSection::Tag::Rewrite("APT-Sources", source_index_file));
+   if (_config->FindB("APT::Cache::ShowFull", false))
+   {
+      RW.push_back(pkgTagSection::Tag::Rewrite("APT-Pin", std::to_string(Policy->GetPriority(V))));
+      if (Policy->GetCandidateVer(V.ParentPkg()) == V)
+	 RW.push_back(pkgTagSection::Tag::Rewrite("APT-Candidate", "yes"));
+      if (auto Release = I.RelStr(); not I.Flagged(pkgCache::Flag::NotSource) && not Release.empty())
+	 RW.push_back(pkgTagSection::Tag::Rewrite("APT-Release", Release));
+   }
 
    FileFd stdoutfd;
    if (stdoutfd.OpenDescriptor(STDOUT_FILENO, FileFd::WriteOnly, false) == false ||
-	 Tags.Write(stdoutfd, TFRewritePackageOrder, RW) == false || stdoutfd.Close() == false)
+       Tags.Write(stdoutfd, pkgTagSection::WRITE_HUMAN, TFRewritePackageOrder, RW) == false || stdoutfd.Close() == false)
       return _error->Error("Internal Error, Unable to parse a package record");
 
    // write the description
@@ -291,7 +307,7 @@ static bool DisplayRecordV2(pkgCacheFile &CacheFile, pkgRecords &Recs, /*{{{*/
    if (Desc.end() == false)
    {
       pkgRecords::Parser &P = Recs.Lookup(Desc.FileList());
-      out << "Description: " << P.LongDesc();
+      out << color("Show::Field", "Description: ") << P.LongDesc();
    }
 
    // write a final newline (after the description)
@@ -347,6 +363,10 @@ bool ShowPackage(CommandLine &CmdL)					/*{{{*/
 
    int const ShowVersion = _config->FindI("APT::Cache::Show::Version", 1);
    pkgRecords Recs(CacheFile);
+
+   if (not InitOutputPager())
+      return false;
+
    for (APT::VersionList::const_iterator Ver = verset.begin(); Ver != verset.end(); ++Ver)
    {
       pkgCache::VerFileIterator Vf;
@@ -437,19 +457,30 @@ bool ShowSrcPackage(CommandLine &CmdL)					/*{{{*/
    if (_error->PendingError() == true)
       return false;
 
+   if (not InitOutputPager())
+      return false;
+
    bool found = false;
    // avoid showing identical records
    std::set<std::string> seen;
    for (const char **I = CmdL.FileList + 1; *I != 0; I++)
    {
+      const char *pkgname = *I;
       SrcRecs.Restart();
 
       pkgSrcRecords::Parser *Parse;
       bool found_this = false;
-      while ((Parse = SrcRecs.Find(*I,false)) != 0) {
+      bool only_source = _config->FindB("APT::Cache::Only-Source", false);
+      if (APT::String::Startswith(pkgname, "src:"))
+      {
+	 only_source = true;
+	 pkgname += 4;
+      }
+      while ((Parse = SrcRecs.Find(pkgname, false)) != 0)
+      {
 	 // SrcRecs.Find() will find both binary and source names
-	 if (_config->FindB("APT::Cache::Only-Source", false) == true)
-	    if (Parse->Package() != *I)
+	 if (only_source)
+	    if (Parse->Package() != pkgname)
 	       continue;
          std::string sha1str = Sha1FromString(Parse->AsStr());
          if (std::find(seen.begin(), seen.end(), sha1str) == seen.end())
@@ -482,6 +513,9 @@ bool Policy(CommandLine &CmdL)
       return false;
    pkgPolicy * const Plcy = CacheFile.GetPolicy();
    if (unlikely(Plcy == nullptr))
+      return false;
+
+   if (not InitOutputPager())
       return false;
 
    // Print out all of the package files

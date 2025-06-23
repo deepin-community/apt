@@ -68,7 +68,7 @@ struct Digest {
    }
 };
 
-static constexpr Digest Digests[] = {
+static constexpr std::array<Digest,12> Digests = {{
    {Digest::State::Untrusted, "Invalid digest"},
    {Digest::State::Untrusted, "MD5"},
    {Digest::State::Untrusted, "SHA1"},
@@ -81,17 +81,14 @@ static constexpr Digest Digests[] = {
    {Digest::State::Trusted, "SHA384"},
    {Digest::State::Trusted, "SHA512"},
    {Digest::State::Trusted, "SHA224"},
-};
+}};
 
-static Digest FindDigest(std::string const & Digest)
+static Digest FindDigest(std::string const &Digest)
 {
    int id = atoi(Digest.c_str());
-   if (id >= 0 && static_cast<unsigned>(id) < APT_ARRAY_SIZE(Digests))
-   {
+   if (id >= 0 && static_cast<unsigned>(id) < Digests.size())
       return Digests[id];
-   } else {
-      return Digests[0];
-   }
+   return Digests[0];
 }
 
 struct Signer {
@@ -112,6 +109,7 @@ struct APT_HIDDEN SignersStorage {
    std::vector<Signer> Worthless;
    // a worthless signature is a expired or revoked one
    std::vector<Signer> SoonWorthless;
+   std::vector<Signer> LaterWorthless;
    std::vector<std::string> NoPubKey;
    std::vector<std::string> Valid;
    std::vector<std::string> SignedBy;
@@ -123,13 +121,9 @@ class GPGVMethod : public aptMethod
 				vector<string> const &keyFpts,
 				vector<string> const &keyFiles,
 				SignersStorage &Signers);
-   string VerifyGetSignersWithLegacy(const char *file, const char *outfile,
-				     vector<string> const &keyFpts,
-				     vector<string> const &keyFiles,
-				     SignersStorage &Signers);
 
    protected:
-   virtual bool URIAcquire(std::string const &Message, FetchItem *Itm) APT_OVERRIDE;
+   bool URIAcquire(std::string const &Message, FetchItem *Itm) override;
    public:
    GPGVMethod() : aptMethod("gpgv", "1.1", SingleInstance | SendConfig | SendURIEncoded){};
 };
@@ -189,6 +183,12 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
    if (Debug == true)
       std::clog << "inside VerifyGetSigners" << std::endl;
 
+   // Abort early if we can't find gpgv, before forking further. This also
+   // caches the invocation of --dump-options to find the working gpgv across
+   // our fork() below.
+   if (APT::Internal::FindGPGV(Debug).first.empty())
+      return "Internal error: Cannot find gpgv";
+
    int fd[2];
 
    if (pipe(fd) < 0)
@@ -200,15 +200,14 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
    else if (pid == 0)
    {
       std::ostringstream keys;
-      implodeVector(keyFiles, keys, ",");
       setenv("APT_KEY_NO_LEGACY_KEYRING", "1", true);
-      ExecGPGV(outfile, file, 3, fd, keys.str());
+      ExecGPGV(outfile, file, 3, fd, keyFiles);
    }
    close(fd[1]);
 
    FILE *pipein = fdopen(fd[0], "r");
 
-   // Loop over the output of apt-key (which really is gnupg), and check the signatures.
+   // Loop over the output of gpgv, and check the signatures.
    std::vector<std::string> ErrSigners;
    std::map<std::string, std::vector<std::string>> SubKeyMapping;
    size_t buffersize = 0;
@@ -260,6 +259,17 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
 	    Signers.Good.erase(std::remove_if(Signers.Good.begin(), Signers.Good.end(), [&](std::string const &goodsig)
 					      { return IsTheSameKey(fpr, goodsig); }),
 			       Signers.Good.end());
+	 }
+	 else if (not IsAssertedPubKeyAlgo(pkstr, "APT::Key::Assert-Pubkey-Algo::Next"))
+	 {
+	    std::string reason;
+	    Signers.SoonWorthless.push_back({fpr, pkstr});
+	 }
+	 else if (not IsAssertedPubKeyAlgo(pkstr, "APT::Key::Assert-Pubkey-Algo::Future"))
+	 {
+	    std::string reason;
+	    strprintf(reason, _("%s will be deprecated in a future release"), pkstr.c_str());
+	    Signers.LaterWorthless.push_back({fpr, reason});
 	 }
       }
       else if (strncmp(buffer, GNUPGGOODSIG, sizeof(GNUPGGOODSIG)-1) == 0)
@@ -323,7 +333,7 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
    for (auto errSigner : ErrSigners)
       Signers.Worthless.push_back({errSigner, ""});
 
-   // apt-key has a --keyid parameter, but this requires gpg, so we call it without it
+   // gpgv has no --keyid parameter, so we call it without it
    // and instead check after the fact which keyids where used for verification
    if (keyFpts.empty() == false)
    {
@@ -420,6 +430,8 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
       std::for_each(Signers.Worthless.begin(), Signers.Worthless.end(), [](Signer const &sig) { std::cerr << sig.key << ", "; });
       std::cerr << "\n  SoonWorthless: ";
       std::for_each(Signers.SoonWorthless.begin(), Signers.SoonWorthless.end(), [](Signer const &sig) { std::cerr << sig.key << ", "; });
+      std::cerr << "\n  LaterWorthless: ";
+      std::for_each(Signers.LaterWorthless.begin(), Signers.LaterWorthless.end(), [](Signer const &sig) { std::cerr << sig.key << ", "; });
       std::cerr << "\n  NoPubKey: ";
       implodeVector(Signers.NoPubKey, std::cerr, ", ");
       std::cerr << "\n  Signed-By: ";
@@ -462,52 +474,9 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
    else if (WEXITSTATUS(status) == 1)
       return _("At least one invalid signature was encountered.");
    else if (WEXITSTATUS(status) == 111)
-      return _("Could not execute 'apt-key' to verify signature (is gnupg installed?)");
+      return _("Could not execute 'gpgv' to verify signature (is gnupg installed?)");
    else
-      return _("Unknown error executing apt-key");
-}
-string GPGVMethod::VerifyGetSignersWithLegacy(const char *file, const char *outfile,
-					      vector<string> const &keyFpts,
-					      vector<string> const &keyFiles,
-					      SignersStorage &Signers)
-{
-   string const msg = VerifyGetSigners(file, outfile, keyFpts, keyFiles, Signers);
-   if (_error->PendingError())
-      return msg;
-
-   // Bad signature always remains bad, no need to retry against trusted.gpg
-   if (!Signers.Bad.empty())
-      return msg;
-
-   // We do not have a key file pinned, did not find a good signature, but found
-   // missing keys - let's retry with trusted.gpg
-   if (keyFiles.empty() && Signers.Valid.empty() && !Signers.NoPubKey.empty())
-   {
-      std::vector<std::string> legacyKeyFiles{_config->FindFile("Dir::Etc::trusted")};
-      if (legacyKeyFiles[0].empty())
-	 return msg;
-      if (DebugEnabled())
-	 std::clog << "Retrying against " << legacyKeyFiles[0] << "\n";
-
-      SignersStorage legacySigners;
-
-      string const legacyMsg = VerifyGetSigners(file, outfile, keyFpts, legacyKeyFiles, legacySigners);
-      if (_error->PendingError())
-	 return legacyMsg;
-      // Hooray, we found a key apparently, something verified as good or bad
-      if (!legacySigners.Valid.empty() || !legacySigners.Bad.empty())
-      {
-	 std::string warning;
-	 strprintf(warning,
-		   _("Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION section in apt-key(8) for details."),
-		   legacyKeyFiles[0].c_str());
-	 Warning(std::move(warning));
-	 Signers = std::move(legacySigners);
-	 return legacyMsg;
-      }
-
-   }
-   return msg;
+      return _("Unknown error executing gpgv");
 }
 static std::string GenerateKeyFile(std::string const key)
 {
@@ -546,8 +515,8 @@ bool GPGVMethod::URIAcquire(std::string const &Message, FetchItem *Itm)
 	    keyFpts.emplace_back(std::move(key));
    }
 
-   // Run apt-key on file, extract contents and get the key ID of the signer
-   string const msg = VerifyGetSignersWithLegacy(Path.c_str(), Itm->DestFile.c_str(), keyFpts, keyFiles, Signers);
+   // Run gpgv on file, extract contents and get the key ID of the signer
+   string const msg = VerifyGetSigners(Path.c_str(), Itm->DestFile.c_str(), keyFpts, keyFiles, Signers);
    if (_error->PendingError())
       return false;
 
@@ -564,6 +533,13 @@ bool GPGVMethod::URIAcquire(std::string const &Message, FetchItem *Itm)
          // TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 	 strprintf(msg, _("Signature by key %s uses weak algorithm (%s)"), Signer.key.c_str(), Signer.note.c_str());
          Warning(std::move(msg));
+      }
+      for (auto const &Signer : Signers.LaterWorthless)
+      {
+	 std::string msg;
+	 // TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
+	 strprintf(msg, _("Signature by key %s uses weak algorithm (%s)"), Signer.key.c_str(), Signer.note.c_str());
+	 Audit(std::move(msg));
       }
    }
 
@@ -634,7 +610,7 @@ bool GPGVMethod::URIAcquire(std::string const &Message, FetchItem *Itm)
    Dequeue();
 
    if (DebugEnabled())
-      std::clog << "apt-key succeeded\n";
+      std::clog << "gpgv succeeded\n";
 
    return true;
 }

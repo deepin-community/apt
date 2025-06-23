@@ -17,7 +17,6 @@
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/pkgcache.h>
 #include <apt-pkg/pkgsystem.h>
-#include <apt-pkg/string_view.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile-keys.h>
 #include <apt-pkg/tagfile.h>
@@ -44,7 +43,25 @@ edspListParser::edspListParser(FileFd * const File) : edspLikeListParser(File)
 bool edspLikeListParser::NewVersion(pkgCache::VerIterator &Ver)
 {
    _system->SetVersionMapping(Ver->ID, Section.FindI("APT-ID", Ver->ID));
-   return debListParser::NewVersion(Ver);
+   if (not debListParser::NewVersion(Ver))
+      return false;
+
+   // Patch up the source version, it is stored in the Source-Version field in EDSP.
+   if (std::string_view version = Section.Find(pkgTagSection::Key::Source_Version); not version.empty())
+   {
+      if (version != Ver.VerStr())
+      {
+	 map_stringitem_t const idx = StoreString(pkgCacheGenerator::VERSIONNUMBER, version);
+	 Ver.SourceVersion()->VerStr = idx;
+      }
+   }
+
+   // If we have a Size field, use it, otherwise fake one based on APT-Release to
+   // be able to distinguish downloadable debs from installed ones.
+   Ver->Size = Section.Exists(pkgTagSection::Key::Size)
+		  ? Section.FindI(pkgTagSection::Key::Size)
+		  : Section.Exists("APT-Release");
+   return true;
 }
 									/*}}}*/
 // ListParser::Description - Return the description string		/*{{{*/
@@ -54,9 +71,9 @@ std::vector<std::string> edspLikeListParser::AvailableDescriptionLanguages()
 {
    return {};
 }
-APT::StringView edspLikeListParser::Description_md5()
+std::string_view edspLikeListParser::Description_md5()
 {
-   return APT::StringView();
+   return {};
 }
 									/*}}}*/
 // ListParser::VersionHash - Compute a unique hash for this version	/*{{{*/

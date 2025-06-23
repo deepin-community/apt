@@ -1,10 +1,12 @@
 // Include files							/*{{{*/
 #include <config.h>
 
+#include <apt-pkg/aptconfiguration.h>
 #include <apt-pkg/cachefile.h>
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/depcache.h>
 #include <apt-pkg/error.h>
+#include <apt-pkg/fileutl.h>
 #include <apt-pkg/pkgcache.h>
 #include <apt-pkg/pkgrecords.h>
 #include <apt-pkg/policy.h>
@@ -17,11 +19,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <iomanip>
 #include <iostream>
 #include <langinfo.h>
 #include <regex.h>
 #include <sys/ioctl.h>
+#include <sys/wait.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include <sstream>
@@ -30,6 +35,7 @@
 									/*}}}*/
 
 using namespace std;
+using APT::Configuration::color;
 
 std::ostream c0out(0);
 std::ostream c1out(0);
@@ -38,6 +44,14 @@ std::ofstream devnull("/dev/null");
 
 
 unsigned int ScreenWidth = 80 - 1; /* - 1 for the cursor */
+static pid_t Pager = -1;
+static constexpr std::array<int, 5> PagerSignalsToHandle = {
+   SIGINT,
+   SIGHUP,
+   SIGTERM,
+   SIGQUIT,
+   SIGPIPE,
+};
 
 // SigWinch - Window size change signal handler				/*{{{*/
 // ---------------------------------------------------------------------
@@ -53,9 +67,174 @@ static void SigWinch(int)
 #endif
 }
 									/*}}}*/
+
+bool IsStdoutAtty()
+{
+   static bool is = isatty(STDOUT_FILENO);
+   return is;
+}
+
+static void WaitPager()
+{
+   if (Pager != -1)
+   {
+      c0out.flush();
+      c1out.flush();
+      c2out.flush();
+      std::cerr.flush();
+      std::cout.flush();
+      fflush(stdout);
+      fflush(stderr);
+      close(STDOUT_FILENO);
+      close(STDERR_FILENO);
+      waitpid(Pager, nullptr, 0);
+      Pager = -1;
+   }
+}
+
+static void SignalPager(int signo)
+{
+   if (Pager != -1)
+   {
+      // We can't flush from inside the signal handler.
+      close(STDOUT_FILENO);
+      close(STDERR_FILENO);
+      waitpid(Pager, nullptr, 0);
+      Pager = -1;
+      for (auto signalToHandle : PagerSignalsToHandle)
+	 signal(signalToHandle, SIG_DFL);
+      raise(signo);
+   }
+}
+
+static std::string DeterminePager()
+{
+   if (not IsStdoutAtty() || not _config->FindB("Pager", false))
+      return "";
+   if (auto pager = getenv("APT_PAGER"); pager)
+      return pager;
+   if (auto pager = getenv("PAGER"); pager)
+      return pager;
+   return DEFAULT_PAGER;
+}
+
+bool InitOutputPager()
+{
+   // InitOutputPager() behaves like a singleton, do not run twice-
+   static bool alreadyRan = false;
+   if (alreadyRan)
+      return true;
+   alreadyRan = true;
+
+   auto pager = DeterminePager();
+   if (pager.empty() || pager == "cat")
+      return true;
+
+   auto pagerEnv = VectorizeString(PAGER_ENV, '\n');
+
+   int pipefds[2] = {-1, -1};
+   int notifyPipe[2] = {-1, -1};
+
+   DEFER([&] () {
+      close(pipefds[0]);
+      close(pipefds[1]);
+      close(notifyPipe[0]);
+      close(notifyPipe[1]);
+   });
+
+   if (pipe(pipefds) || pipe(notifyPipe))
+      return _error->Errno("pipe", "Failed to setup pipe");
+
+   Pager = ExecFork();
+   if (Pager < 0)
+      return _error->Errno("fork", "Failed to fork");
+   if (Pager == 0)
+   {
+      // Child process
+      if (dup2(pipefds[0], STDIN_FILENO) == -1)
+	 goto err;
+      if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
+	 goto err;
+
+      for (int sig = 1; sig < NSIG; sig++)
+	 signal(sig, SIG_DFL);
+
+      for (auto &v: pagerEnv)
+      {
+	 // WARNING: VectorizeString() is not thread-safe, do not call after creating a thread.
+	 auto keyAndValue = VectorizeString(v, '=');
+	 if (keyAndValue.size() != 2)
+	 {
+	    _error->Fatal("Invalid environment string: %s", v.c_str());
+	    goto err;
+	 }
+	 // NOTE: Must not override user values, so setenv(..., override=0) is used rather than putenv()
+	 setenv(keyAndValue[0].c_str(), keyAndValue[1].c_str(), 0);
+      }
+
+      {
+	 // If our pager name contains a space we need to invoke it in a shell. Boooo!
+	 char *cmd[] = {(char*)"/bin/sh", (char*)"-c", pager.data(), nullptr};
+	 constexpr std::string_view allowed_chars{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" "+-._=/"};
+	 static_assert(allowed_chars.size() == 26 + 26 + 10 + 6);
+	 if (pager.find_first_not_of(allowed_chars) == pager.npos)
+	 {
+	    cmd[0] = pager.data();
+	    cmd[1] = nullptr;
+	 }
+	 execvp(cmd[0], cmd);
+      }
+   err:
+      int err = errno;
+      FileFd::Write(notifyPipe[1], &err, sizeof(err));
+      _exit(128);
+   }
+
+   // Parent process.
+
+   // Figure out if we were able to execvp() the child successfully. To do so,
+   // read from the notifyPipe. If execvp() was successful, it was closed due
+   // to CLOEXEC. On failure, our child code writes an errno to it.
+   _error->PushToStack();
+   close(notifyPipe[1]);   // Need to close our write end so our read doesn't block
+   notifyPipe[1] = -1;
+   if (int err = 0; FileFd::Read(notifyPipe[0], &err, sizeof(err))) {
+      errno = err;
+      _error->WarningE("PagerSetup", "Could not execute pager");
+      _error->MergeWithStack();
+      return true;
+   }
+   _error->RevertToStack();
+
+   // When running a pager, we must not be reading from stdin/tty, so
+   // let's be safe and open /dev/null in its place.
+   if (int const nullfd = open("/dev/null", O_RDONLY); nullfd != -1)
+   {
+      dup2(nullfd, STDIN_FILENO);
+      close(nullfd);
+   }
+
+   // Redirect the output(s) to the pager
+   if (dup2(pipefds[1], STDOUT_FILENO) == -1)
+      abort();
+   if (isatty(STDERR_FILENO) && dup2(pipefds[1], STDERR_FILENO) == -1)
+      abort();
+
+   // From now on, we can't show any progress messages as we are outputting
+   // to the pager.
+   _config->CndSet("quiet::NoUpdate", "1");
+
+   // Setup signal handlers and exit handlers for the pager, such that
+   // we wait for it.
+   for (auto signalToHandle : PagerSignalsToHandle)
+      signal(signalToHandle, SignalPager);
+   atexit(WaitPager);
+
+   return true;
+}
 bool InitOutput(std::basic_streambuf<char> * const out)			/*{{{*/
 {
-   if (!isatty(STDOUT_FILENO) && _config->FindI("quiet", -1) == -1)
+   if (not IsStdoutAtty() && _config->FindI("quiet", -1) == -1)
       _config->Set("quiet","1");
 
    c0out.rdbuf(out);
@@ -86,7 +265,7 @@ bool InitOutput(std::basic_streambuf<char> * const out)			/*{{{*/
       SigWinch(0);
    }
 
-   if (isatty(STDOUT_FILENO) == 0 || not _config->FindB("APT::Color", true) || getenv("NO_COLOR") != nullptr)
+   if (not IsStdoutAtty() || not _config->FindB("APT::Color", true) || getenv("NO_COLOR") != nullptr || getenv("APT_NO_COLOR") != nullptr)
    {
       _config->Set("APT::Color", false);
       _config->Set("APT::Color::Highlight", "");
@@ -94,6 +273,7 @@ bool InitOutput(std::basic_streambuf<char> * const out)			/*{{{*/
    } else {
       // Colors
       _config->CndSet("APT::Color::Highlight", "\x1B[32m");
+      _config->CndSet("APT::Color::Bold", "\x1B[1m");
       _config->CndSet("APT::Color::Neutral", "\x1B[0m");
       
       _config->CndSet("APT::Color::Red", "\x1B[31m");
@@ -103,6 +283,14 @@ bool InitOutput(std::basic_streambuf<char> * const out)			/*{{{*/
       _config->CndSet("APT::Color::Magenta", "\x1B[35m");
       _config->CndSet("APT::Color::Cyan", "\x1B[36m");
       _config->CndSet("APT::Color::White", "\x1B[37m");
+
+      _config->CndSet("APT::Color::Action::Upgrade", "green");
+      _config->CndSet("APT::Color::Action::Install", "green");
+      _config->CndSet("APT::Color::Action::Install-Dependencies", "green");
+      _config->CndSet("APT::Color::Action::Downgrade", "yellow");
+      _config->CndSet("APT::Color::Action::Remove", "red");
+      _config->CndSet("APT::Color::Show::Field", "\x1B[1m");
+      _config->CndSet("APT::Color::Show::Package", "\x1B[32m");
    }
 
    return true;
@@ -302,8 +490,8 @@ void ListSingleVersion(pkgCacheFile &CacheFile, pkgRecords &records,	/*{{{*/
    else if (V.ParentPkg()->CurrentState == pkgCache::State::ConfigFiles)
       StatusStr = _("[residual-config]");
    output = SubstVar(output, "${apt:Status}", StatusStr);
-   output = SubstVar(output, "${color:highlight}", _config->Find("APT::Color::Highlight", ""));
-   output = SubstVar(output, "${color:neutral}", _config->Find("APT::Color::Neutral", ""));
+   output = SubstVar(output, "${color:highlight}", color("Highlight"));
+   output = SubstVar(output, "${color:neutral}", color("Neutral"));
    output = SubstVar(output, "${Description}", GetShortDescription(CacheFile, records, P));
    if (output.find("${LongDescription}") != string::npos)
       output = SubstVar(output, "${LongDescription}", GetLongDescription(CacheFile, records, P));
@@ -314,6 +502,83 @@ void ListSingleVersion(pkgCacheFile &CacheFile, pkgRecords &records,	/*{{{*/
       output.erase(output.length() - 1);
 
    out << output;
+}
+									/*}}}*/
+// ShowWithColumns - Show a list in the style of ls			/*{{{*/
+// ---------------------------------------------------------------------
+/* This prints out a vector of strings with the given indent and in as
+   many columns as will fit the screen width.
+   
+   The output looks like:
+  abiword                debootstrap                  gir1.2-upowerglib-1.0
+  abiword-common         dh-make                      google-chrome-beta
+  abiword-plugin-grammar dmeventd                     gstreamer1.0-clutter-3.0
+  binfmt-support         dmsetup                      hostname
+  console-setup          evolution-data-server        iproute2
+  console-setup-linux    evolution-data-server-common
+  coreutils              ffmpeg
+ */
+struct columnInfo
+{
+   bool ValidLen;
+   size_t LineWidth;
+   vector<size_t> RemainingWidths;
+};
+void ShowWithColumns(ostream &out, vector<string> const &List, size_t Indent, size_t ScreenWidth)
+{
+   constexpr size_t MinColumnWidth = 2;
+   constexpr size_t ColumnSpace = 2;
+
+   size_t const ListSize = List.size();
+   size_t const MaxScreenCols = (ScreenWidth - Indent) /
+         MinColumnWidth;
+   size_t const MaxNumCols = min(MaxScreenCols, ListSize);
+
+   vector<columnInfo> ColumnInfo(MaxNumCols);
+   for (size_t I = 0; I < MaxNumCols; ++I) {
+      ColumnInfo[I].ValidLen = true;
+      ColumnInfo[I].LineWidth = (I + 1) * MinColumnWidth;
+      ColumnInfo[I].RemainingWidths.resize(I + 1, MinColumnWidth);
+   }
+
+   for (size_t I = 0; I < ListSize; ++I) {
+      for (size_t J = 0; J < MaxNumCols; ++J) {
+         auto& Col = ColumnInfo[J];
+         if (!Col.ValidLen)
+            continue;
+
+         size_t Idx = I / ((ListSize + J) / (J + 1));
+         size_t RealColLen = List[I].size() + (Idx == J ? 0 : ColumnSpace);
+         if (Col.RemainingWidths[Idx] < RealColLen) {
+            Col.LineWidth += RealColLen - Col.RemainingWidths[Idx];
+            Col.RemainingWidths[Idx] = RealColLen;
+            Col.ValidLen = Col.LineWidth < ScreenWidth;
+         }
+      }
+   }
+   size_t NumCols = MaxNumCols;
+   while (NumCols > 1 && !ColumnInfo[NumCols - 1].ValidLen)
+      --NumCols;
+
+   size_t NumRows = ListSize / NumCols + (ListSize % NumCols != 0);
+   auto const &LineFormat = ColumnInfo[NumCols - 1];
+   for (size_t Row = 0; Row < NumRows; ++Row) {
+      size_t Col = 0;
+      size_t I = Row;
+      out << string(Indent, ' ');
+      while (true) {
+         out << List[I];
+
+         size_t CurLen = List[I].size();
+         size_t MaxLen = LineFormat.RemainingWidths[Col++];
+         I += NumRows;
+         if (I >= ListSize)
+            break;
+
+         out << string(MaxLen - CurLen, ' ');
+      }
+      out << endl;
+   }
 }
 									/*}}}*/
 // ShowBroken - Debugging aide						/*{{{*/
@@ -447,8 +712,10 @@ void ShowBroken(ostream &out, CacheFile &Cache, bool const Now)
 {
    if (Cache->BrokenCount() == 0)
       return;
-
-   out << _("The following packages have unmet dependencies:") << endl;
+   if (_config->FindI("APT::Output-Version") < 30)
+      out << _("The following packages have unmet dependencies:") << endl;
+   else
+      out << _("Unsatisfied dependencies:") << endl;
    SortedPackageUniverse Universe(Cache);
    for (auto const &Pkg: Universe)
       ShowBrokenPackage(out, &Cache, Pkg, Now);
@@ -458,7 +725,10 @@ void ShowBroken(ostream &out, pkgCacheFile &Cache, bool const Now)
    if (Cache->BrokenCount() == 0)
       return;
 
-   out << _("The following packages have unmet dependencies:") << endl;
+   if (_config->FindI("APT::Output-Version") < 30)
+      out << _("The following packages have unmet dependencies:") << endl;
+   else
+      out << _("Unsatisfied dependencies:") << endl;
    APT::PackageUniverse Universe(Cache);
    for (auto const &Pkg: Universe)
       ShowBrokenPackage(out, &Cache, Pkg, Now);
@@ -468,17 +738,33 @@ void ShowBroken(ostream &out, pkgCacheFile &Cache, bool const Now)
 void ShowNew(ostream &out,CacheFile &Cache)
 {
    SortedPackageUniverse Universe(Cache);
-   ShowList(out,_("The following NEW packages will be installed:"), Universe,
-	 [&Cache](pkgCache::PkgIterator const &Pkg) { return Cache[Pkg].NewInstall(); },
+   if (_config->FindI("APT::Output-Version") < 30) {
+      ShowList(out,_("The following NEW packages will be installed:"), Universe,
+	    [&Cache](pkgCache::PkgIterator const &Pkg) { return Cache[Pkg].NewInstall(); },
+	    &PrettyFullName,
+	    CandidateVersion(&Cache),
+	    "action::install");
+      return;
+   }
+
+   ShowList(out,_("Installing:"), Universe,
+	 [&Cache](pkgCache::PkgIterator const &Pkg) { return Cache[Pkg].NewInstall() && (Cache[Pkg].Flags & pkgCache::Flag::Auto) == 0; },
 	 &PrettyFullName,
-	 CandidateVersion(&Cache));
+	 CandidateVersion(&Cache),
+	 "action::install");
+   ShowList(out,_("Installing dependencies:"), Universe,
+	 [&Cache](pkgCache::PkgIterator const &Pkg) { return Cache[Pkg].NewInstall() && Cache[Pkg].Flags & pkgCache::Flag::Auto;},
+	 &PrettyFullName,
+	 CandidateVersion(&Cache),
+	 "action::install-dependencies");
 }
 									/*}}}*/
 // ShowDel - Show packages to delete					/*{{{*/
 void ShowDel(ostream &out,CacheFile &Cache)
 {
    SortedPackageUniverse Universe(Cache);
-   ShowList(out,_("The following packages will be REMOVED:"), Universe,
+   auto title = _config->FindI("APT::Output-Version") < 30 ? _("The following packages will be REMOVED:") : _("REMOVING:");
+   ShowList(out,title, Universe,
 	 [&Cache](pkgCache::PkgIterator const &Pkg) { return Cache[Pkg].Delete(); },
 	 [&Cache](pkgCache::PkgIterator const &Pkg)
 	 {
@@ -487,14 +773,18 @@ void ShowDel(ostream &out,CacheFile &Cache)
 	       str.append("*");
 	    return str;
 	 },
-	 CandidateVersion(&Cache));
+	 CurrentVersion(&Cache),
+	 "action::remove");
 }
 									/*}}}*/
 // ShowPhasing - Show packages kept due to phasing			/*{{{*/
 void ShowPhasing(ostream &out, CacheFile &Cache, APT::PackageVector const &HeldBackPackages)
 {
    SortedPackageUniverse Universe(Cache);
-   ShowList(out, _("The following upgrades have been deferred due to phasing:"), HeldBackPackages,
+   auto title = _config->FindI("APT::Output-Version") < 30
+	       ? _("The following upgrades have been deferred due to phasing:")
+	       : _("Not upgrading yet due to phasing:");
+   ShowList(out, title, HeldBackPackages,
 	    &AlwaysTrue,
 	    &PrettyFullName,
 	    CurrentToCandidateVersion(&Cache));
@@ -504,7 +794,8 @@ void ShowPhasing(ostream &out, CacheFile &Cache, APT::PackageVector const &HeldB
 void ShowKept(ostream &out,CacheFile &Cache, APT::PackageVector const &HeldBackPackages)
 {
    SortedPackageUniverse Universe(Cache);
-   ShowList(out,_("The following packages have been kept back:"), HeldBackPackages,
+   auto title = _config->FindI("APT::Output-Version") < 30 ? _("The following packages have been kept back:") : _("Not upgrading:");
+   ShowList(out, title, HeldBackPackages,
 	 &AlwaysTrue,
 	 &PrettyFullName,
 	 CurrentToCandidateVersion(&Cache));
@@ -514,13 +805,15 @@ void ShowKept(ostream &out,CacheFile &Cache, APT::PackageVector const &HeldBackP
 void ShowUpgraded(ostream &out,CacheFile &Cache)
 {
    SortedPackageUniverse Universe(Cache);
-   ShowList(out,_("The following packages will be upgraded:"), Universe,
+   auto title = _config->FindI("APT::Output-Version") < 30 ? _("The following packages will be upgraded:") : _("Upgrading:");
+   ShowList(out, title, Universe,
 	 [&Cache](pkgCache::PkgIterator const &Pkg)
 	 {
 	    return Cache[Pkg].Upgrade() == true && Cache[Pkg].NewInstall() == false;
 	 },
 	 &PrettyFullName,
-	 CurrentToCandidateVersion(&Cache));
+	 CurrentToCandidateVersion(&Cache),
+	 "action::upgrade");
 }
 									/*}}}*/
 // ShowDowngraded - Show downgraded packages				/*{{{*/
@@ -529,20 +822,23 @@ void ShowUpgraded(ostream &out,CacheFile &Cache)
 bool ShowDowngraded(ostream &out,CacheFile &Cache)
 {
    SortedPackageUniverse Universe(Cache);
-   return ShowList(out,_("The following packages will be DOWNGRADED:"), Universe,
+   auto title = _config->FindI("APT::Output-Version") < 30 ? _("The following packages will be DOWNGRADED:") : _("DOWNGRADING:");
+   return ShowList(out, title, Universe,
 	 [&Cache](pkgCache::PkgIterator const &Pkg)
 	 {
 	    return Cache[Pkg].Downgrade() == true && Cache[Pkg].NewInstall() == false;
 	 },
 	 &PrettyFullName,
-	 CurrentToCandidateVersion(&Cache));
+	 CurrentToCandidateVersion(&Cache),
+	 "action::downgrade");
 }
 									/*}}}*/
 // ShowHold - Show held but changed packages				/*{{{*/
 bool ShowHold(ostream &out,CacheFile &Cache)
 {
    SortedPackageUniverse Universe(Cache);
-   return ShowList(out,_("The following held packages will be changed:"), Universe,
+   auto title = _config->FindI("APT::Output-Version") < 30 ? _("The following held packages will be changed:") : _("Changing held packages:");
+   return ShowList(out, title, Universe,
 	 [&Cache](pkgCache::PkgIterator const &Pkg)
 	 {
 	    return Pkg->SelectedState == pkgCache::State::Hold &&
@@ -621,7 +917,7 @@ bool ShowEssential(ostream &out,CacheFile &Cache)
    }
    return ShowList(out,_("WARNING: The following essential packages will be removed.\n"
 			 "This should NOT be done unless you know exactly what you are doing!"),
-	 pkglist, &AlwaysTrue, withdue, &EmptyString);
+	 pkglist, &AlwaysTrue, withdue, &EmptyString, "action::remove");
 }
 									/*}}}*/
 // Stats - Show some statistics						/*{{{*/
@@ -633,6 +929,7 @@ void Stats(ostream &out, pkgDepCache &Dep, APT::PackageVector const &HeldBackPac
    unsigned long Downgrade = 0;
    unsigned long Install = 0;
    unsigned long ReInstall = 0;
+   auto outVer = _config->FindI("APT::Output-Version");
    for (pkgCache::PkgIterator I = Dep.PkgBegin(); I.end() == false; ++I)
    {
       if (Dep[I].NewInstall() == true)
@@ -649,21 +946,27 @@ void Stats(ostream &out, pkgDepCache &Dep, APT::PackageVector const &HeldBackPac
       if (Dep[I].Delete() == false && (Dep[I].iFlags & pkgDepCache::ReInstall) == pkgDepCache::ReInstall)
 	 ReInstall++;
    }   
-
-   ioprintf(out,_("%lu upgraded, %lu newly installed, "),
+   if (outVer >= 30) {
+      ioprintf(out, _("Summary:"));
+      ioprintf(out, "\n  ");
+   }
+   ioprintf(out,outVer < 30 ? _("%lu upgraded, %lu newly installed, ") : _("Upgrading: %lu, Installing: %lu, "),
 	    Upgrade,Install);
    
    if (ReInstall != 0)
-      ioprintf(out,_("%lu reinstalled, "),ReInstall);
+      ioprintf(out,outVer < 30 ? _("%lu reinstalled, ") : _("Reinstalling: %lu, "),ReInstall);
    if (Downgrade != 0)
-      ioprintf(out,_("%lu downgraded, "),Downgrade);
+      ioprintf(out,outVer < 30 ? _("%lu downgraded, ") : _("Downgrading: %lu, "),Downgrade);
 
-   ioprintf(out,_("%lu to remove and %lu not upgraded.\n"),
+   ioprintf(out, outVer < 30 ? _("%lu to remove and %lu not upgraded.\n") : _("Removing: %lu, Not Upgrading: %lu\n"),
 	    Dep.DelCount(), HeldBackPackages.size());
-   
-   if (Dep.BadCount() != 0)
+
+   if (Dep.BadCount() != 0) {
+      if (outVer >= 30)
+	 ioprintf(out, "  ");
       ioprintf(out,_("%lu not fully installed or removed.\n"),
 	       Dep.BadCount());
+   }
 }
 									/*}}}*/
 // YnPrompt - Yes No Prompt.						/*{{{*/
@@ -676,10 +979,18 @@ bool YnPrompt(char const * const Question, bool const Default, bool const ShowGl
    // if we ask interactively, show warnings/notices before the question
    if (ShowGlobalErrors == true && AssumeYes == false && AssumeNo == false)
    {
-      if (_config->FindI("quiet",0) > 0)
+      if (_config->FindB("APT::Audit"))
+	 _error->DumpErrors(c2o, GlobalError::AUDIT);
+      else if (_config->FindI("quiet",0) > 0)
 	 _error->DumpErrors(c2o);
       else
-	 _error->DumpErrors(c2o, GlobalError::DEBUG);
+	 _error->DumpErrors(c2o, GlobalError::NOTICE);
+   }
+   // ignore pending input on terminal
+   if (not AssumeYes && not AssumeNo && isatty(STDIN_FILENO) == 1)
+   {
+      tcflush(STDIN_FILENO, TCIFLUSH);
+      std::cin.clear();
    }
 
    c2o << Question << std::flush;
@@ -726,9 +1037,10 @@ bool YnPrompt(char const * const Question, bool const Default, bool const ShowGl
 
    char response[1024] = "";
    std::cin.getline(response, sizeof(response));
-
    if (!std::cin)
       return false;
+   if (isatty(STDIN_FILENO) == 0)
+      c1o << response << '\n';
 
    if (strlen(response) == 0)
       return Default;
@@ -760,13 +1072,21 @@ std::string PrettyFullName(pkgCache::PkgIterator const &Pkg)
 {
    return Pkg.FullName(true);
 }
+std::string CurrentVersion(pkgCacheFile * const Cache, pkgCache::PkgIterator const &Pkg)
+{
+   return (*Cache)[Pkg].CurVersion;
+}
+std::function<std::string(pkgCache::PkgIterator const &)> CurrentVersion(pkgCacheFile * const Cache)
+{
+   return [=](pkgCache::PkgIterator const &i) { return CurrentVersion(Cache, i); };
+}
 std::string CandidateVersion(pkgCacheFile * const Cache, pkgCache::PkgIterator const &Pkg)
 {
    return (*Cache)[Pkg].CandVersion;
 }
 std::function<std::string(pkgCache::PkgIterator const &)> CandidateVersion(pkgCacheFile * const Cache)
 {
-   return std::bind(static_cast<std::string(*)(pkgCacheFile * const, pkgCache::PkgIterator const&)>(&CandidateVersion), Cache, std::placeholders::_1);
+   return [=](pkgCache::PkgIterator const &i) { return CandidateVersion(Cache, i); };
 }
 std::string CurrentToCandidateVersion(pkgCacheFile * const Cache, pkgCache::PkgIterator const &Pkg)
 {
@@ -782,7 +1102,7 @@ std::string CurrentToCandidateVersion(pkgCacheFile * const Cache, pkgCache::PkgI
 }
 std::function<std::string(pkgCache::PkgIterator const &)> CurrentToCandidateVersion(pkgCacheFile * const Cache)
 {
-   return std::bind(static_cast<std::string(*)(pkgCacheFile * const, pkgCache::PkgIterator const&)>(&CurrentToCandidateVersion), Cache, std::placeholders::_1);
+   return [=](pkgCache::PkgIterator const &i) { return CurrentToCandidateVersion(Cache, i); };
 }
 bool AlwaysTrue(pkgCache::PkgIterator const &)
 {

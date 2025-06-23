@@ -5,6 +5,7 @@ TESTDIR="$(readlink -f "$(dirname "$0")")"
 . "$TESTDIR/framework"
 setupenvironment
 configarchitecture "i386"
+allowremovemanual
 
 buildsimplenativepackage "peace-dpkg" "all" "1.0" "stable"
 
@@ -56,14 +57,8 @@ testdpkginstalled b c
 testmarkedauto 'b'
 
 sed -i rootdir/var/log/apt/history.log -e '/^Commandline: / d' -e '/^Start-Date: / d' -e '/^End-Date: / d'
-if [ -n "$SUDO_USER" ] && [ "$(id -u "$SUDO_USER")" -gt 0 ]; then
-	testfileequal 'rootdir/var/log/apt/history.log' "
-Requested-By: $SUDO_USER ($(id -u "$SUDO_USER"))
-Reinstall: b:i386 (1.0)"
-else
-	testfileequal 'rootdir/var/log/apt/history.log' '
+testfileequal 'rootdir/var/log/apt/history.log' '
 Reinstall: b:i386 (1.0)'
-fi
 
 testsuccessequal 'Reading package lists...
 Building dependency tree...

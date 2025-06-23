@@ -87,9 +87,10 @@ static bool DumpPackage(CommandLine &CmdL)
 	 cout << endl;
 	 for (pkgCache::DescIterator D = Cur.DescriptionList(); D.end() == false; ++D)
 	 {
-	    cout << " Description Language: " << D.LanguageCode() << endl
-		 << "                 File: " << D.FileList().File().FileName() << endl
-		 << "                  MD5: " << D.md5() << endl;
+	    cout << " Description Language: " << D.LanguageCode() << '\n';
+	    for (auto DF = D.FileList(); not DF.end(); ++DF)
+	       cout << "                 File: " << DF.File().FileName() << '\n';
+	    cout << "                  MD5: " << D.md5() << '\n';
 	 }
 	 cout << endl;
       }
@@ -238,6 +239,8 @@ static bool Stats(CommandLine &CmdL)
    cout << _("  Mixed virtual packages: ") << NVirt << endl;
    cout << _("  Missing: ") << Missing << endl;
 
+   cout << _("Total distinct source versions: ") << Cache->Head().SourceVersionCount << " (" << SizeToStr(Cache->Head().SourceVersionCount * Cache->Head().SourceVersionSz) << ')' << endl;
+
    cout << _("Total distinct versions: ") << Cache->Head().VersionCount << " (" <<
       SizeToStr(Cache->Head().VersionCount*Cache->Head().VersionSz) << ')' << endl;
    cout << _("Total distinct descriptions: ") << Cache->Head().DescriptionCount << " (" <<
@@ -265,8 +268,8 @@ static bool Stats(CommandLine &CmdL)
 	    stritems.insert(V->VerStr);
 	 if (V->Section != 0)
 	    stritems.insert(V->Section);
-	 stritems.insert(V->SourcePkgName);
-	 stritems.insert(V->SourceVerStr);
+	 // FIXME: Count the source versions
+	 stritems.insert(V.SourceVersion()->VerStr);
 	 for (pkgCache::DepIterator D = V.DependsList(); D.end() == false; ++D)
 	 {
 	    if (D->Version != 0)
@@ -316,18 +319,19 @@ static bool Stats(CommandLine &CmdL)
    unsigned long Total = 0;
 #define APT_CACHESIZE(X,Y) (Cache->Head().X * Cache->Head().Y)
    Total = Slack + Size +
-      APT_CACHESIZE(GroupCount, GroupSz) +
-      APT_CACHESIZE(PackageCount, PackageSz) +
-      APT_CACHESIZE(VersionCount, VersionSz) +
-      APT_CACHESIZE(DescriptionCount, DescriptionSz) +
-      APT_CACHESIZE(DependsCount, DependencySz) +
-      APT_CACHESIZE(DependsDataCount, DependencyDataSz) +
-      APT_CACHESIZE(ReleaseFileCount, ReleaseFileSz) +
-      APT_CACHESIZE(PackageFileCount, PackageFileSz) +
-      APT_CACHESIZE(VerFileCount, VerFileSz) +
-      APT_CACHESIZE(DescFileCount, DescFileSz) +
-      APT_CACHESIZE(ProvidesCount, ProvidesSz) +
-      (2 * Cache->Head().GetHashTableSize() * sizeof(map_id_t));
+	   APT_CACHESIZE(GroupCount, GroupSz) +
+	   APT_CACHESIZE(PackageCount, PackageSz) +
+	   APT_CACHESIZE(VersionCount, VersionSz) +
+	   APT_CACHESIZE(SourceVersionCount, SourceVersionSz) +
+	   APT_CACHESIZE(DescriptionCount, DescriptionSz) +
+	   APT_CACHESIZE(DependsCount, DependencySz) +
+	   APT_CACHESIZE(DependsDataCount, DependencyDataSz) +
+	   APT_CACHESIZE(ReleaseFileCount, ReleaseFileSz) +
+	   APT_CACHESIZE(PackageFileCount, PackageFileSz) +
+	   APT_CACHESIZE(VerFileCount, VerFileSz) +
+	   APT_CACHESIZE(DescFileCount, DescFileSz) +
+	   APT_CACHESIZE(ProvidesCount, ProvidesSz) +
+	   (2 * Cache->Head().GetHashTableSize() * sizeof(map_id_t));
    cout << _("Total space accounted for: ") << SizeToStr(Total) << endl;
 #undef APT_CACHESIZE
 
@@ -464,7 +468,6 @@ static bool DumpAvail(CommandLine &)
    stdoutfd.OpenDescriptor(STDOUT_FILENO, FileFd::WriteOnly, false);
 
    // Iterate over all the package files and write them out.
-   char *Buffer = new char[Cache->HeaderP->MaxVerFileSize+10];
    for (pkgCache::VerFile **J = VFList; *J != 0;)
    {
       pkgCache::PkgFileIterator File(*Cache, Cache->PkgFileP + (*J)->File);
@@ -472,40 +475,23 @@ static bool DumpAvail(CommandLine &)
       FileFd PkgF(File.FileName(),FileFd::ReadOnly, FileFd::Extension);
       if (_error->PendingError() == true)
 	 break;
-      
-      /* Write all of the records from this package file, since we
-       	 already did locality sorting we can now just seek through the
-       	 file in read order. We apply 1 more optimization here, since often
-       	 there will be < 1 byte gaps between records (for the \n) we read that
-       	 into the next buffer and offset a bit.. */
-      unsigned long Pos = 0;
+
+      pkgTagFile tagsfile(&PkgF, Cache->HeaderP->MaxVerFileSize);
+      pkgTagSection Tags;
+
       for (; *J != 0; J++)
       {
 	 if (Cache->PkgFileP + (*J)->File != File)
 	    break;
-	 
+
 	 const pkgCache::VerFile &VF = **J;
-
-	 // Read the record and then write it out again.
-	 unsigned long Jitter = VF.Offset - Pos;
-	 if (Jitter > 8)
-	 {
-	    if (PkgF.Seek(VF.Offset) == false)
-	       break;
-	    Jitter = 0;
-	 }
-	 
-	 if (PkgF.Read(Buffer,VF.Size + Jitter) == false)
+	 if (not tagsfile.Jump(Tags, VF.Offset))
 	    break;
-	 Buffer[VF.Size + Jitter] = '\n';
 
-	 // See above..
 	 if ((File->Flags & pkgCache::Flag::NotSource) == pkgCache::Flag::NotSource)
 	 {
-	    pkgTagSection Tags;
-	    if (Tags.Scan(Buffer+Jitter,VF.Size+1) == false ||
-		Tags.Write(stdoutfd, NULL, RW) == false ||
-		stdoutfd.Write("\n", 1) == false)
+	    if (not Tags.Write(stdoutfd, NULL, RW) ||
+		  not stdoutfd.Write("\n", 1))
 	    {
 	       _error->Error("Internal Error, Unable to parse a package record");
 	       break;
@@ -513,18 +499,24 @@ static bool DumpAvail(CommandLine &)
 	 }
 	 else
 	 {
-	    if (stdoutfd.Write(Buffer + Jitter, VF.Size + 1) == false)
+	    char const *Start, *Stop;
+	    Tags.GetSection(Start, Stop);
+	    for (; Start < Stop; --Stop)
+	       if (std::string_view{"\n\r"}.find(*(Stop - 1)) == std::string_view::npos)
+		  break;
+	    if (not stdoutfd.Write(Start, Stop - Start) ||
+		not stdoutfd.Write("\n\n", 2))
+	    {
+	       _error->Error("Internal Error, Unable to parse a package record");
 	       break;
+	    }
 	 }
-
-	 Pos = VF.Offset + VF.Size;
       }
 
-      if (_error->PendingError() == true)
+      if (_error->PendingError())
          break;
    }
 
-   delete [] Buffer;
    delete [] VFList;
    return !_error->PendingError();
 }

@@ -19,7 +19,7 @@
 #include <apt-pkg/pkgsystem.h>
 #include <apt-pkg/prettyprinters.h>
 #include <apt-pkg/progress.h>
-#include <apt-pkg/string_view.h>
+#include <apt-pkg/solver3.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile.h>
 
@@ -41,20 +41,9 @@
 
 using std::string;
 
-// we could use pkgCache::DepType and ::Priority, but these would be localized strings…
-constexpr char const * const PrioMap[] = {
-   nullptr, "important", "required", "standard",
-   "optional", "extra"
-};
-constexpr char const * const DepMap[] = {
-   nullptr, "Depends", "Pre-Depends", "Suggests",
-   "Recommends" , "Conflicts", "Replaces",
-   "Obsoletes", "Breaks", "Enhances"
-};
-
 // WriteOkay - varaidic helper to easily Write to a FileFd		/*{{{*/
 static bool WriteOkay_fn(FileFd &) { return true; }
-template<typename... Tail> static bool WriteOkay_fn(FileFd &output, APT::StringView data, Tail... more_data)
+template<typename... Tail> static bool WriteOkay_fn(FileFd &output, std::string_view data, Tail... more_data)
 {
    return likely(output.Write(data.data(), data.length()) && WriteOkay_fn(output, more_data...));
 }
@@ -99,7 +88,7 @@ static bool WriteScenarioVersion(FileFd &output, pkgCache::PkgIterator const &Pk
 // WriteScenarioDependency						/*{{{*/
 static bool WriteScenarioDependency(FileFd &output, pkgCache::VerIterator const &Ver, bool const OnlyCritical)
 {
-   std::array<std::string, APT_ARRAY_SIZE(DepMap)> dependencies;
+   std::array<std::string, 10> dependencies;
    bool orGroup = false;
    for (pkgCache::DepIterator Dep = Ver.DependsList(); Dep.end() == false; ++Dep)
    {
@@ -123,7 +112,7 @@ static bool WriteScenarioDependency(FileFd &output, pkgCache::VerIterator const 
    bool Okay = output.Failed() == false;
    for (size_t i = 1; i < dependencies.size(); ++i)
       if (dependencies[i].empty() == false)
-	 WriteOkay(Okay, output, "\n", DepMap[i], ": ", dependencies[i]);
+	 WriteOkay(Okay, output, "\n", pkgCache::DepType_NoL10n(i), ": ", dependencies[i]);
    std::vector<std::string> provides;
    for (auto Prv = Ver.ProvidesList(); not Prv.end(); ++Prv)
    {
@@ -152,7 +141,7 @@ static bool WriteScenarioLimitedDependency(FileFd &output,
 					  std::vector<bool> const &pkgset,
 					  bool const OnlyCritical)
 {
-   std::array<std::string, APT_ARRAY_SIZE(DepMap)> dependencies;
+   std::array<std::string, 10> dependencies;
    bool orGroup = false;
    for (pkgCache::DepIterator Dep = Ver.DependsList(); Dep.end() == false; ++Dep)
    {
@@ -189,7 +178,7 @@ static bool WriteScenarioLimitedDependency(FileFd &output,
    bool Okay = output.Failed() == false;
    for (size_t i = 1; i < dependencies.size(); ++i)
       if (dependencies[i].empty() == false)
-	 WriteOkay(Okay, output, "\n", DepMap[i], ": ", dependencies[i]);
+	 WriteOkay(Okay, output, "\n", pkgCache::DepType_NoL10n(i), ": ", dependencies[i]);
    string provides;
    for (pkgCache::PrvIterator Prv = Ver.ProvidesList(); Prv.end() == false; ++Prv)
    {
@@ -216,7 +205,7 @@ static bool checkKnownArchitecture(std::string const &arch)		/*{{{*/
    return std::find(veryforeign.begin(), veryforeign.end(), arch) != veryforeign.end();
 }
 									/*}}}*/
-static bool WriteGenericRequestHeaders(FileFd &output, APT::StringView const head)/*{{{*/
+static bool WriteGenericRequestHeaders(FileFd &output, std::string_view const head)/*{{{*/
 {
    bool Okay = WriteOkay(output, head, "Architecture: ", _config->Find("APT::Architecture"), "\n",
 	 "Architectures:");
@@ -250,10 +239,12 @@ static bool WriteScenarioEDSPVersion(pkgDepCache &Cache, FileFd &output, pkgCach
 {
    bool Okay = WriteOkay(output, "\nSource: ", Ver.SourcePkgName(),
 	 "\nSource-Version: ", Ver.SourceVerStr());
-   if (PrioMap[Ver->Priority] != nullptr)
-      WriteOkay(Okay, output, "\nPriority: ", PrioMap[Ver->Priority]);
+   if (auto const Prio = pkgCache::Priority_NoL10n(Ver->Priority); not Prio.empty())
+      WriteOkay(Okay, output, "\nPriority: ", Prio);
    if (Ver->Section != 0)
       WriteOkay(Okay, output, "\nSection: ", Ver.Section());
+   if (Ver->Size != 0)
+      WriteOkay(Okay, output, "\nSize: ", Ver->Size);
    if (Pkg.CurrentVer() == Ver)
       WriteOkay(Okay, output, "\nInstalled: yes");
    if (Pkg->SelectedState == pkgCache::State::Hold ||
@@ -336,6 +327,36 @@ bool EDSP::WriteLimitedScenario(pkgDepCache &Cache, FileFd &output,
       Progress->Done();
    return Okay;
 }
+
+static void MarkPackage(std::vector<bool> &pkgset, pkgCache::PkgIterator pkg)
+{
+   if (pkgset[pkg->ID])
+      return;
+   pkgset[pkg->ID] = true;
+   for (auto ver = pkg.VersionList(); not ver.end(); ++ver)
+   {
+      for (auto P = ver.ProvidesList(); not P.end(); ++P)
+	 MarkPackage(pkgset, P.ParentPkg());
+      for (auto D = ver.DependsList(); not D.end(); ++D)
+      {
+	 std::unique_ptr<pkgCache::Version *[]> targets(D.AllTargets());
+	 for (size_t i = 0; targets[i] != 0; ++i)
+	    MarkPackage(pkgset, pkgCache::VerIterator(*ver.Cache(), targets[i]).ParentPkg());
+
+	 MarkPackage(pkgset, D.TargetPkg());
+      }
+   }
+}
+
+bool EDSP::WriteLimitedScenario(pkgDepCache &Cache, FileFd &output,
+				OpProgress *Progress)
+{
+   std::vector<bool> pkgset(Cache.Head().PackageCount);
+   for (auto Pkg = Cache.PkgBegin(); not Pkg.end(); ++Pkg)
+      if (Cache[Pkg].Install() || Pkg->CurrentVer)
+	 MarkPackage(pkgset, Pkg);
+   return WriteLimitedScenario(Cache, output, pkgset, Progress);
+}
 									/*}}}*/
 // EDSP::WriteRequest - to the given file descriptor			/*{{{*/
 bool EDSP::WriteRequest(pkgDepCache &Cache, FileFd &output,
@@ -382,8 +403,12 @@ bool EDSP::WriteRequest(pkgDepCache &Cache, FileFd &output,
    }
    if (flags & Request::FORBID_NEW_INSTALL)
       WriteOkay(Okay, output, "Forbid-New-Install: yes\n");
+   else if (flags & Request::FORBID_REMOVE)
+      WriteOkay(Okay, output, "Forbid-New-Install: no\n");
    if (flags & Request::FORBID_REMOVE)
       WriteOkay(Okay, output, "Forbid-Remove: yes\n");
+   else if (flags & Request::FORBID_NEW_INSTALL)
+      WriteOkay(Okay, output, "Forbid-Remove: no\n");
    auto const solver = _config->Find("APT::Solver", "internal");
    WriteOkay(Okay, output, "Solver: ", solver, "\n");
    if (_config->FindB("APT::Solver::Strict-Pinning", true) == false)
@@ -435,7 +460,7 @@ bool EDSP::ReadResponse(int const input, pkgDepCache &Cache, OpProgress *Progres
 				if (Progress != nullptr)
 					Progress->Done();
 				Progress = nullptr;
-				_error->DumpErrors(std::cerr, GlobalError::DEBUG, false);
+				_error->DumpErrors(std::cerr, GlobalError::NOTICE, false);
 			}
 			std::string msg = SubstVar(SubstVar(section.FindS("Message"), "\n .\n", "\n\n"), "\n ", "\n");
 			if (msg.empty() == true) {
@@ -536,7 +561,7 @@ static bool localStringToBool(std::string answer, bool const defValue) {
    return defValue;
 }
 									/*}}}*/
-static bool LineStartsWithAndStrip(std::string &line, APT::StringView const with)/*{{{*/
+static bool LineStartsWithAndStrip(std::string &line, std::string_view const with)/*{{{*/
 {
    if (line.compare(0, with.size(), with.data()) != 0)
       return false;
@@ -544,7 +569,7 @@ static bool LineStartsWithAndStrip(std::string &line, APT::StringView const with
    return true;
 }
 									/*}}}*/
-static bool ReadFlag(unsigned int &flags, std::string &line, APT::StringView const name, unsigned int const setflag)/*{{{*/
+static bool ReadFlag(unsigned int &flags, std::string &line, std::string_view const name, unsigned int const setflag)/*{{{*/
 {
    if (LineStartsWithAndStrip(line, name) == false)
       return false;
@@ -746,7 +771,7 @@ static bool CreateDumpFile(char const * const id, char const * const type, FileF
 	auto const dumpdir = flNotFile(dumpfile);
 	_error->PushToStack();
 	bool errored_out = CreateAPTDirectoryIfNeeded(dumpdir, dumpdir) == false ||
-	   output.Open(dumpfile, FileFd::WriteOnly | FileFd::Exclusive | FileFd::Create, FileFd::Extension, 0644) == false;
+	   output.Open(dumpfile, FileFd::WriteOnly | FileFd::Exclusive | FileFd::Create | FileFd::BufferedWrite, FileFd::Extension, 0644) == false;
 	std::vector<std::string> downgrademsgs;
 	while (_error->empty() == false)
 	{
@@ -765,12 +790,33 @@ static bool CreateDumpFile(char const * const id, char const * const type, FileF
 // EDSP::ResolveExternal - resolve problems by asking external for help	{{{*/
 bool EDSP::ResolveExternal(const char* const solver, pkgDepCache &Cache,
 			 unsigned int const flags, OpProgress *Progress) {
+   if (strstr(solver, "3.") == solver)
+   {
+      APT::Solver s(Cache.GetCache(), Cache.GetPolicy(), (EDSP::Request::Flags) flags);
+      FileFd output;
+      bool res = true;
+      if (Progress != NULL)
+	 Progress->OverallProgress(0, 100, 1, (flags & EDSP::Request::UPGRADE_ALL) ? _("Calculating upgrade") : _("Solving dependencies"));
+      if (res && not s.FromDepCache(Cache))
+	 res = false;
+      if (Progress != NULL)
+	 Progress->Progress(10);
+      if (res && not s.Solve())
+	 res = false;
+      if (Progress != NULL)
+	 Progress->Progress(90);
+      if (res && not s.ToDepCache(Cache))
+	 res = false;
+      if (Progress != NULL)
+	 Progress->Done();
+      return res;
+   }
 	if (strcmp(solver, "internal") == 0)
 	{
 		FileFd output;
 		bool Okay = CreateDumpFile("EDSP::Resolve", "solver", output);
 		Okay &= EDSP::WriteRequest(Cache, output, flags, nullptr);
-		return Okay && EDSP::WriteScenario(Cache, output, nullptr);
+		return Okay && EDSP::WriteLimitedScenario(Cache, output, nullptr);
 	}
 	_error->PushToStack();
 	int solver_in, solver_out;
@@ -963,14 +1009,14 @@ bool EIPP::WriteScenario(pkgDepCache &Cache, FileFd &output, OpProgress * const 
 	 pkgset[P->ID] = true;
 	 if (strcmp(P.Arch(), "any") == 0)
 	 {
-	    APT::StringView const pkgname(P.Name());
+	    std::string_view const pkgname(P.Name());
 	    auto const idxColon = pkgname.find(':');
-	    if (idxColon != APT::StringView::npos)
+	    if (idxColon != std::string_view::npos)
 	    {
 	       pkgCache::PkgIterator PA;
 	       if (pkgname.substr(idxColon + 1) == "any")
 	       {
-		  auto const GA = Cache.FindGrp(pkgname.substr(0, idxColon).to_string());
+		  auto const GA = Cache.FindGrp(pkgname.substr(0, idxColon));
 		  for (auto PA = GA.PackageList(); PA.end() == false; PA = GA.NextPkg(PA))
 		  {
 		     pkgset[PA->ID] = true;
@@ -978,7 +1024,7 @@ bool EIPP::WriteScenario(pkgDepCache &Cache, FileFd &output, OpProgress * const 
 	       }
 	       else
 	       {
-		  auto const PA = Cache.FindPkg(pkgname.to_string());
+		  auto const PA = Cache.FindPkg(pkgname);
 		  if (PA.end() == false)
 		     pkgset[PA->ID] = true;
 	       }
@@ -1044,7 +1090,7 @@ bool EIPP::ReadResponse(int const input, pkgPackageManager * const PM, OpProgres
 	    if (Progress != nullptr)
 	       Progress->Done();
 	    Progress = nullptr;
-	    _error->DumpErrors(std::cerr, GlobalError::DEBUG, false);
+	    _error->DumpErrors(std::cerr, GlobalError::NOTICE, false);
 	 }
 	 std::string msg = SubstVar(SubstVar(section.FindS("Message"), "\n .\n", "\n\n"), "\n ", "\n");
 	 if (msg.empty() == true) {

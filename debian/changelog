@@ -1,33 +1,868 @@
-apt (2.8.0deepin4) unstable; urgency=medium
+apt (3.0.2) unstable; urgency=medium
 
-  * optimize prompt translation files.
-  * add reminders for uninstalled packages.
+  * debian/NEWS: Document new requirements on trusted.gpg.d (Closes: #1104320)
+  * test: Fix test-skipped regression in 3.0.1
+  * test: Do not use host's sequoia config
+  * Pass --check to msgfmt and fix broken format strings
+  * Downgrade "modernize-sources" notice to audit
 
- -- lhdjply <lhdjply@126.com>  Mon, 23 Jun 2025 17:23:10 +0800
+ -- Julian Andres Klode <jak@debian.org>  Sun, 25 May 2025 10:39:53 +0200
 
-apt (2.8.0deepin3) unstable; urgency=medium
+apt (3.0.1) unstable; urgency=medium
 
-  * add a prompt for uninstalling critical system packages
+  [ Laurent Bigonville ]
+  * Remove boggus option in French manpage translation
 
- -- lhdjply <lhdjply@126.com>  Mon, 23 Jun 2025 12:01:10 +0800
+  [ Julian Andres Klode ]
+  * Update Sequoia crypto policy.
+    Move our cut-offs to February to align with Sequoia, and cut-off more:
+    - 2024-02: DSA keys retroactively (align with GnuPG config)
+    - 2026-02: SHA224 hashes
+    - 2028-02: Brainpool keys (align closer with GnuPG backend)
+    - 2030-02: RSA2048 keys
+    These algorithms will not be valid starting on those cut-off dates.
+  * sqv: Refactor execution of sqv into separate method
+  * sqv: Warn about signatures that will be rejected by policy within a year
 
-apt (2.8.0deepin2) unstable; urgency=medium
+ -- Julian Andres Klode <jak@debian.org>  Fri, 25 Apr 2025 23:08:27 +0200
 
-  * add a warning regarding `apt upgrade' usage.
+apt (3.0.0) unstable; urgency=medium
 
- -- LiChengGang <lichenggang@uniontech.com>  Mon, 29 Jul 2024 17:16:50 +0800
+  [ Julian Andres Klode ]
+  * And so it begins: Bump the version to 3.0 to mark the start
+    of a stable series, dedicated to Steve Langasek.
+  * symbols: Update to 2.9.35
+  * solver3: Consider more upgrades more costly when not upgrading
+    (LP: #2105395)
 
-apt (2.8.0deepin1) unstable; urgency=medium
+  [ Frans Spiesschaert ]
+  * Dutch manpages translation update (Closes: #1100801)
+  * Dutch program translation update (Closes: #1100807)
 
-  * Revert 64-bit time_t transition changes.
-  * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
-    juliank: it is one of the t64 workarounds to force libnettle8t64 to be
-    installed and apt to be upgraded rather than both being kept back
-  * Apply deepin changes.
+  [ Rafael Fontenelle ]
+  * Brazilian Portuguese program translation update (Closes: #1100964)
 
- -- Tianyu Chen <sweetyfish@deepin.org>  Mon, 06 May 2024 14:34:27 +0800
+  [ Remus-Gabriel Chelu ]
+  * Romanian program translation update (Closes: #1101535)
 
-apt (2.8.0) noble; urgency=medium
+  [ Carles Pina i Estany ]
+  * Catalan program translation update
+
+  [ Helge Kreutzmann ]
+  * German program translation update (Closes: #1100550)
+
+  [ bubub ]
+  * French program translation update (Closes: #1100708)
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 04 Apr 2025 22:32:19 +0200
+
+apt (2.9.35) unstable; urgency=medium
+
+  * Respect custom LESS/MORE/LV variables (LP: #2103921)
+  * solver3: Correctly deb822-escape error message in evaluation report
+    (LP: #2104276)
+  * pager: Also set SMK in LESS, fix LV=C to be LV=-c (LP: #2104280)
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 27 Mar 2025 22:52:21 +0100
+
+apt (2.9.34) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Fix uploads to errors.ubuntu.com with whoopsie:
+    - zstd: The compressor level should be -6, not -19
+    - edsp: Add functionality to only write relevant packages
+    - solver evaluation: write minimized solver dumps
+    - edsp: Dump minimized Dir::Log::Solver logs
+    - solver3: Use zstd-compressed, base64-encoded dumps
+    - solver3: Avoid empty ErrorMessage field in evaluation crash report
+  * solver3: Only hide ver->pkg clauses, not pkg->ver version selection ones
+    - previously we hid version information vital to the understanding
+    - thanks to Helmut Grohne for the report
+  * solver3: Record manual flag before discovering packages (LP: #2102720)
+  * solver3: Handle previously satisfied Suggests last and do not install
+    new packages for Suggests (LP: #2103556)
+
+  [ Johannes Schauer Marin Rodrigues ]
+  * apt-pkg/solver3.h: avoid static_assert(false)
+  * cmdline/apt-get.cc: emit Signed-By field and support $(SIGNED_BY) in
+    apt-get indextargets --format
+
+  [ Christopher Bock ]
+  * doc/sources.list.5.xml: snapshot infos
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 20 Mar 2025 22:45:30 +0100
+
+apt (2.9.33) unstable; urgency=medium
+
+  * 3.0 solver updates:
+    - Fix detection of satisfied recommends for pkg variables
+    - Print correct reason when registering dependency
+    - Correctly determine 'same' or groups (a|c was same as a|b...)
+    - Fix Recommends/Suggests vs Enhances confusion (LP: #2101800)
+    - Fix test-resolve-by-keep-new-recommend
+  * edsp: Set Forbid-New-Install/Forbid-Remove: no if other is set such
+    that `apt upgrade` dumps are different from `apt-get upgrade` ones
+    and can be correctly reproduced (as the one in the LP bug above).
+  * test: Fix some weird editing artefact introduced in 2.9.32 causing
+    a test to effectively be skipped.
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 12 Mar 2025 19:22:59 +0100
+
+apt (2.9.32) unstable; urgency=medium
+
+  * Rewordings and documentation updates:
+    - Add doc/design/install.md: Installation design
+    - Replace "GPG error" with "OpenPGP signature verification failed"
+  * Bug fix: Correctly detect obsolete packages in EDSP
+    - refactor obsolete checks to use VerFileIterator::Downloadable()
+    - Consider 0-size debs not downloadable, set a size in EDSP
+    - edsp: Write 'Size' to the EDSP files
+  * UX: Produce more human-readable dependency errors in 3.0 solver.
+    - test: Grep continuation lines in error messages
+    - solver3: Simplify Var pointer tagging
+    - solver3: cleanup operators for Var
+    - solver3: Support pretty printing clauses
+    - solver3: Verbose error messages
+    The output now has multiple lines, prints the underlying concrete
+    dependency (foo Depends bar), and prints paths not taken.
+  * Bug fixes:
+    - solver3: bestReason: Only find actual assignments [i.e. when the
+      path to a decision is determined for printing, we sometimes picked
+      assignments with the wrong polarity, e.g. when determining "why not foo"
+      in "foo Conflicts mail-transport-agent" we might have picked a
+      decision "not exim4" rather than a choice "postfix"].
+    - solver3: Do not prefer new installs over manually installed obsoletes.
+      (LP: #2100247) - We still try dependencies with obsolete packages
+      last, even if manual, so a "Depends: new" is processed before
+      "Depends: new | obsolete" either way.
+  * Feature: Introduce transaction support and upgrade count for pkgDepCache.
+    - Introduce pkgDepCache::Transaction for transactional depcache updates
+    - depcache: Add a new UpgradeCount() member
+  * Feature: Fall back to the 3.0 solver if internal failed, or apport is
+    installed.
+    - Evaluate and fall back to the 3.0 solver
+    - Print --solver 3.0 explanation if both internal and it failed
+  * Both features have been shipped for several weeks in Ubuntu already and
+    received minor bug fixes and additional test cases.
+
+ -- Julian Andres Klode <jak@debian.org>  Sun, 09 Mar 2025 18:19:14 +0100
+
+apt (2.9.31) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * edsp: Use buffered writes for EDSP dumps
+  * strutl: Add missing #include <cstdint> [gcc 15] (Closes: #1096322)
+  * refactor: Deduplicate and Move SectionInSubTree to Configuration
+  * solver3: Fix test-apt-move-and-forget-manual-sections
+  * solver3: Fix error stack handling
+  * test: Improve output cleaning for solver progress
+  * Fix crash in VersionExtra using --with-source etc (Closes: #1098702)
+  * test-apt-ftparchive-cachedb: Avoid race condition in test case
+
+  [ Miroslav Kure ]
+  * Czech program translation update (Closes: #1095976)
+
+  [ Helge Kreutzmann ]
+  * German program translation update (Closes: #1098456)
+  * German manpage translation update (Closes: #1099118)
+
+  [ David Kalnischkies ]
+  * apt-ftparchive: Do not output locale dependent dsc file size
+
+  [ Алексей Шилин ]
+  * Russian translation update (Closes: #1098937)
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 28 Feb 2025 17:49:31 +0100
+
+apt (2.9.30) unstable; urgency=medium
+
+  * Upload libapt-pkg 7.0 ABI transition to unstable:
+    - Use smart pointers in a whole bunch of places (probably only an API break)
+    - Add a version script to hide any standard library symbols
+    - Remove the functions marked as deprecated, such as PrintStatus and _strtabexpand
+    - Introduce SourceVersion objects in the cache
+    - Migrate from APT::StringView to std::string view and change a bunch of
+      functions from std::string to std::string_view.
+      Thanks to наб for the merge requests, very appreciated, that was a lot
+      of busywork.
+    Several other changes were already queued in the previous releases in
+    #ifdef, please have a look at them.
+
+ -- Julian Andres Klode <jak@debian.org>  Sun, 16 Feb 2025 17:58:07 +0100
+
+apt (2.9.29) unstable; urgency=medium
+
+  [ Helge Kreutzmann ]
+  * German program translation update (Closes: #1052411)
+  * German program translation update (Closes: #1095681)
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1095409)
+  * Dutch manpages translation update (Closes: #1095411)
+
+  [ Jean-Pierre Giraud ]
+  * French manpage translation update (Closes: #1088326, #1050876)
+
+  [ Arnaud Rebillout ]
+  * test: Fix skipping test cases
+
+  [ Peter Krefting ]
+  * Swedish program translation update (Closes: #1070029)
+
+  [ Julian Andres Klode ]
+  * Add DepIterator::IsSatisfied(PkgIterator)
+  * test: Support comments in --skip/--only files
+  * Major 3.0 solver update, improving version selection, unit propagation,
+    and as a result significantly performance (2x for apt-tests). Also new:
+    - Phased updates are now supported
+    - The number of broken test cases is down from 31 to 9
+    - dist-upgrade now installs Essential packages
+    - The order of alternatives in or groups is now better preserved
+    - Recommends for upgrades of installed dependencies are now upgraded
+      to Depends if they are new or previously satisfied; to avoid breaking
+      Recommends or introducing unsatisfied Recommends in an upgrade.
+    - A time out of 10s has been added that is checked whenever the solver
+      backtracks to prevent practically infinite runtime.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 14 Feb 2025 19:42:43 +0100
+
+apt (2.9.28) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * modernize-sources: Avoid opening /dev/stdout for simulate
+  * dpkg: Pass --admindir if a different one is specified; fixes issue
+    where foreign architectures from the host were used when Dir is set.
+  * Various updates to the '3.0' solver: Particularly it now has a clause
+    database for reals rather than rediscovering clauses when backtracking.
+    - refactor: Drop unused code, annotate [[nodiscard]] and const, simplify,
+      extract functions, and particularly introduce the Clause class.
+    - algorithm: Simplify work ordering. This may cause some changes in
+      how dependencies are resolved.
+    - algorithm: Replace PropagateInstall() with Discover() and then
+      propagate based on the stored clauses. Clauses are discovered
+      from package dependencies and persistent, i.e. they have no
+      decision level associated. Discovery is incremental so far.
+    - algorithm: Support comparing packages and versions, such that
+      we can store both package and version variables in a clause.
+    - algorithm: Use a package clause for optional roots. This allows
+      deciding to keep an automatically installed package installed,
+      without having to decide the version (and hence enqueue common
+      dependencies first).
+    - performance: Cache calls to policy.
+    - performance: Cache all configuration calls
+    - performance: Point to stored clauses, do not copy them
+    - performance: Avoid std::vector for statically sized arrays. Due
+      to adding libstdc++ assertions, vector range checks accounted
+      for up to 20% of solver runtime.
+
+  [ Christopher Bock ]
+  * completion: Add modernize-sources (Closes: #1094904)
+  * edit-sources: don't force .list
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 07 Feb 2025 21:00:48 +0100
+
+apt (2.9.27) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Symbols: Update for 2.9.23/2.9.25
+  * Updates for the '3.0' solver:
+    - Soft unit propagation for optional items
+    - Do not accidentally solve new Recommends before hard dependencies
+    - Use a propagation queue instead of recursively propagating facts
+  * Correctly calculate kernel size in /boot (Closes: #1085184)
+  * Measure BootSize as integer
+
+  [ Boyuan Yang ]
+  * po/zh_CN.po: Refresh Simplified Chinese translation for apt
+
+  [ Rafael Fontenelle ]
+  * Brazilian Portuguese program translation update (Closes: #1092563)
+
+  [ David Kalnischkies ]
+  * Cleanups and fixes for cache counters/size fields:
+    - Do not overflow ver/desc<->file relation counters
+    - Drop unused description size info from binary cache
+    - Drop unused version stanza size info from binary cache
+    - Do not create descriptions structs for each architecture
+    - Record all available sources for descriptions
+    - Include Extra in the size counted for Version struct
+
+  [ Samuel Thibault ]
+  * Also support debian-ports modernization
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 03 Feb 2025 13:44:58 +0100
+
+apt (2.9.26) unstable; urgency=medium
+
+  [ Sam Hartman ]
+  * Fix regression that prevented sending intermediate client certificates
+
+  [ Andreas Rönnquist ]
+  * apt-secure manual page is in manual section 8
+
+  [ Julian Andres Klode ]
+  * apt: Introduce the modernize-sources command
+  * Make notices about .list sources without signed-by less obnoxious
+    You get a single line telling you about modernize-sources now, unless
+    you run --audit (or have deb822 files without Signed-By).
+  * Documentation updates:
+    - Deprecate legacy one-line-style format harder. Removal not before 2029.
+    - Set signed-by/Signed-By in sources.list(5) short examples for Debian, Ubuntu
+    - Update Debian, Ubuntu example default sources to best practices:
+      We now ship debian.sources/ubuntu.sources instead of sources.list
+    - Update codenames for trixie, plucky as stable
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 28 Jan 2025 19:49:53 +0100
+
+apt (2.9.25) unstable; urgency=medium
+
+  * sqv, gpgv: Do not fail if Dir::Etc::Trusted is set and trusted.gpg.d is missing
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 22 Jan 2025 11:07:01 +0100
+
+apt (2.9.24) unstable; urgency=medium
+
+  * gitlab-ci: Use platform: linux/i386 instead of i386/debian image
+  * Warn about missing Signed-By in .list format, this deprecates
+    /etc/apt/trusted.gpg.d.
+  * Remove superseded warning about trusted.gpg fallback
+  * Unset Dir::Etc::trusted, this removes /etc/apt/trusted.gpg from
+    the trusted path.
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 21 Jan 2025 12:17:24 +0100
+
+apt (2.9.23) unstable; urgency=high
+
+  [ David Kalnischkies ]
+  * Write Pre-Depends with a dash again in EDSP (Closes: #1093254)
+  * Grep for more evil in test as a signature can contain evil
+
+  [ Julian Andres Klode ]
+  * Workaround gcc 14.2.0-9 regression in no-tree-slp-vectorize on Graviton;
+    this prevented https connections from working.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 17 Jan 2025 20:37:48 +0100
+
+apt (2.9.22) unstable; urgency=medium
+
+  [ Balint Reczey ]
+  * apt-pkg/deb/debsystem.cc: Fall back to "dpkg" when Dir::Bin::dpkg is not found
+
+  [ Julian Andres Klode ]
+  * debian/changelog: v3 signature packet, not v3 subkey
+  * Ensure we can build with APT_PKG_ABI > 601
+  * ssl: Set an error when we receive SSL_ERROR_SYSCALL
+  * ssl: Explictly return -1 (error) or 0 (server closed connection)
+  * abicheck: Add some workarounds to avoid errors
+  * t/i/test-method-gpgv-legacy-keyring: Switch to http, extend
+  * proxy: Avoids triggering bounds check in std::string_view
+  * methods/connect: Avoid unused argument warning
+
+  [ David Kalnischkies ]
+  * Resolve autopkgtest failures caused by dpkg >= 1.22.12 (Closes: #1092090)
+  * Try stomping a little less on global macro namespace
+  * Add pkgCache::{Priority,DepType}_NoL10n to avoid duplication
+  * Replaces macros with C++ attributes: APT_OVERRIDE, APT_ARRAY_SIZE, APT_NORETURN,
+    APT_DEPRECATED, APT_UNUSED, APT_MUSTCHECK, APT_IGNORE_DEPRECATED
+  * Drop SourceListWarnings::NonFreeFirmware messages
+  * Remove leftovers of the apt-key removal
+  * Move apt-extractexamples desc line from apt-utils to apt (Closes: #1091344)
+  * Remove leftovers from ftp and rsh/ssh methods removal
+  * Change multi sources.list entry example from FTP to HTTPS
+
+  [ Sergio Durigan Junior ]
+  * d/t/control: Don't depend on gdb-minimal.
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 14 Jan 2025 18:33:08 +0100
+
+apt (2.9.21) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * sources.list(5): Suggest VENDOR.sources for new systems
+
+  [ Guillem Jover ]
+  * Remove non-US leftovers in code and documentation
+  * Remove obsolete references to ftp://ftp.debian.org
+  * Use deb.debian.org instead of ftp.debian.org URLs
+
+  [ Julian Andres Klode ]
+  * Extend v3 signature packet expiry to 2026, owing to OBS use
+  * sqv: Avoid propagating errors between files (Closes: #1091679)
+  * http: seccomp: Allow reading directories (Closes: #1091351)
+  * test: Check "${METHODSDIR}/sqv" not "/usr/bin/sqv"
+  * Unfuzzy documentation translations
+  * Run update-po4a
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 01 Jan 2025 22:48:55 +0100
+
+apt (2.9.20) unstable; urgency=medium
+
+  * symbols: Merge 2.9.19 and fix version for InsertErrno
+  * Re-include std:: symbols in the symbols file as optional again
+
+ -- Julian Andres Klode <jak@debian.org>  Sat, 28 Dec 2024 22:59:50 +0100
+
+apt (2.9.19) unstable; urgency=medium
+
+  * Replace GnuTLS and gcrypt with OpenSSL
+  * Replace GnuPG with Sequoia on supported Debian platforms
+    - methods: Add new sqv method
+    - debian: Add default policy to allow SHA-1 self-signatures until 2026
+    - debian: Plug sqv into the package build
+  * Smaller bits:
+    - apt-helper: Add a hash-file helper to debug file hashing
+    - Use sq in the test suite, remove apt-key
+    - abicheck: Add symbol-merge.py helper
+    - Symbols: Merge stable, noble, testing, unstable
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 23 Dec 2024 12:16:19 +0100
+
+apt (2.9.18) unstable; urgency=medium
+
+  * Fix out-of-bounds read in `apt show :` (Closes: #1090068)
+  * Introduce git-like automatic pager for apt(8), emulating git behavior.
+    It is enabled for the show, list, search, policy, showsrc commands.
+    The pager can be set using APT_PAGER or PAGER and defaults to `pager`
+  * Add initial pinning information to apt show --full.
+    The fields `APT-Pin`, `APT-Candidate`, and `APT-Release` provide
+    pinning information. It is not yet possible to see multiple sources,
+    and the per-source pinning is not shown.
+  * gpgv: Extract VerifyDetachedSignatureFile()
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 19 Dec 2024 18:38:04 +0100
+
+apt (2.9.17) unstable; urgency=medium
+
+  * solver3:
+    - Fix intransitivity of version comparison on upgrade, this
+      means no-strict-pinning gets the correct order now.
+    - Add a missing debug level check
+    - Reject all non-candidates outright for strict pinning
+  * gpgv: Merge all keyrings into a single one again. This fixes
+    issues with arbitrary gpgv restrictions, such as strange
+    filenames or more than 40 keys
+  * Stop installing apt-key, make it a test suite helper
+    - gpgv: Drop references to apt-key
+    - Remove the apt-key manual page and add documentation to apt-secure
+
+ -- Julian Andres Klode <jak@debian.org>  Sat, 07 Dec 2024 17:12:51 +0100
+
+apt (2.9.16) unstable; urgency=medium
+
+  * Avoid extension check for .gpg in Signed-By keyrings (Closes: #1088656)
+    A warning for extensions other than .pgp and .gpg will be introduced at
+    a later point, but not now as we try to be bug compatible.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 29 Nov 2024 09:45:11 +0100
+
+apt (2.9.15) unstable; urgency=medium
+
+  [ David Kalnischkies ]
+  * Collect unprinted Ign errors for display in Err output
+
+  [ Julian Andres Klode ]
+  * Stop using apt-key for signature verification
+    - test-apt-cdrom: Hande assert-pubkey-algo like other gpgv messages
+    - Fix accidental ABI break in debListParser::ParseDepends
+    - tagfile: Avoid uninitialized variable warnings
+    - gpgv: Generalize apt_error to apt_msg(), add apt_warning()
+    - Do not implode key file name vector for calling gpgv
+    - apt-key: Only cat supported keyrings into the merged one
+    - apt-key: Temporarily accept 'pub' as an extension for binary gpg keys
+    - gpgv: Explictly pass all the keyrings to gpgv from apt
+    - gpgv: Use std::string instead of const char *
+    - strutl: Add Base64Decode
+    - gpgv: Verify keyrings and dearmor outside apt-key
+    - Directly call gpgv instead of apt-key
+    - gpgv: Add direct support for --assert-pubkey-algo
+    - fileutl: Use execvp() in Popen() instead of execv()
+    - Detect working gpgv using gpgv --dump-options
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 28 Nov 2024 19:33:03 +0100
+
+apt (2.9.14) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * test: Do not fail if valgrind is not available
+  * test: Handle gpgv-sq differeces and test with it
+  * apt-key: Prefer gpgv-sq if installed
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1087458)
+  * Dutch manpages translation update (Closes: #1087461)
+
+  [ Алексей Шилин ]
+  * Russian program translation update (Closes: #1087804)
+
+  [ Luca Vercelli ]
+  * Italian program translation update (Closes: #1081992)
+
+  [ David Kalnischkies ]
+  * Fixes for several compile-time warnings:
+    - Acknowledge non-erase usage of remove_if for volatile sources
+    - Fix expired std::string usage in APT::StringView testcase
+    - Add a virtual destructor to private CacheSet Matcher
+    - Avoid unnormalized paths for CMake install destinations
+    - Tag hidden acquire classes as final for devirtualization
+  * Support uncompressed indexes from partial file:/ mirrors, and
+    other fixes for the acquire system:
+    - Show hashes calculated by main thread in error messages
+    - Alternatively calculate alternative file hashes in file method
+    - Rewrite hidden config option checker for more patterns
+    - Allow AutoDetectProxy to work with more than just http(s)
+    - Do not assume mirror-URIs end in a filename causing a hang
+    - Do not change UsedMirror on local copy of InRelease
+    - Clear previous ignored errors before processing acquire item again
+    - Never consider file/copy/cdrom sources bad sites due to errors
+    - Allow HashSum mismatches to fallback to other mirrors
+    - Look at non by-hash paths in copy and file methods
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 22 Nov 2024 17:13:23 +0100
+
+apt (2.9.13) unstable; urgency=medium
+
+  * Add a --comment option to record Comment: in history
+  * Hardening: Add -Wp,-D_GLIBCXX_ASSERTIONS to CXXFLAGS to enable bounds
+    checking for all STL containers.
+  * patterns: Avoid out-of-bounds std::string_view read.
+    We only pass NUL-terminated strings to the function, and the code expects
+    that but we pass through an interface which doesn't guarantee that, so
+    we trigger an index < size() assertion when accessing the terminating
+    NUL byte when compiled with -Wp,-D_GLIBCXX_ASSERTIONS.
+  * ftparchive: Remove fixed size buffers on trusted inputs (LP: #2087848)
+    - ftparchive: override: Remove fixed-size line buffers in override files
+    - ftparchive: cachedb: Remove 600-byte key (and hence file path) limit
+    - ftparchive: writer: Remove line length limit on file lists
+  * tests: Temporarily disable valgrind-if-available on armhf and ppc64el
+    to avoid having to wait for a new valgrind without those architectures
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 20 Nov 2024 15:59:46 +0100
+
+apt (2.9.12) unstable; urgency=medium
+
+  [ наб ]
+  * More refactorings for string_view
+  * Provide a DEFER() macro for cleanup of local variables
+
+  [ Julian Andres Klode ]
+  * string_view: Include missing headers, fixes rust-rust-apt failure
+  * Handle Retry-After by default
+
+  [ Felix Moessbauer ]
+  * http: use Retry-After HTTP header to optimize retries
+  * http: add test for Retry-After handling
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 18 Nov 2024 15:03:10 +0100
+
+apt (2.9.11) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Various refactorings to the 3.0 solver
+  * Remove ftp, rsh, ssh methods (disabled since 1.8)
+  * Apply messaging fixes from Robert Krátký
+  * Fix keeping back removals of obsolete packages (LP: #2078720)
+  * Return an error if ResolveByKeep() is unsuccessful (LP: #2078720)
+  * Move apt-extracttemplates to /usr/lib/apt in 'apt' package
+  * json: Add "options" array to JSON hooks; adjust test cases accordingly
+
+  [ наб ]
+  * Refactor buffers into std::array and bump sizes, improving performance:
+    - Bump various buffer sizes to the default APT_BUFFER_SIZE
+    - Turn char[APT_BUFFER_SIZE] buffers into std::array<char, APT_BUFFER_SIZE>
+    - Turn std::unique_ptr<char[]/std::array<char>>(APT_BUFFER_SIZE) buffers into std::array<char, APT_BUFFER_SIZE>
+    - dpkgpm: use sysconf(_SC_GETPW_R_SIZE_MAX)-sized + growing buffer for getpwuid_r() instead of 255
+    - dpkgpm: use std::array<unsigned char, APT_BUFFER_SIZE> for I/O copy buffers
+  * File reading changes, fixing static line size limitations:
+    - dpkgpm: lift out CopyIndented() and make_unique_*() for FILEs; use getline() for reading lines instead of 1k buffer
+    - dpkgpm: use getline() for Apport var/crash lines
+    - dpkgpm: fdopen() failing doesn't close the fd
+  * Only run valgrind in tests if valgrind available on host
+  * ReportMirrorFailureToCentral: fix use-after-free
+  * Non-functional changes:
+    - Replace constant-size never-reallicated getservbyport_r() std::vector buffer with std::array
+    - FileFd::Open: don't needlessly copy filename in three-arg constructor
+    - Replace std::bind with lambdas
+    - Turn unique_ptr<decltype(fclose and free)> into real deleter types (warnings now, UB in C++20)
+    - dpkgpm: append ":$printarchitecture" instead of ':'+${#printarchitecture} to package name
+    - Prepare for APT::StringView -> std::string_view
+
+  [ Américo Monteiro ]
+  * Portuguese manpages translation update (Closes: #1086336)
+
+  [ Miroslav Kure ]
+  * Czech program translation update (Closes: #1087220)
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 14 Nov 2024 18:29:35 +0100
+
+apt (2.9.10) unstable; urgency=medium
+
+  [ Rafael Marian ]
+  * Fixed missing spaces in apt-mark(8) (Closes: #959854)
+  * Update manual link in apt-secure(8) (Closes: #1050616)
+  * Fix misspeling in italian apt --help (Closes: #967973)
+
+  [ David Kalnischkies ]
+  * Ignore pending input before confirmation prompts (Closes: #1082956)
+  * Show prompt reply if input is from non-terminal
+
+  [ Julian Andres Klode ]
+  * extracttar: Move large buffer to heap for valgrind
+
+  [ Christopher Bock ]
+  * apt-patterns(7): document recommends
+
+  [ Raziel Anarki ]
+  * Support --target-release in `apt list`
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 22 Oct 2024 18:47:04 +0200
+
+apt (2.9.9) unstable; urgency=medium
+
+  [ Chongyun Lee ]
+  * Fix compilation error with clang/libc++ 18
+
+  [ Julian Andres Klode ]
+  * Implement 'Pin: source-version <foo>'
+  * Fix buffer overflow, stack overflow, exponential complexity in
+    apt-ftparchive Contents generation (LP: #2083697)
+    - ftparchive: Mystrdup: Add safety check and bump buffer size
+    - ftparchive: contents: Avoid exponential complexity and overflows
+    - test framework: Improve valgrind support
+    - test: Check that apt-ftparchive handles deep paths
+
+  [ Remus-Gabriel Chelu ]
+  * Romanian program translation update (Closes: #1080210)
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 17 Oct 2024 09:41:18 +0200
+
+apt (2.9.8) unstable; urgency=medium
+
+  [ Aristo Chen ]
+  * Do not return error if `Signed-By` value in source list is empty
+
+  [ Carles Pina i Estany ]
+  * Update Catalan translation
+
+  [ Julian Andres Klode ]
+  * Fix obsoleted-by handling for experimental in 3.0 solver
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 12 Aug 2024 16:12:43 +0200
+
+apt (2.9.7) unstable; urgency=medium
+
+  [ sid ]
+  * Show installed version (not candidate version) while removing a package
+
+  [ David Kalnischkies ]
+  * Parse snapshot option for apt show/list (Closes: #1075819)
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1075874)
+  * Dutch manpages translation update (Closes: #1075875)
+
+  [ Michał Kułach ]
+  * Polish program translation update (Closes: #1075975)
+
+  [ Julian Andres Klode ]
+  * worker: Add an audit level to log audit messages
+  * gpgv: Add a LaterWorthless level, a SoonWorthless but at 'audit' level
+  * gpgv: Add IsAssertedPubKeyAlgo() function
+  * Only revoke weak RSA keys for now, add 'next' and 'future' levels
+    (LP: #2073126)
+  * solver3: Refactor Reason.Pkg()/Reason.Ver() use with iterator
+  * Add note that redundant 'CLI interface' is intentional
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 30 Jul 2024 13:19:24 +0900
+
+apt (2.9.6) unstable; urgency=medium
+
+  * solver3: Do not accidentally promote Replaces and Enhances to
+    dependencies; this fixes a regression in 2.9.5 when we added
+    code to promote currently satisfied Suggests to Depends.
+  * solver3: Unmark packages before setting any in ToDepCache
+  * solver3: Refactor (rewrite) FromDepCache() (Closes: #1071519)
+    This was intended to not have any behavioural changes, but verifying
+    the things that changed actually showed that they fixed subtle bugs.
+  * solver3: Consider packages as obsolete and not versions; this makes things
+    a bit easier to reason about.
+  * solver3: Only demote obsolete packages in choices for upgrades; this
+    fixes packages being needlessly replaced in apt install.
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 02 Jul 2024 22:20:36 +0200
+
+apt (2.9.5) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * CI: Set /bin/sh shell for travis user, so flock -c works
+  * Fix test cases for non-amd64 architectures
+  * edsp: Parse source version from the Source-Version field
+  * Check gpgv --dump-options for --assert-pubkey-algo support.
+    Thanks to Justus Winter for the idea
+  * Make the failure mode for non-executable tests stronger
+  * solver3: Do not dump sizes that are clearly pointers
+  * solver3: Group work items
+  * solver3: Remove no longer necessary comparisons
+  * solver3: Order obsolete choices last
+
+  [ Noah Meyerhans ]
+  * Fix spelling of @SNAPSHOTID@ in apt.conf.5.xml (Closes: #1072189)
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1072493)
+  * Dutch manpages translation update (Closes: #1072494)
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 13 Jun 2024 21:04:40 +0200
+
+apt (2.9.4) unstable; urgency=medium
+
+  [ David Kalnischkies ]
+  * Fix accidental silencing of output differences in tests
+  * Do not mark new if we have already installed providers
+  * Do not save new if we have already installed providers (Closes: #839546)
+  * Deal better with spurious spaces in arch restrictions (Closes: #1071219)
+
+  [ Julian Andres Klode ]
+  * pkgcachegen: Do not try to chmod or write to /dev/null (LP: #2067138)
+  * test: Show statistics for parallel tests too
+  * test: Run working tests against the 3.0 solver, and adjust as many as possible
+    (more bug fixes in a further release)
+    - test: Temporarily ignore autoremovable lists for solver3
+    - test: Support the 3.0 solver in most existing test cases
+  * Various improvements to the 3.0 solver:
+    - edsp: solver3: Show some progress
+    - solver3: Implement APT::Solver::RemoveManual to allow removing manual packages
+    - solver3: Promote satisfied Suggests to Recommends
+    - solver3: Solve optional dependencies before optional packages
+    - solver3: Try candidate before installed version on upgrade
+    - solver3: Use stable sort
+    - solver3: Actually restore unsolved items rather than solved ones
+    - solver3: Fix translations of removals for marked install
+
+ -- Julian Andres Klode <jak@debian.org>  Sat, 25 May 2024 10:58:49 +0200
+
+apt (2.9.3) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Initial implementation ("alpha") of the 3.0 solver:
+    This new solver is available using the --solver 3.0 option.
+    Highlights:
+    - Fully backtracking solver, think DPLL without pure literal elimination
+    - Manually installed packages are not offered up for removal
+    - New --no-strict-pinning option allows APT to fallback to non-candidate
+      versions, e.g. apt install --no-strict-pinning foo/experimental installs
+      foo from experimental and will switch dependencies where needed.
+    - Autoremove is more aggressive and only keeps the strongest automatically
+      installed package. For example, gcc-<version> will now be offered for
+      removal and no longer kept around due libtool Depends: gcc | c-compiler
+      and gcc-<version> Provides: c-compiler, as `gcc` is already satisfied.
+    Caveats right now:
+    - Test suite is not yet passing
+    - The list of automatically removable packages is not displayed
+      when automatically installed packages are not removed
+    - Error information gets lost on backtracking (see Debug::APT::Solver=2)
+    - Error information is just rendered as A -> B implication graphs,
+      with some nodes perhaps containing a "not".
+    - The logic for replacing obsolete manually installed packages with
+      new replacement packages (think Conflits/Replaces/Provides) is not
+      yet implemented.
+    - Conflict-driven clause learning is not implemented, so backtracking
+      is technically pretty inefficient.
+  * Solver3 integration fixes:
+    - test: Ignore progress output in comparing output..
+    - test-allow-scores-for-all-dependency-types: Adjust for solver3
+    - EDSP: Add "solver3" alias for apt-internal-solver
+  * UI work:
+    - Highlight essential removals with action::remove color
+    - The text of notices and audits shall not be bold
+    - Separate columns by 2 spaces in lists (Closes: #1070064)
+  * Support src:name shortcuts in showsrc, source, build-dep commands
+
+  [ David Kalnischkies ]
+  * Do not ignore if a cmake execute_process fails
+  * Avoid figuring which kept pkgs are phased if we don't display it
+  * Match version constraints before saving garbage packages
+  * Do not upgrade rev-deps ear-marked for removal
+  * Drop sudo-related envvars in testing framework
+  * Add test for dealing with unsat Suggests promoted to Recommends
+  * Allow parsing an empty Provides line (Closes: #1069874)
+
+  [ Frans Spiesschaert ]
+  * Dutch program translation update (Closes: #1070142)
+  * Dutch manpages translation update (Closes: #1070143)
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 14 May 2024 13:01:31 +0200
+
+apt (2.9.2) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Output customization and color refactoring:
+    - Also respect an APT_NO_COLOR variable
+    - Add a --color, --no-color option
+    - Add APT::Configuration::color helper to colorize things
+    - Use APT::Configuration::color to apply color to output
+    - Configure individual action colors using APT::Color::Action
+    - apt.conf(5): Document the APT::Color scope
+  * Introduce the new --audit error level
+    - Add an "audit" error level, and change the default to notice
+    - Add an --audit option to switch on audit logging
+    - Add an audit message for missing InRelease files
+  * Change the rendering for notices, warnings, errors:
+    - i18n: Use Error:/Warning:/Notice: instead of E:/W:/N:
+    - Render notices without (yellow) color, just in bold
+    - Keep the entire error/warning/notice message bold
+  * Other UI changes:
+    - apt update: Show upgradable package count in bold
+    - show: Highlight field names and colorize package name
+    - Remove spurious newline inside `apt autoremove` message
+    - Insert blank line following simulation note
+    - Show "Upgrading:" before other sections
+    - Only erase OpProgress lines in output version 3.0
+  * Test fixes:
+    - test: configuration: color: reset _config after tests
+    - build: test: Silence warnings in GTest code
+
+  [ Miroslav Kure ]
+  * Czech program translation update (Closes: #1068943)
+
+  [ Boyuan Yang ]
+  * Simplified Chinese program translation update (Closes: #1069118)
+
+  [ David Kalnischkies ]
+  * Allow no spaces for the last dependency in ParseDepends, too (LP: #2061834)
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 22 Apr 2024 19:36:30 +0200
+
+apt (2.9.1) unstable; urgency=medium
+
+  [ Julian Andres Klode ]
+  * Further UX improvements for apt(8)
+    - Estimate free space and issue warnings if exceeded, incl. /boot
+      + Rename "Installed size:" to "Space needed:"
+      + Space needed: Show space available in /usr
+      + Show space estimate for /boot, if separate; or estimate initrd for /usr
+      + Add warnings if space estimate exceeds free space
+    - Show downgrades as yellow
+    - Use "Continue anyway?" if a warning is queued, and default to N
+    - Use unicode install progress bar on UTF-8 locales
+  * Hide some of the output formatting and details from translatable strings,
+    do expect some more translation churn in upcoming uploads.
+
+  [ Rafael ]
+  * Remove duplicate sentence "Changing held packages:"
+
+ -- Julian Andres Klode <jak@debian.org>  Sun, 14 Apr 2024 18:45:28 +0200
+
+apt (2.9.0) unstable; urgency=medium
+
+  * Welcome to the APT 3.0 development series. It has a new UI for
+    apt(8). It has colors, columnar display, some more padding, and
+    shows removals last (Closes: #755088), making the output more
+    easy to quickly scan.
+
+  [ David Kalnischkies ]
+  * Avoid subshell hiding failure report from testfilestats
+  * Ignore umask of leftover diff_Index in failed pdiff test
+  * Fix and unfuzzy previous VCG/Graphviz URI change
 
   [ Julian Andres Klode ]
   * Revert "Temporarily downgrade key assertions to "soon worthless""
@@ -35,19 +870,19 @@ apt (2.8.0) noble; urgency=medium
     launchpad PPAs time to be fixed, but warnings are not safe:
     Untrusted keys could be hiding on your system, but just not
     used at the moment. Hence revert this so we get the errors we
-    want. (LP: #2060721)
-  * Branch off the stable 2.8.y branch for noble:
-    - CI: Test in ubuntu:noble images for 2.8.y
-    - debian/gbp.conf: Point at the 2.8.y branch
+    want.
+    This reverts commit 66998ed3d299bede651ad40368bdb270f5f5b0f9. (LP: #2060721)
+  * columnar: Fix floating point exception (list is empty if -V)
+  * OpProgress: Erase lines when done
+  * apt: Introduce the new terse apt output format 3.0
+  * Show Recommends/Suggests for upgrades too, move them down
+  * Only show Recommends/Suggests for new installs, not upgrades
+  * Use the same words for the summary
 
-  [ David Kalnischkies ]
-  * Test suite fixes:
-    - Avoid subshell hiding failure report from testfilestats
-    - Ignore umask of leftover diff_Index in failed pdiff test
-  * Documentation translation fixes:
-    - Fix and unfuzzy previous VCG/Graphviz URI change
+  [ Christian Blichmann ]
+  * Columnar output for package lists similar to 'ls'
 
- -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 16 Apr 2024 16:59:14 +0200
+ -- Julian Andres Klode <jak@debian.org>  Fri, 12 Apr 2024 20:17:34 +0200
 
 apt (2.7.14) unstable; urgency=medium
 

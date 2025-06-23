@@ -21,6 +21,7 @@
 #include <apt-pkg/hashes.h>
 #include <apt-pkg/strutl.h>
 
+#include <array>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -30,13 +31,13 @@
 #include <apti18n.h>
 									/*}}}*/
 
-class StoreMethod : public aptMethod
+class StoreMethod final : public aptMethod
 {
-   virtual bool Fetch(FetchItem *Itm) APT_OVERRIDE;
+   bool Fetch(FetchItem *Itm) override;
 
    public:
 
-   explicit StoreMethod(std::string &&pProg) : aptMethod(std::move(pProg),"1.2",SingleInstance | SendConfig | SendURIEncoded)
+   explicit StoreMethod(std::string pProg) : aptMethod(std::move(pProg),"1.2",SingleInstance | SendConfig | SendURIEncoded)
    {
       SeccompFlags = aptMethod::BASE;
       if (Binary != "store")
@@ -103,10 +104,10 @@ bool StoreMethod::Fetch(FetchItem *Itm)					/*{{{*/
    Res.Size = 0;
    while (1)
    {
-      unsigned char Buffer[APT_BUFFER_SIZE];
+      std::array<unsigned char, APT_BUFFER_SIZE> Buffer;
       unsigned long long Count = 0;
 
-      if (!From.Read(Buffer,sizeof(Buffer),&Count))
+      if (!From.Read(Buffer.data(),Buffer.size(),&Count))
       {
 	 if (To.IsOpen())
 	    To.OpFail();
@@ -116,8 +117,8 @@ bool StoreMethod::Fetch(FetchItem *Itm)					/*{{{*/
 	 break;
       Res.Size += Count;
 
-      Hash.Add(Buffer,Count);
-      if (To.IsOpen() && To.Write(Buffer,Count) == false)
+      Hash.Add(Buffer.data(),Count);
+      if (To.IsOpen() && To.Write(Buffer.data(),Count) == false)
       {
 	 Failed = true;
 	 break;
@@ -143,5 +144,5 @@ bool StoreMethod::Fetch(FetchItem *Itm)					/*{{{*/
 
 int main(int, char *argv[])
 {
-   return StoreMethod(flNotDir(argv[0])).Run();
+   return StoreMethod(std::string{flNotDir(argv[0])}).Run();
 }

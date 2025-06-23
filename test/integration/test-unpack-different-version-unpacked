@@ -14,8 +14,8 @@ cleanstatus() {
 	rm rootdir/var/cache/apt/*.bin
 }
 
-#FIXME: the reported version is wrong, it should be 1, not 2
 insertinstalledpackage 'libqtcore4' 'i386,amd64' '1' 'Multi-Arch: same' '' 'install ok unpacked'
+#FIXME(internal): the reported version is wrong, it should be 1, not 2
 testsuccessequal 'Reading package lists...
 Building dependency tree...
 0 upgraded, 0 newly installed, 0 to remove and 2 not upgraded.
