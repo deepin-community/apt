@@ -3496,8 +3496,13 @@ pkgAcqArchive::pkgAcqArchive(pkgAcquire *const Owner, pkgSourceList *const Sourc
    auto FinalFile = _config->FindDir("Dir::Cache::Archives") + flNotDir(StoreFilename);
    if (stat(FinalFile.c_str(), &Buf) == 0)
    {
+      bool IgnoreSizeCheck = false;
+      char* IgnoreSizeCheckStr = getenv("APT_IGNORE_FILESIZE_CHECK");
+      if (IgnoreSizeCheckStr != nullptr) {
+         IgnoreSizeCheck = StringToBool(IgnoreSizeCheckStr, false);
+      }
       // Make sure the size matches
-      if ((unsigned long long)Buf.st_size == Version->Size)
+      if (IgnoreSizeCheck || (unsigned long long)Buf.st_size == Version->Size)
       {
 	 Complete = true;
 	 Local = true;
