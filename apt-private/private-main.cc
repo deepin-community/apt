@@ -6,6 +6,7 @@
 #include <apt-pkg/strutl.h>
 
 #include <apt-private/private-main.h>
+#include <apt-private/private-output.h>
 
 #include <iostream>
 #include <locale>
@@ -68,6 +69,8 @@ void CheckIfSimulateMode(CommandLine &CmdL)				/*{{{*/
 	    "      Keep also in mind that locking is deactivated,\n"
 	    "      so don't depend on the relevance to the real current situation!\n"),
 	    _config->Find("Binary").c_str());
+      if (_config->FindI("APT::Output-Version") >= 30)
+	 std::cout << std::endl;
       _config->Set("Debug::NoLocking",true);
    }
 }
@@ -76,9 +79,11 @@ void CheckIfCalledByScript(int argc, const char *argv[])		/*{{{*/
 {
    if (unlikely(argc < 1)) return;
 
-   if(!isatty(STDOUT_FILENO) &&
-      _config->FindB("Apt::Cmd::Disable-Script-Warning", false) == false)
+   if (not IsStdoutAtty() &&
+       _config->FindB("Apt::Cmd::Disable-Script-Warning", false) == false)
    {
+      // NOTE: CLI interface is redundant on the I/interface, this is
+      // intentional to make it easier to read.
       std::cerr << std::endl
                 << "WARNING: " << flNotDir(argv[0]) << " "
                 << "does not have a stable CLI interface. "

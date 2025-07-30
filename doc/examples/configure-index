@@ -33,6 +33,7 @@ quiet "<INT>" {
   NoUpdate "<BOOL>"; // never update progress information - included in -q=1
   NoProgress "<BOOL>"; // disables the 0% → 100% progress on cache generation and stuff
   NoStatistic "<BOOL>"; // no "42 kB downloaded" stats in update
+  NoSolver3Explanation "<BOOL>"; // do not print solver3 explanations when used with internal solver
   ReleaseInfoChange "<BOOL>" // don't even print the notices if the info change is allowed
   {
     Origin "<BOOL>";
@@ -47,6 +48,7 @@ quiet "<INT>" {
 // Options for APT in general
 APT
 {
+  Audit "<BOOL>"; // display audit messages
   Architecture "<STRING>"; // debian architecture like amd64, i386, powerpc, armhf, mips, …
   Architectures "<LIST>"; // a list of (foreign) debian architectures, defaults to: dpkg --print-foreign-architectures
   BarbarianArchitectures "<LIST>"; // a list of architectures considered too foreign to satisfy M-A:foreign
@@ -104,6 +106,7 @@ APT
 
      Show-Upgraded "<BOOL>";
      Show-Versions "<BOOL>";
+     List-Columns "<BOOL>";
      Upgrade "<BOOL>";
      Only-Upgrade "<BOOL>";
      Upgrade-Allow-New "<BOOL>";
@@ -130,7 +133,6 @@ APT
         SourceListWarnings "<BOOL>"
         {
            APTAuth "<BOOL>";
-           NonFreeFirmware "<BOOL>";
            SignedBy "<BOOL>";
         };
      };
@@ -182,18 +184,16 @@ APT
      Error-Mode "<STRING>";
   };
 
-  /* define a new supported compressor on the fly
-  Compressor::rev {
-     Name "rev";
-     Extension ".reversed";
-     Binary "rev";
-     CompressArg {};
-     UncompressArg {};
-     Cost "10";
-  };
-  */
   Compressor "<LIST>";
-  Compressor::** "<UNDEFINED>";
+  // define a new compressor on the fly, like the super-compressor: /usr/bin/rev
+  Compressor::* {
+     Name "<STRING>"; // rev
+     Extension "<STRING>"; // .reversed
+     Binary "<STRING>"; // rev
+     CompressArg "<LIST>"; // {}
+     UncompressArg "<LIST>"; // {}
+     Cost "<INT>"; // 10
+  };
 
   Authentication
   {
@@ -247,6 +247,7 @@ Acquire
       Delay "<BOOL>" {   // whether to backoff between retries using the delay: method
         Maximum "<INT>"; // maximum number of seconds to delay an item per retry
       };
+      HandleRetryAfter "<BOOL>"; // whether to respect the wait time of the Retry-After header
   };
   Source-Symlinks "<BOOL>";
   ForceHash "<STRING>"; // hashmethod used for expected hash: sha256, sha1 or md5sum
@@ -333,31 +334,6 @@ Acquire
 	User-Agent "Debian APT-CURL/1.0";
   };
 
-  ftp
-  {
-    Proxy "ftp://127.0.0.1/";
-    Proxy::http.us.debian.org "DIRECT"; // Specific per-host setting
-
-    /* Required script to perform proxy login. This example should work
-       for tisfwtk */
-    ProxyLogin
-    {
-       "USER $(PROXY_USER)";
-       "PASS $(PROXY_PASS)";
-       "USER $(SITE_USER)@$(SITE):$(SITE_PORT)";
-       "PASS $(SITE_PASS)";
-    };
-    
-    Timeout "30";
-    ConnectionAttemptDelayMsec "250";
-    
-    /* Passive mode control, proxy, non-proxy and per-host. Pasv mode
-       is preferred if possible */
-    Passive "true";
-    Proxy::Passive "true";
-    Passive::http.us.debian.org "true"; // Specific per-host setting
-  };
-  
   cdrom
   {
     AutoDetect "<BOOL>"; // do auto detection of the cdrom mountpoint
@@ -486,6 +462,10 @@ Dir "<DIR>"
   {
      MountPath "/media/apt"; // Media AutoDetect mount path
   };
+
+  Boot "<DIR>";
+  Usr "<DIR>";
+  Apport "<DIR>";
 };
 
 // Things that effect the APT dselect method
@@ -575,9 +555,11 @@ Debug
   BuildDeps "<BOOL>";
   pkgInitialize "<BOOL>";   // This one will dump the configuration space
   NoLocking "<BOOL>";
-  Acquire::Ftp "<BOOL>";    // Show ftp command traffic
   Acquire::Http "<BOOL>";   // Show http command traffic
   Acquire::Https "<BOOL>";   // Show https debug
+  Acquire::tor "<BOOL>";
+  Acquire::tor+http "<BOOL>";
+  Acquire::tor+https "<BOOL>";
   Acquire::gpgv "<BOOL>";   // Show the gpgv traffic
   Acquire::cdrom "<BOOL>";   // Show cdrom debug output
   Acquire::Transaction "<BOOL>";
@@ -598,6 +580,7 @@ Debug
   SetupAPTPartialDirectory::AssumeGood "<BOOL>";
   Locking "<BOOL>";
   Phasing "<BOOL>";
+  APT::Solver "<INT">;
 };
 
 pkgCacheGen
@@ -688,6 +671,7 @@ acquire::*::by-hash "<STRING>";
 
 // Unsorted options: Some of those are used only internally
 
+pager "<BOOL>"; // true if a pager is to be used
 help "<BOOL>"; // true if the help message was requested via e.g. --help
 version "<BOOL>"; // true if the version number was requested via e.g. --version
 Binary "<STRING>"; // name of the program run like apt-get, apt-cache, …
@@ -715,13 +699,22 @@ apt::hashes::*::untrusted "<BOOL>";
 apt::list-cleanup "<BOOL>";
 apt::authentication::trustcdrom "<BOOL>";
 apt::solver::strict-pinning "<BOOL>";
+apt::solver::enqueue-common-dependencies "<BOOL>";
+apt::solver::defer-version-selection "<BOOL>";
+apt::solver::upgrade "<BOOL>";
+apt::solver::remove "<BOOL>";
+apt::solver::removemanual "<BOOL>";
+apt::solver::install "<BOOL>";
+apt::solver::timeout "<INT>";
 apt::keep-downloaded-packages "<BOOL>";
 apt::solver "<STRING>";
 apt::planner "<STRING>";
 apt::system "<STRING>";
 apt::acquire::translation "<STRING>"; // deprecated in favor of Acquire::Languages
 apt::color::highlight "<STRING>";
+apt::color::bold "<STRING>";
 apt::color::neutral "<STRING>";
+apt::output-version "<INT>";
 
 dpkgpm::reporting-steps "<INT>";
 
@@ -763,6 +756,8 @@ apt::key::masterkeyring "<STRING>";
 apt::key::archivekeyringuri "<STRING>";
 apt::key::net-update-enabled "<STRING>";
 apt::key::assert-pubkey-algo "<STRING>";
+apt::key::assert-pubkey-algo::next "<STRING>";
+apt::key::assert-pubkey-algo::future "<STRING>";
 
 apt::ftparchive::release::patterns "<LIST>";
 apt::ftparchive::release::validtime "<INT>";
@@ -803,17 +798,44 @@ acquire::max-pipeline-depth "<INT>";
 acquire::progress::diffpercent "<BOOL>";
 acquire::gzipindexes "<BOOL>";
 acquire::indextargets::randomized "<BOOL>";
-acquire::indextargets::deb::** "<UNDEFINED>";
-acquire::indextargets::deb-src::** "<UNDEFINED>";
+acquire::indextargets::* "<LIST>" {
+	* {
+		MetaKey "<STRING>";
+		ShortDescription "<STRING>";
+		Description "<STRING>";
+		flatMetaKey "<STRING>";
+		flatDescription "<STRING>";
+		Identifier "<STRING>";
+		DefaultEnabled "<BOOL>";
+		Optional "<BOOL>";
+		KeepCompressed "<BOOL>";
+		PDiffs "<BOOL>";
+		By-Hash "<STRING>";
+		Fallback-Of "<STRING>";
+		CompressionTypes "<STRING>";
+		KeepCompressedAs "<STRING>";
+	};
+};
 acquire::progress::ignore::showerrortext "<BOOL>";
 acquire::*::dl-limit "<INT>"; // catches file: and co which do not have these
+acquire::file::dl-limit "<INVALID>";
+acquire::copy::dl-limit "<INVALID>";
+acquire::gpgv::dl-limit "<INVALID>";
+acquire::store::dl-limit "<INVALID>";
+acquire::mirror::dl-limit "<INVALID>";
 methods::mirror::problemreporting "<STRING>";
-acquire::http::proxyautodetect "<STRING>";
-acquire::http::proxy-auto-detect "<STRING>";
-acquire::http::proxy::* "<STRING>";
-acquire::https::proxyautodetect "<STRING>";
-acquire::https::proxy-auto-detect "<STRING>";
-acquire::https::proxy::* "<STRING>";
+acquire::*::proxyautodetect "<STRING>";
+acquire::file::proxyautodetect "<INVALID>";
+acquire::copy::proxyautodetect "<INVALID>";
+acquire::store::proxyautodetect "<INVALID>";
+acquire::*::proxy-auto-detect "<STRING>";
+acquire::file::proxy-auto-detect "<INVALID>";
+acquire::copy::proxy-auto-detect "<INVALID>";
+acquire::store::proxy-auto-detect "<INVALID>";
+acquire::file::proxy::* "<INVALID>";
+acquire::copy::proxy::* "<INVALID>";
+acquire::store::proxy::* "<INVALID>";
+acquire::*::proxy::* "<STRING>";
 
 // Options used by apt-ftparchive
 dir::archivedir "<DIR>";
@@ -880,7 +902,13 @@ Rred::f "<BOOL>";
 Rred::Compress "<STRING>";
 
 APT::Internal::OpProgress::Absolute "<BOOL>";
+APT::Internal::OpProgress::EraseLines "<BOOL>";
 APT::Color "<BOOL>";
+APT::Color::Show::Field "<STRING>";
+APT::Color::Show::Package "<STRING>";
+APT::Color::* "<STRING>";
 
 update-manager::always-include-phased-updates "<BOOL>";
 update-manager::never-include-phased-updates "<BOOL>";
+
+apt::history::comment "<STRING>";

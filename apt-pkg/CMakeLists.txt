@@ -3,7 +3,8 @@ include_directories(${PROJECT_BINARY_DIR}/include/apt-pkg)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include/apt-pkg/)
 execute_process(COMMAND grep -v "^#" "${CMAKE_CURRENT_SOURCE_DIR}/tagfile-keys.list"
-		OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list")
+		OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list"
+		COMMAND_ERROR_IS_FATAL ANY)
 execute_process(COMMAND ${TRIEHASH_EXECUTABLE}
                         --ignore-case
                          --header ${PROJECT_BINARY_DIR}/include/apt-pkg/tagfile-keys.h
@@ -13,7 +14,8 @@ execute_process(COMMAND ${TRIEHASH_EXECUTABLE}
                          --function-name pkgTagHash
                          --include "<apt-pkg/tagfile.h>"
                          --include "<apt-pkg/header-is-private.h>"
-                         "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list")
+                         "${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.clean.list"
+                COMMAND_ERROR_IS_FATAL ANY)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "tagfile-keys.list")
 set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.cc" PROPERTIES COMPILE_DEFINITIONS APT_COMPILING_APT)
 
@@ -22,16 +24,19 @@ set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/tagfile-keys.cc" PROPER
 execute_process(COMMAND awk -v ORS=. "/^\#define APT_PKG_M/ {print \$3}"
                 COMMAND sed "s/\\.\$//"
                 INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/contrib/macros.h
-                OUTPUT_VARIABLE MAJOR OUTPUT_STRIP_TRAILING_WHITESPACE)
+                OUTPUT_VARIABLE MAJOR OUTPUT_STRIP_TRAILING_WHITESPACE
+                COMMAND_ERROR_IS_FATAL ANY)
 execute_process(COMMAND grep "^#define APT_PKG_RELEASE"
                 COMMAND cut -d " " -f 3
                 INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/contrib/macros.h
-                OUTPUT_VARIABLE MINOR OUTPUT_STRIP_TRAILING_WHITESPACE)
+                OUTPUT_VARIABLE MINOR OUTPUT_STRIP_TRAILING_WHITESPACE
+                COMMAND_ERROR_IS_FATAL ANY)
 
 message(STATUS "Building libapt-pkg ${MAJOR} (release ${MINOR})")
 set(APT_PKG_MAJOR ${MAJOR} PARENT_SCOPE) # exporting for methods/CMakeLists.txt
 
 configure_file(apt-pkg.pc.in ${CMAKE_CURRENT_BINARY_DIR}/apt-pkg.pc @ONLY)
+configure_file(versionscript.in ${CMAKE_CURRENT_BINARY_DIR}/versionscript @ONLY)
 
 # Definition of the C++ files used to build the library - note that this
 # is expanded at CMake time, so you have to rerun cmake if you add or remove
@@ -41,7 +46,6 @@ file(GLOB_RECURSE headers "*.h")
 
 # Create a library using the C++ files
 add_library(apt-pkg SHARED ${library})
-add_dependencies(apt-pkg apt-pkg-versionscript)
 # Link the library and set the SONAME
 target_include_directories(apt-pkg
                            PRIVATE ${ZLIB_INCLUDE_DIRS}
@@ -52,7 +56,7 @@ target_include_directories(apt-pkg
                                    $<$<BOOL:${UDEV_FOUND}>:${UDEV_INCLUDE_DIRS}>
                                    $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_INCLUDE_DIRS}>
                                    ${ICONV_INCLUDE_DIRS}
-                                   $<$<BOOL:${GCRYPT_FOUND}>:${GCRYPT_INCLUDE_DIRS}>
+                                   ${OPENSSL_INCLUDE_DIRS}
                                    $<$<BOOL:${XXHASH_FOUND}>:${XXHASH_INCLUDE_DIRS}>
 )
 
@@ -67,13 +71,13 @@ target_link_libraries(apt-pkg
                              $<$<BOOL:${UDEV_FOUND}>:${UDEV_LIBRARIES}>
                              $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>
                              ${ICONV_LIBRARIES}
-                             $<$<BOOL:${GCRYPT_FOUND}>:${GCRYPT_LIBRARIES}>
+                             OpenSSL::Crypto
                              $<$<BOOL:${XXHASH_FOUND}>:${XXHASH_LIBRARIES}>
 )
 set_target_properties(apt-pkg PROPERTIES VERSION ${MAJOR}.${MINOR})
 set_target_properties(apt-pkg PROPERTIES SOVERSION ${MAJOR})
 set_target_properties(apt-pkg PROPERTIES CXX_VISIBILITY_PRESET hidden)
-add_version_script(apt-pkg)
+target_link_libraries(apt-pkg PRIVATE -Wl,-version-script="${CMAKE_CURRENT_BINARY_DIR}/versionscript")
 
 # Install the library and the header files
 install(TARGETS apt-pkg LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

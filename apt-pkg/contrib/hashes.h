@@ -3,10 +3,10 @@
 /* ######################################################################
 
    Hashes - Simple wrapper around the hash functions
-   
+
    This is just used to make building the methods simpler, this is the
    only interface required..
-   
+
    ##################################################################### */
 									/*}}}*/
 #ifndef APTPKG_HASHES_H
@@ -15,12 +15,12 @@
 #include <apt-pkg/macros.h>
 
 #ifdef APT_COMPILING_APT
-#include <apt-pkg/string_view.h>
 #include <apt-pkg/tagfile-keys.h>
 #endif
 
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -41,7 +41,7 @@ class APT_PUBLIC HashString
 
  public:
    HashString(std::string Type, std::string Hash);
-   explicit HashString(std::string StringedHashString);  // init from str as "type:hash"
+   explicit HashString(std::string_view StringedHashString);  // init from str as "type:hash"
    HashString();
 
    // get hash type used
@@ -66,9 +66,9 @@ class APT_PUBLIC HashString
    static APT_PURE const char** SupportedHashes();
 #ifdef APT_COMPILING_APT
    struct APT_HIDDEN HashSupportInfo {
-      APT::StringView name;
+      std::string_view name;
       pkgTagSection::Key namekey;
-      APT::StringView chksumsname;
+      std::string_view chksumsname;
       pkgTagSection::Key chksumskey;
    };
    APT_HIDDEN static std::vector<HashSupportInfo> SupportedHashesInfo();

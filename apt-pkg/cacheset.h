@@ -218,11 +218,11 @@ public:
 	operator container_iterator(void) const { return _iter; }
 	inline iterator_type& operator++() { ++_iter; return static_cast<iterator_type&>(*this); }
 	inline iterator_type operator++(int) { iterator_type tmp(*this); operator++(); return tmp; }
-	inline iterator_type operator+(typename container_iterator::difference_type const &n) { return iterator_type(_iter + n); }
+	inline iterator_type operator+(typename container_iterator::difference_type const &n) const { return iterator_type(_iter + n); }
 	inline iterator_type operator+=(typename container_iterator::difference_type const &n) { _iter += n; return static_cast<iterator_type&>(*this); }
 	inline iterator_type& operator--() { --_iter;; return static_cast<iterator_type&>(*this); }
 	inline iterator_type operator--(int) { iterator_type tmp(*this); operator--(); return tmp; }
-	inline iterator_type operator-(typename container_iterator::difference_type const &n) { return iterator_type(_iter - n); }
+	inline iterator_type operator-(typename container_iterator::difference_type const &n) const { return iterator_type(_iter - n); }
 	inline typename container_iterator::difference_type operator-(iterator_type const &b) { return (_iter - b._iter); }
 	inline iterator_type operator-=(typename container_iterator::difference_type const &n) { _iter -= n; return static_cast<iterator_type&>(*this); }
 	inline bool operator!=(iterator_type const &i) const { return _iter != i._iter; }
@@ -344,7 +344,7 @@ private:
 	void * const d;
 };
 									/*}}}*/
-template<class Container> class APT_PUBLIC PackageContainer : public PackageContainerInterface {/*{{{*/
+template<class Container> class PackageContainer : public PackageContainerInterface {/*{{{*/
 /** \class APT::PackageContainer
 
     Simple wrapper around a container class like std::set to provide a similar
@@ -366,13 +366,13 @@ public:									/*{{{*/
 	typedef typename Container::size_type size_type;
 	typedef typename Container::allocator_type allocator_type;
 
-	bool insert(pkgCache::PkgIterator const &P) APT_OVERRIDE { if (P.end() == true) return false; _cont.insert(P); return true; }
+	bool insert(pkgCache::PkgIterator const &P) override { if (P.end() == true) return false; _cont.insert(P); return true; }
 	template<class Cont> void insert(PackageContainer<Cont> const &pkgcont) { _cont.insert((typename Cont::const_iterator)pkgcont.begin(), (typename Cont::const_iterator)pkgcont.end()); }
 	void insert(const_iterator begin, const_iterator end) { _cont.insert(begin, end); }
 
-	bool empty() const APT_OVERRIDE { return _cont.empty(); }
-	void clear() APT_OVERRIDE { return _cont.clear(); }
-	size_t size() const APT_OVERRIDE { return _cont.size(); }
+	[[nodiscard]] bool empty() const override { return _cont.empty(); }
+	void clear() override { return _cont.clear(); }
+	[[nodiscard]] size_t size() const override { return _cont.size(); }
 #if __GNUC__ >= 5 || (__GNUC_MINOR__ >= 9 && __GNUC__ >= 4)
 	iterator erase( const_iterator pos ) { return iterator(_cont.erase(pos._iter)); }
 	iterator erase( const_iterator first, const_iterator last ) { return iterator(_cont.erase(first._iter, last._iter)); }
@@ -658,9 +658,8 @@ public:
 	typedef const_iterator::difference_type difference_type;
 	typedef std::make_unsigned<const_iterator::difference_type>::type size_type;
 
-
-	bool empty() const APT_OVERRIDE { return false; }
-	size_t size() const APT_OVERRIDE { return _cont->Head().PackageCount; }
+	[[nodiscard]] bool empty() const override { return false; }
+	[[nodiscard]] size_t size() const override { return _cont->Head().PackageCount; }
 
 	const_iterator begin() const { return const_iterator(_cont->PkgBegin()); }
 	const_iterator end() const { return const_iterator(_cont->PkgEnd()); }
@@ -676,11 +675,11 @@ public:
 	virtual ~PackageUniverse();
 
 private:
-	APT_HIDDEN bool insert(pkgCache::PkgIterator const &) APT_OVERRIDE { return true; }
+	APT_HIDDEN bool insert(pkgCache::PkgIterator const &/*P*/) override { return true; }
 	template<class Cont> APT_HIDDEN void insert(PackageContainer<Cont> const &) { }
 	APT_HIDDEN void insert(const_iterator, const_iterator) { }
 
-	APT_HIDDEN void clear() APT_OVERRIDE { }
+	APT_HIDDEN void clear() override { }
 	APT_HIDDEN iterator erase( const_iterator pos );
 	APT_HIDDEN iterator erase( const_iterator first, const_iterator last );
 };
@@ -799,7 +798,7 @@ protected:								/*{{{*/
 									/*}}}*/
 };
 									/*}}}*/
-template<class Container> class APT_PUBLIC VersionContainer : public VersionContainerInterface {/*{{{*/
+template<class Container> class VersionContainer : public VersionContainerInterface {/*{{{*/
 /** \class APT::VersionContainer
 
     Simple wrapper around a container class like std::set to provide a similar
@@ -821,12 +820,12 @@ public:									/*{{{*/
 	typedef typename Container::size_type size_type;
 	typedef typename Container::allocator_type allocator_type;
 
-	bool insert(pkgCache::VerIterator const &V) APT_OVERRIDE { if (V.end() == true) return false; _cont.insert(V); return true; }
+	bool insert(pkgCache::VerIterator const &V) override { if (V.end() == true) return false; _cont.insert(V); return true; }
 	template<class Cont> void insert(VersionContainer<Cont> const &vercont) { _cont.insert((typename Cont::const_iterator)vercont.begin(), (typename Cont::const_iterator)vercont.end()); }
 	void insert(const_iterator begin, const_iterator end) { _cont.insert(begin, end); }
-	bool empty() const APT_OVERRIDE { return _cont.empty(); }
-	void clear() APT_OVERRIDE { return _cont.clear(); }
-	size_t size() const APT_OVERRIDE { return _cont.size(); }
+	[[nodiscard]] bool empty() const override { return _cont.empty(); }
+	void clear() override { return _cont.clear(); }
+	[[nodiscard]] size_t size() const override { return _cont.size(); }
 #if APT_GCC_VERSION >= 0x409
 	iterator erase( const_iterator pos ) { return iterator(_cont.erase(pos._iter)); }
 	iterator erase( const_iterator first, const_iterator last ) { return iterator(_cont.erase(first._iter, last._iter)); }

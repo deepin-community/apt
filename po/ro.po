@@ -9,35 +9,37 @@
 #
 # Sorin Batariuc <sorin@bonbon.net>, 2004, 2005, 2006.
 # Eddy Petrișor <eddy.petrisor@gmail.com>, 2008.
-# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2023.
+# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2023, 2024, 2025.
 #
 # Cronologia traducerii fișierului „apt”:
 # Traducerea inițială, făcută de SB, pentru versiunea apt 0.5.24, noi-2004.
-# Actualizare a traducerii pentru versiunea 0.6.40.1, făcută de SB aug-2005.
-# Actualizare a traducerii pentru versiunea 0.6.4.2, făcută de SB ian-2006.
-# Actualizare a traducerii pentru versiunea 0.6.43.2, făcută de SB mar-2006.
-# Actualizare a traducerii pentru versiunea 0.6.43.3, făcută de SB iun-2006.
-# Actualizare a traducerii pentru versiunea 0.6.44.2, făcută de SB sep-2006.
-# Actualizare a traducerii pentru versiunea 1.0.5, făcută de EP noi-2008.
+# Actualizare a traducerii pentru versiunea 0.6.40.1, făcută de SB, aug-2005.
+# Actualizare a traducerii pentru versiunea 0.6.4.2, făcută de SB, ian-2006.
+# Actualizare a traducerii pentru versiunea 0.6.43.2, făcută de SB, mar-2006.
+# Actualizare a traducerii pentru versiunea 0.6.43.3, făcută de SB, iun-2006.
+# Actualizare a traducerii pentru versiunea 0.6.44.2, făcută de SB, sep-2006.
+# Actualizare a traducerii pentru versiunea 1.0.5, făcută de EP, noi-2008.
 # Actualizare a traducerii pentru versiunea 2.7.2, făcută de R-GC, iul-2023.
+# Actualizare a traducerii pentru versiunea 2.9.8, făcută de R-GC, aug-2024.
+# Actualizare a traducerii pentru versiunea 2.9.35, făcută de R-GC, mar-2025.
 # Actualizare a traducerii pentru versiunea Y, făcută de X, Z(luna-anul).
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: apt 2.7.2\n"
+"Project-Id-Version: apt 2.9.35\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
-"PO-Revision-Date: 2023-07-13 19:58+0200\n"
+"POT-Creation-Date: 2025-03-27 21:54+0000\n"
+"PO-Revision-Date: 2025-03-29 00:56+0100\n"
 "Last-Translator: Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>\n"
 "Language-Team: Romanian <debian-l10n-romanian@lists.debian.org>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 3.5\n"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
@@ -75,11 +77,12 @@ msgstr "Depozitul „%s” nu mai are un fișier „Release” (versiunea lansat
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
-"În mod normal, acest lucru nu este permis, dar opțiunea Acquire::"
-"AllowDowngradeToInsecureRepositories a fost dată pentru a-l suprascrie."
+"În mod normal, acest lucru nu este permis, dar opțiunea "
+"Acquire::AllowDowngradeToInsecureRepositories a fost dată pentru a-l "
+"suprascrie."
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -147,17 +150,18 @@ msgstr ""
 #, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 "S-a produs o eroare în timpul verificării semnăturii. Depozitul nu este "
-"actualizat și vor fi utilizate fișierele de index anterioare. Eroare GPG: "
-"%s: %s"
+"actualizat și vor fi utilizate fișierele de index anterioare. Verificarea "
+"semnăturii OpenPGP a eșuat: %s: %s"
 
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
-msgstr "Eroare GPG: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
+msgstr "Verificarea semnăturii OpenPGP a eșuat: %s: %s"
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -226,8 +230,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Distribuție în conflict: %s (se aștepta %s, dar s-a obținut %s)"
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr "Depozitul „%s” și-a schimbat valoarea „%s” din „%s” în „%s”"
@@ -240,7 +243,7 @@ msgstr ""
 "%hi."
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -267,6 +270,15 @@ msgstr "Eșec la aducerea lui %s  %s"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+"Depozitele ar trebui să furnizeze un fișier InRelease cu semnătură clară, "
+"dar nu s-a găsit niciunul la %s."
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -284,16 +296,6 @@ msgstr "Nu se poate găsi o sursă pentru a descărca versiunea „%s” a „%s
 #, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "Jurnalul de modificări nu este disponibil pentru %s=%s"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
-"Metoda „%s” nu este acceptată și este dezactivată în mod implicit. Luați în "
-"considerare trecerea la http(s). Configurați Dir::Bin::Methods::%s la „%s” "
-"pentru a o activa din nou."
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -722,6 +724,30 @@ msgstr ""
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "Eroare de sintaxă %s:%u: deșeuri suplimentare la sfârșitul fișierului"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr "Eroare:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr "Avertisment:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr "Aviz:"
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr "Audit:"
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr "Depanare:"
+
 #: apt-pkg/contrib/extracttar.cc
 #, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -838,11 +864,11 @@ msgstr "Subprocesul %s a returnat un cod de eroare (%u)"
 msgid "Sub-process %s exited unexpectedly"
 msgstr "Subprocesul %s a ieșit în mod neașteptat"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "Eroare de citire"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "Eroare de scriere"
 
@@ -1169,6 +1195,14 @@ msgstr "Nu se poate bloca directorul de administrare (%s), sunteți „root”?"
 msgid "Not locked"
 msgstr "Nu este blocat"
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+"Executabilul dpkg specificat în Dir::Bin::dpkg lipsește, revenind la "
+"utilizarea executabilului dpkg implicit."
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1362,6 +1396,14 @@ msgstr "Se pregătește pentru primirea soluției"
 #: apt-pkg/edsp.cc
 msgid "External solver failed without a proper error message"
 msgstr "Soluționatorul extern a eșuat fără un mesaj de eroare relevant"
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "Se calculează înnoirea"
+
+#: apt-pkg/edsp.cc
+msgid "Solving dependencies"
+msgstr "Se rezolvă dependențele"
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1693,10 +1735,6 @@ msgstr ""
 "Descărcarea unor fișiere index a eșuat, acestea fie au fost ignorate, fie au "
 "fost folosite în loc cele vechi."
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "Se calculează înnoirea"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1864,12 +1902,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Notă: se selectează „%s” în loc de „%s”\n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr "Cele mai utilizate comenzi:"
 
@@ -1984,17 +2016,24 @@ msgid "Broken packages"
 msgstr "Pachete deteriorate"
 
 #: apt-private/private-install.cc
+msgid "Writing error report"
+msgstr "Se scrie raportul de eroare"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
 msgstr ""
+"Un „/usr” neunificat nu mai este acceptat, utilizați «usrmerge» pentru a "
+"converti la un sistem cu un „/usr” unificat (în care directoarele /"
+"{bin,sbin,lib}/ sunt legate simbolic la directoarele corespondente din /"
+"usr/)."
 
 #. TRANSLATORS: %s is a url to a page describing merged-usr (bookworm release notes)
 #: apt-private/private-install.cc
-#, fuzzy, c-format
-#| msgid "Selected %s for removal.\n"
+#, c-format
 msgid "See %s for more details."
-msgstr "%s a fost selectat pentru eliminare\n"
+msgstr "Consultați %s pentru mai multe detalii."
 
 #: apt-private/private-install.cc
 msgid ""
@@ -2048,12 +2087,22 @@ msgstr ""
 "Ce ciudat... Dimensiunile nu se potrivesc, trimiteți un mesaj la "
 "apt@packages.debian.org"
 
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB / %sB\n"
+msgstr "  Dimensiunea descărcării: %so / %so\n"
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "Este nevoie să descărcați %so/%so de arhive.\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr "  Dimensiunea descărcării: %so\n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -2062,12 +2111,57 @@ msgstr "Este nevoie să descărcați %so/%so de arhive.\n"
 msgid "Need to get %sB of archives.\n"
 msgstr "Este nevoie să descărcați %so de arhive.\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr "După această operație vor fi folosiți din disc încă %so.\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr "Spațiu necesar: %so / %so disponibil\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+"Este necesar mai mult spațiu decât cel disponibil: %so > %so, instalarea "
+"poate eșua"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr "în %s: %so / %so disponibil\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+"Este nevoie de mai mult spațiu pe %s decât este disponibil: %so > %so, "
+"instalarea poate eșua"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr "Spațiu necesar: %so\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Freed space: %sB\n"
+msgstr "  Spațiu eliberat: %so\n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -2090,18 +2184,19 @@ msgstr ""
 "Eliminarea pachetelor esențiale, cruciale ale sistemului nu este permisă. "
 "Acest lucru ar putea deteriora sistemul."
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr "Continuați totuși?"
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr "Continuați?"
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 msgid "Do you want to continue?"
-msgstr "Vreți să continuați?"
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
 msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
+"Continuați?\n"
+"Doriți să continuați?"
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -2180,6 +2275,14 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "Eroare internă, AutoRemover() a deteriorat anumite lucruri"
 
 #: apt-private/private-install.cc
+#, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] "Folosiți «%s» pentru a-l elimina."
+msgstr[1] "Folosiți «%s» pentru a le elimina."
+msgstr[2] "Folosiți «%s» pentru a le elimina."
+
+#: apt-private/private-install.cc
 msgid ""
 "The following package was automatically installed and is no longer required:"
 msgid_plural ""
@@ -2201,16 +2304,8 @@ msgstr[1] "%lu pachete au fost instalate automat și nu mai sunt necesare:\n"
 msgstr[2] "%lu de pachete au fost instalate automat și nu mai sunt necesare:\n"
 
 #: apt-private/private-install.cc
-#, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] "Folosiți «%s» pentru a-l elimina."
-msgstr[1] "Folosiți «%s» pentru a le elimina."
-msgstr[2] "Folosiți «%s» pentru a le elimina."
-
-#: apt-private/private-install.cc
-msgid "The following additional packages will be installed:"
-msgstr "Următoarele pachete adiționale vor fi instalate:"
+msgid "Result calculated by the 3.0 solver."
+msgstr "Rezultat calculat de soluționatorul 3.0."
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2219,6 +2314,10 @@ msgstr "Pachete sugerate:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "Pachete recomandate:"
+
+#: apt-private/private-install.cc
+msgid "The following additional packages will be installed:"
+msgstr "Următoarele pachete adiționale vor fi instalate:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2268,9 +2367,9 @@ msgid_plural ""
 msgstr[0] ""
 "Există %i versiune suplimentară. Utilizați opțiunea „-a” pentru a o vedea."
 msgstr[1] ""
-"Există %i versiuni suplimentare. Utilizați opțiunea „-a” pentru a-le vedea."
+"Există %i versiuni suplimentare. Utilizați opțiunea „-a” pentru a le vedea."
 msgstr[2] ""
-"Există %i de versiuni suplimentare. Utilizați opțiunea „-a” pentru a-le "
+"Există %i de versiuni suplimentare. Utilizați opțiunea „-a” pentru a le "
 "vedea."
 
 #. TRANSLATORS: placeholder is a binary name like apt or apt-get
@@ -2356,18 +2455,40 @@ msgid "The following packages have unmet dependencies:"
 msgstr "Următoarele pachete au dependențe neîndeplinite:"
 
 #: apt-private/private-output.cc
+msgid "Unsatisfied dependencies:"
+msgstr "Dependențe nesatisfăcute:"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "Următoarele pachete NOI vor fi instalate:"
 
 #: apt-private/private-output.cc
-msgid "The following packages will be REMOVED:"
-msgstr "Următoarele pachete vor fi ȘTERSE:"
+msgid "Installing:"
+msgstr "Se instalează:"
 
 #: apt-private/private-output.cc
-#, fuzzy
-#| msgid "The following packages have been kept back:"
+msgid "Installing dependencies:"
+msgstr "Se instalează dependențele:"
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr "SE ELIMINĂ:"
+
+#: apt-private/private-output.cc
+msgid "The following packages will be REMOVED:"
+msgstr "Următoarele pachete vor fi ELIMINATE:"
+
+#: apt-private/private-output.cc
 msgid "The following upgrades have been deferred due to phasing:"
-msgstr "Următoarele pachete au fost reținute:"
+msgstr "Următoarele actualizări au fost amânate din cauza eșalonării:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading yet due to phasing:"
+msgstr "Nu se actualizează încă din cauza eșalonării:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr "Nu se actualizează:"
 
 #: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
@@ -2378,8 +2499,20 @@ msgid "The following packages will be upgraded:"
 msgstr "Următoarele pachete vor fi ÎNNOITE:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr "Se înnoiește:"
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr "SE RETROGRADEAZĂ:"
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr "Următoarele pachete vor fi RETROGRADATE:"
+
+#: apt-private/private-output.cc
+msgid "Changing held packages:"
+msgstr "Se schimbă pachetele ținute:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2399,9 +2532,18 @@ msgstr ""
 "Acest lucru NU trebuie făcut decât dacă știți exact ceea ce faceți!"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr "Rezumat:"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu înnoit(e), %lu nou instalat(e), "
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "Se înnoiește: %lu, Se instalează: %lu, "
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2410,13 +2552,28 @@ msgstr "%lu reinstalat(e), "
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Reinstalling: %lu, "
+msgstr "Se reinstalează: %lu, "
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu downgraded, "
 msgstr "%lu retrogragradat(e), "
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Downgrading: %lu, "
+msgstr "Se retrogradează: %lu, "
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu de eliminat și %lu neactualizat(e).\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr "Se elimină: %lu, Nu se înnoiește: %lu\n"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2445,7 +2602,7 @@ msgid "Y"
 msgstr "D"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr "N"
 
@@ -2463,13 +2620,13 @@ msgid "There is %i additional record. Please use the '-a' switch to see it"
 msgid_plural ""
 "There are %i additional records. Please use the '-a' switch to see them."
 msgstr[0] ""
-"Există %i înregistrare suplimentară. Utilizați opțiunea „-a” pentru a-o "
+"Există %i înregistrare suplimentară. Utilizați opțiunea „-a” pentru a o "
 "vedea."
 msgstr[1] ""
-"Există %i înregistrări suplimentare. Utilizați opțiunea „-a” pentru a-le "
+"Există %i înregistrări suplimentare. Utilizați opțiunea „-a” pentru a le "
 "vedea."
 msgstr[2] ""
-"Există %i de înregistrări suplimentare. Utilizați opțiunea „-a” pentru a-le "
+"Există %i de înregistrări suplimentare. Utilizați opțiunea „-a” pentru a le "
 "vedea."
 
 #: apt-private/private-show.cc
@@ -2636,11 +2793,11 @@ msgstr "%s nu are dependențe de compilare.\n"
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
-"Nu sunt disponibile informații despre arhitectură pentru %s. Consultați apt."
-"conf(5) „APT::Architectures” pentru configurare."
+"Nu sunt disponibile informații despre arhitectură pentru %s. Consultați "
+"apt.conf(5) „APT::Architectures” pentru configurare."
 
 #: apt-private/private-source.cc
 msgid "Must specify at least one package to check builddeps for"
@@ -2683,6 +2840,11 @@ msgstr "Nu s-a putut analiza %s. Editați din nou? "
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr "Fișierul „%s” s-a modificat, executați «apt-get update».\n"
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr "Rescrieți sursele %zu?"
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2702,6 +2864,14 @@ msgstr ""
 "Utilizarea lui %s ar trebui să fie preferată în locul încorporării "
 "informațiilor de autentificare direct în intrarea %s pentru „%s”."
 
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+"Intrarea din %s pentru „%s” ar trebui să fie actualizată pentru formatul "
+"deb822 .sources"
+
 # R-GC, scrie:
 # mesaj, tradus cu ajutorul lui
 # David Kalnischkies, actualul
@@ -2713,6 +2883,33 @@ msgid "Missing Signed-By in the %s entry for '%s'"
 msgstr "Lipsește opțiunea «Signed-By» din %s pentru „%s”"
 
 #: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+"Luați în considerare migrarea tuturor intrărilor sources.list(5) către "
+"formatul deb822 .sources"
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+"Formatul deb822 .sources acceptă atât chei OpenPGP încorporate, cât și "
+"externe"
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+"Consultați pagina de manual apt-secure(8) pentru cele mai bune practici în "
+"configurarea semnării depozitelor."
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
+msgstr ""
+"Unele surse pot fi modernizate. Rulați „apt modernize-sources” pentru a face "
+"acest lucru."
+
+#: apt-private/private-update.cc
 #, c-format
 msgid "%i package can be upgraded. Run 'apt list --upgradable' to see it.\n"
 msgid_plural ""
@@ -2720,10 +2917,10 @@ msgid_plural ""
 msgstr[0] ""
 "%i pachet poate fi înnoit. Rulați «apt list --upgradable» pentru a-l vedea.\n"
 msgstr[1] ""
-"%i pachete pot fi înnoite. Rulați «apt list --upgradable» pentru a-le "
+"%i pachete pot fi înnoite. Rulați «apt list --upgradable» pentru a le "
 "vedea.\n"
 msgstr[2] ""
-"%i de pachete pot fi înnoite. Rulați «apt list --upgradable» pentru a-le "
+"%i de pachete pot fi înnoite. Rulați «apt list --upgradable» pentru a le "
 "vedea.\n"
 
 #: apt-private/private-update.cc
@@ -2762,6 +2959,10 @@ msgstr "  Pachete virtuale mixte: "
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  Lipsă: "
+
+#: cmdline/apt-cache.cc
+msgid "Total distinct source versions: "
+msgstr "Total versiuni sursă distincte: "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -3122,6 +3323,10 @@ msgid "concatenate files, with automatic decompression"
 msgstr "concatenează fișiere, cu decomprimare automată"
 
 #: cmdline/apt-helper.cc
+msgid "hash file"
+msgstr "suma de control a fișierului"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr "detectează proxy-ul folosind apt.conf"
 
@@ -3365,6 +3570,10 @@ msgid "edit the source information file"
 msgstr "editează fișierul cu informații despre surse"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr "modernizarea fișierelor .list în fișiere .sources"
+
+#: cmdline/apt.cc
 msgid "satisfy dependency strings"
 msgstr "efectuează operațiile pentru satisfacerea lanțurilor de dependențe"
 
@@ -3572,7 +3781,7 @@ msgstr "Algoritm de comprimare necunoscut „%s”"
 msgid "Compressed output %s needs a compression set"
 msgstr "Rezultatul comprimat %s are nevoie de o ajustare a comprimării"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "Eșec la crearea conductei IPC către subproces"
 
@@ -3683,7 +3892,7 @@ msgstr "*** Nu s-a putut face legătura între %s și %s"
 #: ftparchive/writer.cc
 #, c-format
 msgid " DeLink limit of %sB hit.\n"
-msgstr " Limita de %sB a dezlegării a fost atinsă.\n"
+msgstr " Limita de %so a dezlegării a fost atinsă.\n"
 
 #: ftparchive/writer.cc
 msgid "Archive had no package field"
@@ -3691,23 +3900,23 @@ msgstr "Arhiva nu are câmp de pachet"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "  %s nu are intrare „override”\n"
+msgid "  %.*s has no override entry\n"
+msgstr "  %.*s nu are intrare „override”\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "  %s responsabil este %s nu %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "  %.*s responsabil este %.*s nu %s\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "  %s nu are nici o intrare „source override”\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "  %.*s nu are nici o intrare „source override”\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "  %s nu are nici intrare „binary override”\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "  %.*s nu are nici intrare „binary override”\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3745,7 +3954,7 @@ msgstr "Antet de date necorespunzător"
 msgid "Connection failed"
 msgstr "Conectare eșuată"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3794,7 +4003,7 @@ msgstr ""
 msgid "Disk not found."
 msgstr "Disc negăsit."
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "Fișier negăsit"
 
@@ -3829,7 +4038,7 @@ msgstr "Nu s-a putut crea un soclu pentru %s (f=%u t=%u p=%u)"
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "Nu s-a putut iniția conexiunea cu %s:%s (%s)."
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "Eșec"
 
@@ -3844,9 +4053,7 @@ msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr ""
 "Nu s-a putut realiza conexiunea cu %s:%s (%s), timpul de conectare expirat"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "Conectare la %s"
@@ -3884,152 +4091,15 @@ msgstr "Nu s-au putut obține atributele (executarea stat() a eșuat)"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "Adresă URI nevalidă, adresele URI locale nu trebuie să înceapă cu //"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "Autentificare în curs"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "Nu se poate determina numele mașinii de la distanță"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "Nu s-a putut detecta numele local"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "Serverul a refuzat conexiunea și a răspuns: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "„USER” a eșuat, serverul a răspuns: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "„PASS” a eșuat, serverul a răspuns: %s"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"Un server proxy a fost precizat, dar nu există nici un script de conectare, "
-"valoarea opțiunii „Acquire::ftp::ProxyLogin” este goală."
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr ""
-"Comanda scriptului de autentificare „%s” a eșuat, serverul a răspuns: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "„TYPE” a eșuat, serverul a răspuns: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "Timpul de conectare a expirat"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "Serverul a închis conexiunea"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "Un răspuns a depășit zona memoriei tampon."
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "Protocol corupt"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "Nu s-a putut crea un soclu"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr ""
-"Nu s-a putut realiza conectarea la soclul de date, timpul de conectare a "
-"expirat"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "Nu s-a putut realiza conectarea la un soclu pasiv."
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "getaddrinfo() n-a reușit să obțină un soclu de ascultare"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "Nu s-a putut realiza asocierea la un soclu"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "Nu s-a putut asculta pe soclu"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "Nu s-a putut detecta numele soclului"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "Nu s-a putut trimite comanda PORT"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "Familie de adrese necunoscută %u (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "Comanda „EPRT” a eșuat, serverul a răspuns: %s"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "Timpul de conectare la soclul de date a expirat"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "Nu s-a putut accepta conexiunea"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "Problemă la calcularea sumei de control pentru fișierul"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "Nu s-a putut aduce fișierul, serverul a răspuns „%s”"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "Timp expirat pentru soclul de date"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "Transferul de date a eșuat, serverul a răspuns: „%s”"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "Interogare"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "Nu s-a putut invoca "
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
-msgstr ""
+msgstr "algoritm de cheie publică nesigur (nu este de încredere): %s"
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
+msgstr "%s va fi depreciat într-o versiune viitoare"
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
 #: methods/gpgv.cc
@@ -4052,28 +4122,18 @@ msgstr ""
 "amprenta digitală a cheii?!"
 
 #: methods/gpgv.cc
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
-"Nu s-a putut executa «apt-key» pentru verificarea semnăturii («gnupg» este "
+"Nu s-a putut executa «gpgv» pentru verificarea semnăturii („gnupg” este "
 "instalat?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
-msgstr "Eroare necunoscută în timp ce se executa «apt-key»"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
-"Cheia este stocată în trusted.gpg keyring (%s), consultați secțiunea "
-"DEPRECATION din apt-key(8) pentru detalii."
+msgid "Unknown error executing gpgv"
+msgstr "Eroare necunoscută în timp ce se executa «gpgv»"
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
-#, fuzzy, c-format
-#| msgid "Signature by key %s uses weak digest algorithm (%s)"
+#, c-format
 msgid "Signature by key %s uses weak algorithm (%s)"
 msgstr ""
 "Semnătura cu cheia %s utilizează un algoritm de sumă de control slab (%s)"
@@ -4111,17 +4171,161 @@ msgstr "Selecția a eșuat"
 msgid "Connection timed out"
 msgstr "Timp de conectare expirat"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "Problemă la calcularea sumei de control pentru fișierul"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "Eșec la ajustarea timpului de modificare"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "Conexiune închisă prematur"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr "Fișierele goale nu pot fi arhive valide"
+
+#, c-format
+#~ msgid "GPG error: %s: %s"
+#~ msgstr "Eroare GPG: %s: %s"
+
+#, fuzzy, c-format
+#~| msgid ""
+#~| "Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
+#~| "section in apt-key(8) for details."
+#~ msgid ""
+#~ "Key is stored in legacy trusted.gpg keyring (%s). Use Signed-By instead. "
+#~ "See the USER CONFIGURATION section in apt-secure(8) for details."
+#~ msgstr ""
+#~ "Cheia este stocată în trusted.gpg keyring (%s), consultați secțiunea "
+#~ "DEPRECATION din apt-key(8) pentru detalii."
+
+#, c-format
+#~ msgid ""
+#~ "The method '%s' is unsupported and disabled by default. Consider "
+#~ "switching to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it "
+#~ "again."
+#~ msgstr ""
+#~ "Metoda „%s” nu este acceptată și este dezactivată în mod implicit. Luați "
+#~ "în considerare trecerea la http(s). Configurați Dir::Bin::Methods::%s la "
+#~ "„%s” pentru a o activa din nou."
+
+#~ msgid "Logging in"
+#~ msgstr "Autentificare în curs"
+
+#~ msgid "Unable to determine the peer name"
+#~ msgstr "Nu se poate determina numele mașinii de la distanță"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "Nu s-a putut detecta numele local"
+
+#, c-format
+#~ msgid "The server refused the connection and said: %s"
+#~ msgstr "Serverul a refuzat conexiunea și a răspuns: %s"
+
+#, c-format
+#~ msgid "USER failed, server said: %s"
+#~ msgstr "„USER” a eșuat, serverul a răspuns: %s"
+
+#, c-format
+#~ msgid "PASS failed, server said: %s"
+#~ msgstr "„PASS” a eșuat, serverul a răspuns: %s"
+
+#~ msgid ""
+#~ "A proxy server was specified but no login script, "
+#~ "Acquire::ftp::ProxyLogin is empty."
+#~ msgstr ""
+#~ "Un server proxy a fost precizat, dar nu există nici un script de "
+#~ "conectare, valoarea opțiunii „Acquire::ftp::ProxyLogin” este goală."
+
+#, c-format
+#~ msgid "Login script command '%s' failed, server said: %s"
+#~ msgstr ""
+#~ "Comanda scriptului de autentificare „%s” a eșuat, serverul a răspuns: %s"
+
+#, c-format
+#~ msgid "TYPE failed, server said: %s"
+#~ msgstr "„TYPE” a eșuat, serverul a răspuns: %s"
+
+#~ msgid "Connection timeout"
+#~ msgstr "Timpul de conectare a expirat"
+
+#~ msgid "Server closed the connection"
+#~ msgstr "Serverul a închis conexiunea"
+
+#~ msgid "A response overflowed the buffer."
+#~ msgstr "Un răspuns a depășit zona memoriei tampon."
+
+#~ msgid "Protocol corruption"
+#~ msgstr "Protocol corupt"
+
+#~ msgid "Could not create a socket"
+#~ msgstr "Nu s-a putut crea un soclu"
+
+#~ msgid "Could not connect data socket, connection timed out"
+#~ msgstr ""
+#~ "Nu s-a putut realiza conectarea la soclul de date, timpul de conectare a "
+#~ "expirat"
+
+#~ msgid "Could not connect passive socket."
+#~ msgstr "Nu s-a putut realiza conectarea la un soclu pasiv."
+
+#~ msgid "getaddrinfo was unable to get a listening socket"
+#~ msgstr "getaddrinfo() n-a reușit să obțină un soclu de ascultare"
+
+#~ msgid "Could not bind a socket"
+#~ msgstr "Nu s-a putut realiza asocierea la un soclu"
+
+#~ msgid "Could not listen on the socket"
+#~ msgstr "Nu s-a putut asculta pe soclu"
+
+#~ msgid "Could not determine the socket's name"
+#~ msgstr "Nu s-a putut detecta numele soclului"
+
+#~ msgid "Unable to send PORT command"
+#~ msgstr "Nu s-a putut trimite comanda PORT"
+
+#, c-format
+#~ msgid "Unknown address family %u (AF_*)"
+#~ msgstr "Familie de adrese necunoscută %u (AF_*)"
+
+#, c-format
+#~ msgid "EPRT failed, server said: %s"
+#~ msgstr "Comanda „EPRT” a eșuat, serverul a răspuns: %s"
+
+#~ msgid "Data socket connect timed out"
+#~ msgstr "Timpul de conectare la soclul de date a expirat"
+
+#~ msgid "Unable to accept connection"
+#~ msgstr "Nu s-a putut accepta conexiunea"
+
+#, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "Nu s-a putut aduce fișierul, serverul a răspuns „%s”"
+
+#~ msgid "Data socket timed out"
+#~ msgstr "Timp expirat pentru soclul de date"
+
+#, c-format
+#~ msgid "Data transfer failed, server said '%s'"
+#~ msgstr "Transferul de date a eșuat, serverul a răspuns: „%s”"
+
+#~ msgid "Query"
+#~ msgstr "Interogare"
+
+#~ msgid "Unable to invoke "
+#~ msgstr "Nu s-a putut invoca "
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "Conexiune închisă prematur"
+
+#, fuzzy, c-format
+#~| msgid "  Installed: "
+#~ msgid "  Installed size: %sB\n"
+#~ msgstr "  Instalat: "
+
+#, fuzzy
+#~| msgid "The following held packages will be changed:"
+#~ msgid "Changing held packages:Changing held packages:"
+#~ msgstr "Următoarele pachete ținute vor fi schimbate:"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "Da, fă cum îți spun!"

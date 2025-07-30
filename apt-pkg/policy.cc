@@ -21,7 +21,6 @@
 #include <apt-pkg/fileutl.h>
 #include <apt-pkg/pkgcache.h>
 #include <apt-pkg/policy.h>
-#include <apt-pkg/string_view.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/tagfile-keys.h>
 #include <apt-pkg/tagfile.h>
@@ -58,8 +57,8 @@ pkgPolicy::pkgPolicy(pkgCache *Owner) : VerPins(nullptr),
 {
    if (Owner == 0)
       return;
-   PFPriority = new signed short[Owner->Head().PackageFileCount];
-   VerPins = new Pin[Owner->Head().VersionCount];
+   PFPriority = std::make_unique<signed short[]>(Owner->Head().PackageFileCount);
+   VerPins = std::make_unique<Pin[]>(Owner->Head().VersionCount);
 
    auto VersionCount = Owner->Head().VersionCount;
    for (decltype(VersionCount) I = 0; I != VersionCount; ++I)
@@ -238,7 +237,7 @@ void pkgPolicy::CreatePin(pkgVersionMatch::MatchType Type,string Name,
 	    // Find matching version(s) and copy the pin into it
 	    pkgVersionMatch Match(P.Data,P.Type);
 	    if (Match.VersionMatches(Ver)) {
-	       Pin *VP = VerPins + Ver->ID;
+	       Pin *VP = &VerPins[Ver->ID];
 	       if (VP->Type == pkgVersionMatch::None) {
 		  *VP = P;
 		   matched = true;
@@ -261,7 +260,7 @@ void pkgPolicy::CreatePin(pkgVersionMatch::MatchType Type,string Name,
 	    for (pkgCache::VerIterator Ver = Pkg.VersionList(); Ver.end() != true; ++Ver)
 	    {
 	       if (Match.VersionMatches(Ver)) {
-		  Pin *VP = VerPins + Ver->ID;
+		  Pin *VP = &VerPins[Ver->ID];
 		  if (VP->Type == pkgVersionMatch::None) {
 		     *VP = P;
 		      matched = true;
@@ -438,13 +437,13 @@ bool ReadPinFile(pkgPolicy &Plcy,string File)
       if (Name.empty())
 	 return _error->Error(_("Invalid record in the preferences file %s, no Package header"), File.c_str());
       if (Name == "*")
-	 Name = APT::StringView{};
+	 Name = {};
 
       const char *Start;
       const char *End;
       if (Tags.Find("Pin",Start,End) == false)
 	 continue;
-	 
+
       const char *Word = Start;
       for (; Word != End && isspace(*Word) == 0; Word++);
 
@@ -452,6 +451,8 @@ bool ReadPinFile(pkgPolicy &Plcy,string File)
       pkgVersionMatch::MatchType Type;
       if (stringcasecmp(Start,Word,"version") == 0 && Name.empty() == false)
 	 Type = pkgVersionMatch::Version;
+      else if (stringcasecmp(Start,Word,"source-version") == 0 && Name.empty() == false)
+	 Type = pkgVersionMatch::SourceVersion;
       else if (stringcasecmp(Start,Word,"release") == 0)
 	 Type = pkgVersionMatch::Release;
       else if (stringcasecmp(Start,Word,"origin") == 0)
@@ -488,7 +489,7 @@ bool ReadPinFile(pkgPolicy &Plcy,string File)
          return _error->Error(_("No priority (or zero) specified for pin"));
       }
 
-      std::istringstream s(Name.to_string());
+      std::istringstream s(std::string{Name});  // TODO: replace with std::string_view_stream in C++23
       string pkg;
       while(!s.eof())
       {
@@ -502,9 +503,4 @@ bool ReadPinFile(pkgPolicy &Plcy,string File)
 }
 									/*}}}*/
 
-pkgPolicy::~pkgPolicy()
-{
-   delete[] PFPriority;
-   delete[] VerPins;
-   delete d;
-}
+pkgPolicy::~pkgPolicy() = default;

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"POT-Creation-Date: 2025-03-09 17:32+0000\n"
 "PO-Revision-Date: 2008-05-08 12:48+0200\n"
 "Last-Translator: Erdal Ronahi <erdal.ronahi@gmail.com>\n"
 "Language-Team: ku <ubuntu-l10n-kur@lists.ubuntu.com>\n"
@@ -50,8 +50,8 @@ msgstr "Rêça %s zêde dirêj e"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -117,13 +117,14 @@ msgstr ""
 #, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -179,8 +180,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr ""
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -191,7 +191,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -213,6 +213,13 @@ msgstr "Anîna %s %s biserneket"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -227,13 +234,6 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "Girêdan bi %s (%s) re pêk tê"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -614,6 +614,30 @@ msgstr ""
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr ""
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr ""
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr ""
+
 #: apt-pkg/contrib/extracttar.cc
 #, fuzzy, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -721,11 +745,11 @@ msgstr ""
 msgid "Sub-process %s exited unexpectedly"
 msgstr ""
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "Çewiya xwendinê"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "Çewtiya nivîsînê"
 
@@ -1032,6 +1056,12 @@ msgstr "Pelrêça daxistinê nayê quflekirin"
 msgid "Not locked"
 msgstr ""
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1211,6 +1241,16 @@ msgstr ""
 #: apt-pkg/edsp.cc
 msgid "External solver failed without a proper error message"
 msgstr ""
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "Bilindkirin tê hesibandin"
+
+#: apt-pkg/edsp.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Solving dependencies"
+msgstr "Bindestên giştî:"
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1501,10 +1541,6 @@ msgid ""
 "used instead."
 msgstr ""
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "Bilindkirin tê hesibandin"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1663,12 +1699,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr ""
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
@@ -1767,6 +1797,12 @@ msgid "Broken packages"
 msgstr "Paketên şikestî"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "Çewtiya nivîsînê"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1816,12 +1852,23 @@ msgstr ""
 msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr ""
 
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "  Installed: "
+msgid "  Download size: %sB / %sB\n"
+msgstr "  Sazkirî: "
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "Anîna %sB/%sB ji arşîvan pêwist e.\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr ""
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1830,11 +1877,52 @@ msgstr "Anîna %sB/%sB ji arşîvan pêwist e.\n"
 msgid "Need to get %sB of archives.\n"
 msgstr "Anîna %sB ji arşîvan pêwist e.\n"
 
+#: apt-private/private-install.cc
+#, c-format
+msgid "After this operation, %sB of additional disk space will be used.\n"
+msgstr ""
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
-msgid "After this operation, %sB of additional disk space will be used.\n"
+msgid "Space needed: %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Freed space: %sB\n"
 msgstr ""
 
 #. TRANSLATOR: The required space between number and unit is already included
@@ -1854,18 +1942,17 @@ msgid ""
 "break the system."
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr ""
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 msgid "Do you want to continue?"
 msgstr "Dixwazî bidomînî?"
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -1920,6 +2007,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr ""
 
 #: apt-private/private-install.cc
+#, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: apt-private/private-install.cc
 #, fuzzy
 msgid ""
 "The following package was automatically installed and is no longer required:"
@@ -1938,16 +2032,8 @@ msgstr[0] "Ev pakêtên NÛ dê werine sazkirin:"
 msgstr[1] "Ev pakêtên NÛ dê werine sazkirin:"
 
 #: apt-private/private-install.cc
-#, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] ""
-msgstr[1] ""
-
-#: apt-private/private-install.cc
-#, fuzzy
-msgid "The following additional packages will be installed:"
-msgstr "Ev pakêtên NÛ dê werine sazkirin:"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -1956,6 +2042,11 @@ msgstr "Paketên tên pêşniyaz kirin:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "Paketên tên tawsiyê kirin:"
+
+#: apt-private/private-install.cc
+#, fuzzy
+msgid "The following additional packages will be installed:"
+msgstr "Ev pakêtên NÛ dê werine sazkirin:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2087,8 +2178,29 @@ msgid "The following packages have unmet dependencies:"
 msgstr ""
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Unsatisfied dependencies:"
+msgstr "Bindestên giştî:"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "Ev pakêtên NÛ dê werine sazkirin:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+msgid "Installing:"
+msgstr "%s hatine sazkirin"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Installing dependencies:"
+msgstr "Bindestên giştî:"
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr ""
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2096,6 +2208,14 @@ msgstr "Ev pakêt dê werine RAKIRIN:"
 
 #: apt-private/private-output.cc
 msgid "The following upgrades have been deferred due to phasing:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "Not upgrading yet due to phasing:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
 msgstr ""
 
 #: apt-private/private-output.cc
@@ -2107,8 +2227,22 @@ msgid "The following packages will be upgraded:"
 msgstr "Ev paket dê werine bilindkirin:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr ""
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Suggested packages:"
+msgid "Changing held packages:"
+msgstr "Paketên tên pêşniyaz kirin:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2126,14 +2260,28 @@ msgid ""
 msgstr ""
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr ""
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu hatine bilindkirin, %lu nû hatine sazkirin."
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "%s hatine sazkirin"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu reinstalled, "
 msgstr "%lu ji nû ve sazkirî,"
+
+#: apt-private/private-output.cc
+#, fuzzy, c-format
+msgid "Reinstalling: %lu, "
+msgstr "%s hatine sazkirin"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2142,8 +2290,18 @@ msgstr "%lu hatine nizmkirin."
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Downgrading: %lu, "
+msgstr ""
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu werin rakirin û %lu neyên bilindkirin. \n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr ""
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2173,7 +2331,7 @@ msgid "Y"
 msgstr "E"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr ""
 
@@ -2347,8 +2505,8 @@ msgstr ""
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
 
 #: apt-private/private-source.cc
@@ -2385,6 +2543,11 @@ msgstr "%s ji hev nehate veçirandin"
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr ""
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr ""
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2405,7 +2568,32 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
 msgstr ""
 
 #: apt-private/private-update.cc
@@ -2453,6 +2641,12 @@ msgstr "  Pakêtên hevbeş yên farazî:"
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  Winda: "
+
+#: cmdline/apt-cache.cc
+#, fuzzy
+#| msgid "Total distinct versions: "
+msgid "Total distinct source versions: "
+msgstr "Guhertoyên vekirî yên giştî:"
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -2763,6 +2957,10 @@ msgid "concatenate files, with automatic decompression"
 msgstr ""
 
 #: cmdline/apt-helper.cc
+msgid "hash file"
+msgstr ""
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr ""
 
@@ -3012,6 +3210,10 @@ msgid "edit the source information file"
 msgstr ""
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ""
+
+#: cmdline/apt.cc
 msgid "satisfy dependency strings"
 msgstr ""
 
@@ -3170,7 +3372,7 @@ msgstr ""
 msgid "Compressed output %s needs a compression set"
 msgstr ""
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr ""
 
@@ -3289,22 +3491,22 @@ msgstr "Di arşîvê de qada pakêtê tuneye"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
+msgid "  %.*s has no override entry\n"
 msgstr ""
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
 msgstr ""
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
+msgid "  %.*s has no source override entry\n"
 msgstr ""
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
+msgid "  %.*s has no binary override entry either\n"
 msgstr ""
 
 #: methods/basehttp.cc
@@ -3343,7 +3545,7 @@ msgstr ""
 msgid "Connection failed"
 msgstr "Girêdan pêk nehatiye"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3383,7 +3585,7 @@ msgstr ""
 msgid "Disk not found."
 msgstr "Dîsk nehate dîtin."
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "Pel nehate dîtin"
 
@@ -3419,7 +3621,7 @@ msgstr ""
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr ""
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "Serneket"
 
@@ -3433,9 +3635,7 @@ msgstr ""
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr ""
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "Bi %s re tê girêdan"
@@ -3474,147 +3674,14 @@ msgstr "%s venebû"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr ""
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "Têketin"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "Nikare navê herêmî tesbît bike"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr ""
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr ""
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr ""
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr ""
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr ""
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr ""
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr ""
-
-#: methods/ftp.cc
-#, fuzzy, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "Danegira %s nehate vekirin: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr ""
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr ""
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "Lêpirsîn"
-
-#: methods/ftp.cc
-#, fuzzy
-msgid "Unable to invoke "
-msgstr "%s venebû"
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
+msgstr ""
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
 msgstr ""
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
@@ -3634,19 +3701,14 @@ msgid ""
 msgstr ""
 
 #: methods/gpgv.cc
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
+#, fuzzy
+#| msgid "Unknown error executing apt-key"
+msgid "Unknown error executing gpgv"
 msgstr "Di xebitandina apt-key de çewtiya nenas"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
@@ -3685,17 +3747,37 @@ msgstr "Hilbijartin neserketî"
 msgid "Connection timed out"
 msgstr ""
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr ""
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr ""
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "Girêdan zû hatiye girtin"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr ""
+
+#~ msgid "Logging in"
+#~ msgstr "Têketin"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "Nikare navê herêmî tesbît bike"
+
+#, fuzzy, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "Danegira %s nehate vekirin: %s"
+
+#~ msgid "Query"
+#~ msgstr "Lêpirsîn"
+
+#, fuzzy
+#~ msgid "Unable to invoke "
+#~ msgstr "%s venebû"
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "Girêdan zû hatiye girtin"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "Erê, wusa bike!"

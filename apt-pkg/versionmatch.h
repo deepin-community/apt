@@ -13,7 +13,7 @@
      Release: a=testing
      Release: n=squeeze
      Release: *
-     Origin: ftp.debian.org
+     Origin: deb.debian.org
 
    Release may be a complex type that can specify matches for any of:
       Version (v= with prefix)
@@ -62,7 +62,7 @@ class APT_PUBLIC pkgVersionMatch
 
    public:
 
-   enum MatchType {None = 0,Version,Release,Origin} Type;
+   enum MatchType {None = 0,Version,Release,Origin, SourceVersion} Type;
 
    bool MatchVer(const char *A,std::string B,bool Prefix) APT_PURE;
    static bool ExpressionMatches(const char *pattern, const char *string);

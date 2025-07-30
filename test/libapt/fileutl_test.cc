@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "common.h"
 
 #include "file-helpers.h"
 
@@ -288,7 +288,7 @@ TEST(FileUtlTest, Popen)
       OpenFds = Glob("/proc/self/fd/*");
 
    // output something
-   const char* Args[10] = {"/bin/echo", "meepmeep", NULL};
+   const char* Args[10] = {"echo", "meepmeep", NULL};
    EXPECT_TRUE(Popen(Args, Fd, Child, FileFd::ReadOnly));
    EXPECT_TRUE(Fd.Read(buf, sizeof(buf)-1, &n));
    buf[n] = 0;
