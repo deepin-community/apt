@@ -184,17 +184,19 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
       addArg(0, "show-progress", "DpkgPM::Progress", 0);
       addArg('f', "fix-broken", "APT::Get::Fix-Broken", 0);
       addArg(0, "purge", "APT::Get::Purge", 0);
-      addArg('V',"verbose-versions","APT::Get::Show-Versions",0);
+      addArg('V',"verbose-versions", "APT::Get::Show-Versions",0);
+      addArg(0, "list-columns", "APT::Get::List-Columns", 0);
       addArg(0, "autoremove", "APT::Get::AutomaticRemove", 0);
       addArg(0, "auto-remove", "APT::Get::AutomaticRemove", 0);
       addArg(0, "reinstall", "APT::Get::ReInstall", 0);
       addArg(0, "solver", "APT::Solver", CommandLine::HasArg);
+      addArg(0, "strict-pinning", "APT::Solver::Strict-Pinning", 0);
       addArg(0, "planner", "APT::Planner", CommandLine::HasArg);
+      addArg(0, "comment", "APT::History::Comment", CommandLine::HasArg);
       addArg('U', "update", "APT::Update", 0);
       if (CmdMatches("upgrade"))
       {
-         _error->Warning(_("Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' may result in incomplete upgrades."));
-         addArg(0, "new-pkgs", "APT::Get::Upgrade-Allow-New",
+         addArg(0, "new-pkgs", "APT::Get::Upgrade-Allow-New", 
                 CommandLine::Boolean);
       }
    }
@@ -230,6 +232,7 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
       addArg('P', "build-profiles", "APT::Build-Profiles", CommandLine::HasArg);
       addArg(0, "purge", "APT::Get::Purge", 0);
       addArg(0, "solver", "APT::Solver", CommandLine::HasArg);
+      addArg(0, "strict-pinning", "APT::Solver::Strict-Pinning", 0);
       if (CmdMatches("build-dep"))
       {
          addArg(0,"arch-only","APT::Get::Arch-Only",0);
@@ -246,10 +249,8 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
    }
    else if (CmdMatches("clean", "autoclean", "auto-clean", "distclean", "dist-clean", "check", "download", "changelog") ||
 	    CmdMatches("markauto", "unmarkauto")) // deprecated commands
-      ;
-   else if (CmdMatches("moo"))
-      addArg(0, "color", "APT::Moo::Color", 0);
-
+   {
+   }
    if (CmdMatches("install", "reinstall", "remove", "purge", "upgrade", "dist-upgrade",
 	    "dselect-upgrade", "autoremove", "auto-remove", "autopurge", "check",
 	    "clean", "autoclean", "auto-clean", "distclean", "dist-clean",
@@ -353,11 +354,15 @@ static bool addArgumentsAPT(std::vector<CommandLine::Args> &Args, char const * c
       addArg(0,"manual-installed","APT::Cmd::Manual-Installed",0);
       addArg('v', "verbose", "APT::Cmd::List-Include-Summary", 0);
       addArg('a', "all-versions", "APT::Cmd::All-Versions", 0);
+      addArg('t', "target-release", "APT::Default-Release", CommandLine::HasArg);
+      addArg('t', "default-release", "APT::Default-Release", CommandLine::HasArg);
+      addArg('S', "snapshot", "APT::Snapshot", CommandLine::HasArg);
    }
    else if (CmdMatches("show") || CmdMatches("info"))
    {
       addArg('a', "all-versions", "APT::Cache::AllVersions", 0);
       addArg('f', "full", "APT::Cache::ShowFull", 0);
+      addArg('S', "snapshot", "APT::Snapshot", CommandLine::HasArg);
    }
    else if (addArgumentsAPTGet(Args, Cmd) || addArgumentsAPTCache(Args, Cmd))
    {
@@ -409,7 +414,9 @@ std::vector<CommandLine::Args> getCommandArgs(APT_CMD const Program, char const 
    addArg('h', "help", "help", 0);
    addArg('v', "version", "version", 0);
    // general options
+   addArg(0, "color", "APT::Color", 0);
    addArg('q', "quiet", "quiet", CommandLine::IntLevel);
+   addArg(0, "audit", "APT::Audit", 0);
    addArg('q', "silent", "quiet", CommandLine::IntLevel);
    addArg('c', "config-file", 0, CommandLine::ConfigFile);
    addArg('o', "option", 0, CommandLine::ArbItem);
@@ -480,11 +487,16 @@ static bool ShowCommonHelp(APT_CMD const Binary, CommandLine &CmdL, std::vector<
 									/*}}}*/
 static void BinarySpecificConfiguration(char const * const Binary)	/*{{{*/
 {
-   std::string const binary = flNotDir(Binary);
+   auto const binary = flNotDir(Binary);
+   if (binary == "apt-cdrom" || binary == "apt-config")
+   {
+      _config->CndSet("Binary::apt-cdrom::APT::Internal::OpProgress::EraseLines", false);
+   }
    if (binary == "apt" || binary == "apt-config")
    {
-      if (getenv("NO_COLOR") == nullptr)
-         _config->CndSet("Binary::apt::APT::Color", true);
+      if (getenv("NO_COLOR") == nullptr && getenv("APT_NO_COLOR") == nullptr)
+	 _config->CndSet("Binary::apt::APT::Color", true);
+      _config->CndSet("Binary::apt::APT::Output-Version", 30);
       _config->CndSet("Binary::apt::APT::Cache::Show::Version", 2);
       _config->CndSet("Binary::apt::APT::Cache::AllVersions", false);
       _config->CndSet("Binary::apt::APT::Cache::ShowVirtuals", true);
@@ -497,6 +509,7 @@ static void BinarySpecificConfiguration(char const * const Binary)	/*{{{*/
       _config->CndSet("Binary::apt::APT::Keep-Downloaded-Packages", false);
       _config->CndSet("Binary::apt::APT::Get::Update::InteractiveReleaseInfoChanges", true);
       _config->CndSet("Binary::apt::APT::Cmd::Pattern-Only", true);
+      _config->CndSet("Binary::apt::Pager", true);
 
       if (isatty(STDIN_FILENO))
          _config->CndSet("Binary::apt::Dpkg::Lock::Timeout", -1);
@@ -509,7 +522,7 @@ static void BinarySpecificConfiguration(char const * const Binary)	/*{{{*/
 									/*}}}*/
 static void BinaryCommandSpecificConfiguration(char const * const Binary, char const * const Cmd)/*{{{*/
 {
-   std::string const binary = flNotDir(Binary);
+   auto const binary = flNotDir(Binary);
    if ((binary == "apt" || binary == "apt-get") && CmdMatches("upgrade", "dist-upgrade", "full-upgrade"))
    {
       //FIXME: the option is documented to apply only for install/remove, so
@@ -575,6 +588,12 @@ std::vector<CommandLine::Dispatch> ParseCommandLine(CommandLine &CmdL, APT_CMD c
       _error->Warning(_("--force-yes is deprecated, use one of the options starting with --allow instead."));
    }
 
+   if (not _config->FindB("APT::Solver::Strict-Pinning", true) && _config->Find("APT::Solver", "internal") == "internal")
+   {
+      _config->Set("APT::Solver", "3.0");
+      _error->Notice("Automatically enabled --solver 3.0 for --no-strict-pinning");
+   }
+
    // See if the help should be shown
    if (_config->FindB("help") == true || _config->FindB("version") == true ||
 	 (CmdL.FileSize() > 0 && strcmp(CmdL.FileList[0], "help") == 0))
@@ -597,11 +616,13 @@ unsigned short DispatchCommandLine(CommandLine &CmdL, std::vector<CommandLine::D
 
    // Print any errors or warnings found during parsing
    bool const Errors = _error->PendingError();
-   if (_config->FindI("quiet",0) > 0)
+   if (_config->FindB("APT::Audit"))
+      _error->DumpErrors(GlobalError::AUDIT);
+   else if (_config->FindI("quiet",0) > 0)
       _error->DumpErrors();
    else
-      _error->DumpErrors(GlobalError::DEBUG);
-   if (returned == false)
+      _error->DumpErrors(GlobalError::NOTICE);
+   if (returned == false || std::cout.bad() || std::cerr.bad() || std::clog.bad())
       return 100;
    return Errors == true ? 100 : 0;
 }

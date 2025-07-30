@@ -29,7 +29,9 @@
 
 #include <ctime>
 #include <set>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <sys/stat.h>
 
@@ -134,8 +136,8 @@ class APT_PUBLIC FileFd
 
    bool Open(std::string FileName,unsigned int const Mode,CompressMode Compress,unsigned long const AccessMode = 0666);
    bool Open(std::string FileName,unsigned int const Mode,APT::Configuration::Compressor const &compressor,unsigned long const AccessMode = 0666);
-   inline bool Open(std::string const &FileName,unsigned int const Mode, unsigned long const AccessMode = 0666) {
-      return Open(FileName, Mode, None, AccessMode);
+   inline bool Open(std::string FileName,unsigned int const Mode, unsigned long const AccessMode = 0666) {
+      return Open(std::move(FileName), Mode, None, AccessMode);
    };
    bool OpenDescriptor(int Fd, unsigned int const Mode, CompressMode Compress, bool AutoClose=false);
    bool OpenDescriptor(int Fd, unsigned int const Mode, APT::Configuration::Compressor const &compressor, bool AutoClose=false);
@@ -166,7 +168,7 @@ class APT_PUBLIC FileFd
    virtual ~FileFd();
 
    private:
-   FileFdPrivate * d;
+   std::unique_ptr<FileFdPrivate> d;
    APT_HIDDEN FileFd(const FileFd &);
    APT_HIDDEN FileFd & operator=(const FileFd &);
    APT_HIDDEN bool OpenInternDescriptor(unsigned int const Mode, APT::Configuration::Compressor const &compressor);
@@ -180,13 +182,13 @@ APT_PUBLIC bool RunScripts(const char *Cnf);
 APT_PUBLIC bool CopyFile(FileFd &From,FileFd &To);
 APT_PUBLIC bool RemoveFile(char const * const Function, std::string const &FileName);
 APT_PUBLIC bool RemoveFileAt(char const * const Function, int const dirfd, std::string const &FileName);
-APT_PUBLIC int GetLock(std::string File,bool Errors = true);
-APT_PUBLIC bool FileExists(std::string File);
-APT_PUBLIC bool RealFileExists(std::string File);
+APT_PUBLIC int GetLock(std::string const &File,bool Errors = true);
+APT_PUBLIC bool FileExists(std::string const &File);
+APT_PUBLIC bool RealFileExists(std::string const &File);
 APT_PUBLIC bool DirectoryExists(std::string const &Path);
 APT_PUBLIC bool CreateDirectory(std::string const &Parent, std::string const &Path);
 APT_PUBLIC time_t GetModificationTime(std::string const &Path);
-APT_PUBLIC bool Rename(std::string From, std::string To);
+APT_PUBLIC bool Rename(std::string const &From, std::string const &To);
 
 APT_PUBLIC std::string GetTempDir();
 APT_PUBLIC std::string GetTempDir(std::string const &User);
@@ -251,10 +253,10 @@ APT_PUBLIC bool ChangeOwnerAndPermissionOfFile(char const * const requester, cha
 APT_PUBLIC bool DropPrivileges();
 
 // File string manipulators
-APT_PUBLIC std::string flNotDir(std::string File);
-APT_PUBLIC std::string flNotFile(std::string File);
+APT_PUBLIC std::string_view flNotDir(std::string_view File);
+APT_PUBLIC std::string flNotFile(std::string const &File); // XXX: this should take a string_view, but right now that causes more type problems than it solves
 APT_PUBLIC std::string flNoLink(std::string File);
-APT_PUBLIC std::string flExtension(std::string File);
+APT_PUBLIC std::string_view flExtension(std::string_view File);
 APT_PUBLIC std::string flCombine(std::string Dir,std::string File);
 
 /** \brief Takes a file path and returns the absolute path
@@ -283,5 +285,33 @@ APT_PUBLIC bool Popen(const char *Args[], FileFd &Fd, pid_t &Child, FileFd::Open
 APT_HIDDEN bool OpenConfigurationFileFd(std::string const &File, FileFd &Fd);
 
 APT_HIDDEN int Inhibit(const char *what, const char *who, const char *why, const char *mode);
+
+
+namespace {
+   struct FILEFcloseDeleter {
+      void operator()(FILE *p) {
+         fclose(p);
+      }
+   };
+   struct FILEPcloseDeleter {
+      void operator()(FILE *p) {
+         pclose(p);
+      }
+   };
+
+   [[maybe_unused]] std::unique_ptr<FILE, FILEFcloseDeleter> make_unique_FILE(const char *const filename, char const *const mode)
+   {
+      return {fopen(filename, mode), {}};
+   }
+   [[maybe_unused]] std::unique_ptr<FILE, FILEFcloseDeleter> make_unique_FILE(std::string const &filename, char const *const mode)
+   {
+      return make_unique_FILE(filename.c_str(), mode);
+   }
+
+   [[maybe_unused]] std::unique_ptr<FILE, FILEPcloseDeleter> make_unique_popen(const char *program, char const *const mode)
+   {
+      return {popen(program, mode), {}};
+   }
+}
 
 #endif

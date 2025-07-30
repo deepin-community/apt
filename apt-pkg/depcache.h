@@ -46,6 +46,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -178,9 +179,9 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
    {
    public:
      DefaultRootSetFunc() : Configuration::MatchAgainstConfig("APT::NeverAutoRemove") {};
-     virtual ~DefaultRootSetFunc() {};
+     ~DefaultRootSetFunc() override = default;
 
-     bool InRootSet(const pkgCache::PkgIterator &pkg) APT_OVERRIDE { return pkg.end() == false && Match(pkg.Name()); };
+     bool InRootSet(const pkgCache::PkgIterator &pkg) override { return pkg.end() == false && Match(pkg.Name()); };
    };
 
    struct APT_PUBLIC StateCache
@@ -266,6 +267,42 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
       bool InstallSuggests;
    };
 
+   /**
+    * \brief Perform changes to the depcache atomically.
+    *
+    * The default policy for a transaction is to rollback if the number of broken packages
+    * increased, otherwise to commit. Call commit() or rollback() to override the default
+    * policy.
+    */
+   class APT_PUBLIC Transaction final
+   {
+      struct Private;
+      std::unique_ptr<Private> d;
+
+      public:
+      enum class Behavior
+      {
+	 COMMIT,
+	 ROLLBACK,
+	 AUTO,
+      };
+
+      explicit Transaction(pkgDepCache &cache, Behavior behavior);
+      /** \brief Commit the transaction immediately */
+      void commit();
+      /** \brief Rollback the transaction immediately */
+      void rollback();
+      /** \brief Like rollback, but can be called multiple times.
+       *
+       * You can for example create a new transaction, then temporarily
+       * rollback to the state before the previous transaction in that
+       * transaction.
+       */
+      void temporaryRollback();
+      /** \brief Commit or rollback the transaction based on default policy */
+      ~Transaction();
+   };
+
    private:
    /** The number of open "action groups"; certain post-action
     *  operations are suppressed if this number is > 0.
@@ -273,6 +310,8 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
    int group_level;
 
    friend class ActionGroup;
+   friend class Transaction;
+
    public:
    int IncreaseActionGroupLevel();
    int DecreaseActionGroupLevel();
@@ -332,9 +371,9 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
    inline Header &Head() {return *Cache->HeaderP;};
    inline GrpIterator GrpBegin() {return Cache->GrpBegin();};
    inline PkgIterator PkgBegin() {return Cache->PkgBegin();};
-   inline GrpIterator FindGrp(APT::StringView Name) {return Cache->FindGrp(Name);};
-   inline PkgIterator FindPkg(APT::StringView Name) {return Cache->FindPkg(Name);};
-   inline PkgIterator FindPkg(APT::StringView Name, APT::StringView Arch) {return Cache->FindPkg(Name, Arch);};
+   inline GrpIterator FindGrp(std::string_view Name) {return Cache->FindGrp(Name);};
+   inline PkgIterator FindPkg(std::string_view Name) {return Cache->FindPkg(Name);};
+   inline PkgIterator FindPkg(std::string_view Name, std::string_view Arch) {return Cache->FindPkg(Name, Arch);};
 
    inline pkgCache &GetCache() {return *Cache;};
    inline pkgVersioningSystem &VS() {return *Cache->VS;};
@@ -478,6 +517,7 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
    inline unsigned long DelCount() {return iDelCount;};
    inline unsigned long KeepCount() {return iKeepCount;};
    inline unsigned long InstCount() {return iInstCount;};
+   unsigned long UpgradeCount();
    inline unsigned long BrokenCount() {return iBrokenCount;};
    inline unsigned long PolicyBrokenCount() {return iPolicyBrokenCount;};
    inline unsigned long BadCount() {return iBadCount;};
@@ -490,7 +530,9 @@ class APT_PUBLIC pkgDepCache : protected pkgCache::Namespace
    virtual ~pkgDepCache();
 
    bool CheckConsistency(char const *const msgtag = "");
-
+#ifdef APT_COMPILING_APT
+   unsigned long long BootSize(bool initrdOnly);
+#endif
    protected:
    // methods call by IsInstallOk
    bool IsInstallOkMultiArchSameVersionSynced(PkgIterator const &Pkg,

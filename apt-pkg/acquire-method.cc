@@ -145,9 +145,15 @@ void pkgAcqMethod::Fail(bool Transient)
 
    Fail("", Transient);
 }
+
+void pkgAcqMethod::Fail(std::string Err, bool Tansient)
+{
+   std::unordered_map<std::string, std::string> fields;
+   FailWithContext(Err, Tansient, fields);
+}
 									/*}}}*/
 // AcqMethod::Fail - A fetch has failed					/*{{{*/
-void pkgAcqMethod::Fail(string Err, bool Transient)
+void pkgAcqMethod::FailWithContext(std::string Err, bool Transient, std::unordered_map<std::string, std::string> &fields)
 {
 
    if (not _error->empty())
@@ -175,7 +181,6 @@ void pkgAcqMethod::Fail(string Err, bool Transient)
    if (IP.empty() == false && _config->FindB("Acquire::Failure::ShowIP", true) == true)
       Err.append(" ").append(IP);
 
-   std::unordered_map<std::string, std::string> fields;
    if (Queue != nullptr)
       try_emplace(fields, "URI", Queue->Uri);
    else
@@ -457,23 +462,6 @@ int pkgAcqMethod::Run(bool Single)
 
    Exit();
    return 0;
-}
-									/*}}}*/
-// AcqMethod::PrintStatus - privately really send a log/status message	/*{{{*/
-void pkgAcqMethod::PrintStatus(char const * const header, const char* Format,
-			       va_list &args) const
-{
-   string CurrentURI = "<UNKNOWN>";
-   if (Queue != 0)
-      CurrentURI = Queue->Uri;
-   if (UsedMirror.empty() == true)
-      fprintf(stdout, "%s\nURI: %s\nMessage: ",
-	      header, CurrentURI.c_str());
-   else
-      fprintf(stdout, "%s\nURI: %s\nUsedMirror: %s\nMessage: ",
-	      header, CurrentURI.c_str(), UsedMirror.c_str());
-   vfprintf(stdout,Format,args);
-   std::cout << "\n\n" << std::flush;
 }
 									/*}}}*/
 // AcqMethod::Log - Send a log message					/*{{{*/

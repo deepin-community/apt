@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 0.7.18\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"POT-Creation-Date: 2025-05-19 18:28+0200\n"
 "PO-Revision-Date: 2010-10-02 23:35+0100\n"
 "Last-Translator: Iñigo Varela <ivarela@softastur.org>\n"
 "Language-Team: Asturian (ast)\n"
@@ -49,8 +49,8 @@ msgstr "El direutorio %s ta desviáu"
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -117,7 +117,8 @@ msgstr ""
 #, fuzzy, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 "Hebo un fallu durante la verificación de la robla. El repositoriu nun ta "
 "anováu y va usase un ficheru índiz. Fallu GPG: %s: %s\n"
@@ -125,8 +126,8 @@ msgstr ""
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
-msgstr "Fallu GPG: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
+msgstr ""
 
 #: apt-pkg/acquire-item.cc
 #, c-format
@@ -181,8 +182,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr "Conflictu de distribución: %s (esperábase %s pero obtúvose %s)"
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -193,7 +193,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -215,6 +215,13 @@ msgstr "Falló algamar %s  %s"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -231,13 +238,6 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "Coneutando a %s (%s)"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -637,6 +637,30 @@ msgstr ""
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "Fallu de sintaxis %s:%u: Puxarra extra al final del ficheru"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr ""
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr ""
+
 #: apt-pkg/contrib/extracttar.cc
 #, fuzzy, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -746,11 +770,11 @@ msgstr "El subprocesu %s devolvió un códigu d'error (%u)"
 msgid "Sub-process %s exited unexpectedly"
 msgstr "El subprocesu %s terminó de manera inesperada"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "Fallu de llectura"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "Fallu d'escritura"
 
@@ -1070,6 +1094,12 @@ msgstr "Nun pudo bloquiase'l direutoriu d'alministración (%s), ¿yes root?"
 msgid "Not locked"
 msgstr "Non bloquiáu"
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1260,6 +1290,16 @@ msgstr ""
 #: apt-pkg/edsp.cc
 msgid "External solver failed without a proper error message"
 msgstr ""
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "Calculando l'anovamientu"
+
+#: apt-pkg/edsp.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Solving dependencies"
+msgstr "Dependencies totales: "
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1565,10 +1605,6 @@ msgstr ""
 "Nun pudieron descargase dellos ficheros d'índiz; inoráronse o usáronse los "
 "antiguos nel so llugar."
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "Calculando l'anovamientu"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1733,12 +1769,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "Nota, escoyendo %s nel llugar de %s\n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
@@ -1842,6 +1872,12 @@ msgid "Broken packages"
 msgstr "Paquetes frañaos"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "Fallu d'escritura"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1855,10 +1891,10 @@ msgstr ""
 
 #: apt-private/private-install.cc
 msgid ""
-"Unable to fetch some archives, maybe run apt-get update or try with --fix-"
+"Unable to fetch some archives, maybe run apt update or try with --fix-"
 "missing?"
 msgstr ""
-"Nun pudieron algamase dellos archivos, ¿seique executando apt-get update o "
+"Nun pudieron algamase dellos archivos, ¿seique executando apt update o "
 "tentando --fix-missing?"
 
 #: apt-private/private-install.cc
@@ -1896,12 +1932,23 @@ msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr ""
 "Que raro... Los tamaños nun concasen, escribe a apt@packages.debian.org"
 
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "  Installed: "
+msgid "  Download size: %sB / %sB\n"
+msgstr "  Instaláu: "
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "Hai que descargar %sB/%sB d'archivos.\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr ""
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1910,12 +1957,54 @@ msgstr "Hai que descargar %sB/%sB d'archivos.\n"
 msgid "Need to get %sB of archives.\n"
 msgstr "Hai que descargar %sB d'archivos.\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr "Tres d'esta operación, van usase %sB d'espaciu de discu adicional.\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Stored label: %s\n"
+msgid "  Freed space: %sB\n"
+msgstr "Etiqueta guardada: %s\n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1934,18 +2023,17 @@ msgid ""
 "break the system."
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr ""
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 msgid "Do you want to continue?"
 msgstr "¿Quies continuar?"
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -2006,6 +2094,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "Error internu, AutoRemover rompió coses"
 
 #: apt-private/private-install.cc
+#, fuzzy, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] "Usa '%s' pa desinstalalos."
+msgstr[1] "Usa '%s' pa desinstalalos."
+
+#: apt-private/private-install.cc
 msgid ""
 "The following package was automatically installed and is no longer required:"
 msgid_plural ""
@@ -2026,16 +2121,8 @@ msgstr[1] ""
 "Los paquetes %lu instaláronse de manera automática y ya nun se necesiten\n"
 
 #: apt-private/private-install.cc
-#, fuzzy, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] "Usa '%s' pa desinstalalos."
-msgstr[1] "Usa '%s' pa desinstalalos."
-
-#: apt-private/private-install.cc
-#, fuzzy
-msgid "The following additional packages will be installed:"
-msgstr "Instalaránse los siguientes paquetes extra:"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2044,6 +2131,11 @@ msgstr "Paquetes afalaos:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "Paquetes encamentaos"
+
+#: apt-private/private-install.cc
+#, fuzzy
+msgid "The following additional packages will be installed:"
+msgstr "Instalaránse los siguientes paquetes extra:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2180,8 +2272,30 @@ msgid "The following packages have unmet dependencies:"
 msgstr "Los siguientes paquetes nun cumplen dependencies:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Failed to satisfy %s dependency for %s: %s"
+msgid "Unsatisfied dependencies:"
+msgstr "Fallu pa satisfacer la dependencia %s pa %s: %s"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "Van instalase los siguientes paquetes NUEVOS:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Installing %s"
+msgid "Installing:"
+msgstr "Instalando %s"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Installing dependencies:"
+msgstr "Dependencies totales: "
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr ""
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2194,6 +2308,16 @@ msgid "The following upgrades have been deferred due to phasing:"
 msgstr "Los siguientes paquetes tan reteníos:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "Not upgrading yet due to phasing:"
+msgstr "Los siguientes paquetes tan reteníos:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "Los siguientes paquetes tan reteníos:"
 
@@ -2202,8 +2326,22 @@ msgid "The following packages will be upgraded:"
 msgstr "Los siguientes paquetes van actualizase:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr "Los siguientes paquetes van DESACTUALIZASE:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Pinned packages:"
+msgid "Changing held packages:"
+msgstr "Paquetes na chincheta:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2223,14 +2361,30 @@ msgstr ""
 "¡Esto NUN hai que facelo si nun sabes esautamente lo que faes!"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr ""
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu actualizaos, %lu nuevos instalaos, "
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "Instalando %s"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu reinstalled, "
 msgstr "%lu reinstalaos, "
+
+#: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Reinstalling: %lu, "
+msgstr "Instalando %s"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2239,8 +2393,18 @@ msgstr "%lu desactualizaos, "
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Downgrading: %lu, "
+msgstr ""
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu para desaniciar y %lu nun actualizaos.\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr ""
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2269,7 +2433,7 @@ msgid "Y"
 msgstr "S"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr ""
 
@@ -2449,8 +2613,8 @@ msgstr "%s nun tien dependencies de construcción.\n"
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
 
 #: apt-private/private-source.cc
@@ -2489,6 +2653,11 @@ msgstr "Nun pudo renomase %s como %s"
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr ""
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr ""
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2509,7 +2678,32 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
 msgstr ""
 
 #: apt-private/private-update.cc
@@ -2556,6 +2750,12 @@ msgstr "  Paquetes virtuales amestaos: "
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr "  Falten: "
+
+#: cmdline/apt-cache.cc
+#, fuzzy
+#| msgid "Total distinct versions: "
+msgid "Total distinct source versions: "
+msgstr "Versiones distintes en total: "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -2887,6 +3087,12 @@ msgid "concatenate files, with automatic decompression"
 msgstr ""
 
 #: cmdline/apt-helper.cc
+#, fuzzy
+#| msgid "Problem hashing file"
+msgid "hash file"
+msgstr "Hebo un problema al xenerar el hash del ficheru"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr ""
 
@@ -3136,10 +3342,18 @@ msgid "edit the source information file"
 msgstr "Lleendo información d'estáu"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ""
+
+#: cmdline/apt.cc
 #, fuzzy
 #| msgid "Failed to satisfy %s dependency for %s: %s"
 msgid "satisfy dependency strings"
 msgstr "Fallu pa satisfacer la dependencia %s pa %s: %s"
+
+#: cmdline/apt.cc
+msgid "produce a reason trace for the current state of the package"
+msgstr ""
 
 #: dselect/install
 msgid "Bad default setting!"
@@ -3342,7 +3556,7 @@ msgstr "Algoritmu de compresión desconocíu '%s'"
 msgid "Compressed output %s needs a compression set"
 msgstr "La salida comprimida %s necesita un xuegu de compresión"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "Falló criar un tubu IPC al soprocesu"
 
@@ -3461,23 +3675,23 @@ msgstr "L'archivu nun tien el campu paquetes"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "  %s nun tien la entrada saltos\n"
+msgid "  %.*s has no override entry\n"
+msgstr "  %.*s nun tien la entrada saltos\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "  el curiador de %s ye %s y non %s\n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "  el curiador de %.*s ye %.*s y non %s\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "  %s nun tien la entrada saltos de fonte\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "  %.*s nun tien la entrada saltos de fonte\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "  %s tampoco nun tiene una entrada binaria de saltos\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "  %.*s tampoco nun tiene una entrada binaria de saltos\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3515,7 +3729,7 @@ msgstr "Datos de testera incorreutos"
 msgid "Connection failed"
 msgstr "Fallo la conexón"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3557,7 +3771,7 @@ msgstr "Nun se pudo desmontar el CD-ROM de %s; puede que se tea usando entá."
 msgid "Disk not found."
 msgstr "Nun s'atopa'l discu."
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "Nun s'atopa'l ficheru."
 
@@ -3593,7 +3807,7 @@ msgstr "Nun se pudo crear un socket pa %s (f=%u t=%u p=%u)"
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "Nun se pudo coneutar a %s:%s (%s)."
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "Falló"
 
@@ -3607,9 +3821,7 @@ msgstr "Nun se pudo coneutar a %s:%s (%s)."
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr "Nun se pudo coneutar a %s:%s (%s); expiró'l tiempu de conexón"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "Coneutando a %s"
@@ -3647,148 +3859,14 @@ msgstr "Falló al lleer"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "URI malu, los URIS llocales nun pueden entamar por //"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "Entrando"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "Nun se pudo determinar el nome del par"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "Nun se pudo determinar el nome llocal"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "El sirvidor refugó la conexón, y dixo: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "L'usuariu (USER) falló; el sirvidor dixo: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "La contraseña (PASS) falló; el sirvidor dixo: %s"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"Especificóse un sirvidor proxy pero non un script d'entrada, Acquire::ftp::"
-"ProxyLogin ta baleru."
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr "Falló la orde '%s' del guión d'entrada; el sirvidor dixo: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "La triba (TYPE) falló; el sirvidor dixo: %s"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "Gandió'l tiempu de conexón"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "El sirvidor zarró la conexón"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "Una rempuesta revirtió'l buffer."
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "Corrupción del protocolu"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "Nun se pudo crear un socket"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr "Nun se pudo coneutar el zócalu de datos; gandió'l tiempu de conexón"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "Nun se pudo coneutar un socket pasivu."
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "getaddrinfo nun pudo obtener un zócalu oyente"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "Nun se pudo enllazar con un socket"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "Nun se pudo escuchar nel socket"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "Nun se pudo determinar el nome del socket"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "Nun se pudo mandar la orde PORT"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "Direición de familia %u desconocida (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "EPRT falló; el sirvidor dixo: %s"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "Gandió'l tiempu de conexón col zócalu de datos"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "Nun se pudo aceptar la conexón"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "Hebo un problema al xenerar el hash del ficheru"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "Nun se pudo descargar el ficheru; el sirvidor dixo '%s'"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "Gandió'l tiempu del zócalu de datos"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "Falló la tresferencia de datos; el sirvidor dixo '%s'"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "Consulta"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "Nun se pudo invocar "
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
+msgstr ""
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
 msgstr ""
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
@@ -3809,20 +3887,18 @@ msgstr ""
 "Fallu internu: Robla bona, pero nun se pudo determinar la so buelga dixital?!"
 
 #: methods/gpgv.cc
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+#, fuzzy
+#| msgid ""
+#| "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
 "Nun pudo executase 'apt-key' pa verificar la robla (¿ta instaláu gnupg?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
+#, fuzzy
+#| msgid "Unknown error executing apt-key"
+msgid "Unknown error executing gpgv"
 msgstr "Fallu desconocíu al executar apt-key"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
@@ -3862,17 +3938,132 @@ msgstr "Falló la escoyeta"
 msgid "Connection timed out"
 msgstr "Gandió'l tiempu de conexón"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "Hebo un problema al xenerar el hash del ficheru"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "Nun se pudo afitar la hora de modificación"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "Conexón encaboxada prematuramente"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr ""
+
+#, c-format
+#~ msgid "GPG error: %s: %s"
+#~ msgstr "Fallu GPG: %s: %s"
+
+#~ msgid "Logging in"
+#~ msgstr "Entrando"
+
+#~ msgid "Unable to determine the peer name"
+#~ msgstr "Nun se pudo determinar el nome del par"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "Nun se pudo determinar el nome llocal"
+
+#, c-format
+#~ msgid "The server refused the connection and said: %s"
+#~ msgstr "El sirvidor refugó la conexón, y dixo: %s"
+
+#, c-format
+#~ msgid "USER failed, server said: %s"
+#~ msgstr "L'usuariu (USER) falló; el sirvidor dixo: %s"
+
+#, c-format
+#~ msgid "PASS failed, server said: %s"
+#~ msgstr "La contraseña (PASS) falló; el sirvidor dixo: %s"
+
+#~ msgid ""
+#~ "A proxy server was specified but no login script, "
+#~ "Acquire::ftp::ProxyLogin is empty."
+#~ msgstr ""
+#~ "Especificóse un sirvidor proxy pero non un script d'entrada, "
+#~ "Acquire::ftp::ProxyLogin ta baleru."
+
+#, c-format
+#~ msgid "Login script command '%s' failed, server said: %s"
+#~ msgstr "Falló la orde '%s' del guión d'entrada; el sirvidor dixo: %s"
+
+#, c-format
+#~ msgid "TYPE failed, server said: %s"
+#~ msgstr "La triba (TYPE) falló; el sirvidor dixo: %s"
+
+#~ msgid "Connection timeout"
+#~ msgstr "Gandió'l tiempu de conexón"
+
+#~ msgid "Server closed the connection"
+#~ msgstr "El sirvidor zarró la conexón"
+
+#~ msgid "A response overflowed the buffer."
+#~ msgstr "Una rempuesta revirtió'l buffer."
+
+#~ msgid "Protocol corruption"
+#~ msgstr "Corrupción del protocolu"
+
+#~ msgid "Could not create a socket"
+#~ msgstr "Nun se pudo crear un socket"
+
+#~ msgid "Could not connect data socket, connection timed out"
+#~ msgstr "Nun se pudo coneutar el zócalu de datos; gandió'l tiempu de conexón"
+
+#~ msgid "Could not connect passive socket."
+#~ msgstr "Nun se pudo coneutar un socket pasivu."
+
+#~ msgid "getaddrinfo was unable to get a listening socket"
+#~ msgstr "getaddrinfo nun pudo obtener un zócalu oyente"
+
+#~ msgid "Could not bind a socket"
+#~ msgstr "Nun se pudo enllazar con un socket"
+
+#~ msgid "Could not listen on the socket"
+#~ msgstr "Nun se pudo escuchar nel socket"
+
+#~ msgid "Could not determine the socket's name"
+#~ msgstr "Nun se pudo determinar el nome del socket"
+
+#~ msgid "Unable to send PORT command"
+#~ msgstr "Nun se pudo mandar la orde PORT"
+
+#, c-format
+#~ msgid "Unknown address family %u (AF_*)"
+#~ msgstr "Direición de familia %u desconocida (AF_*)"
+
+#, c-format
+#~ msgid "EPRT failed, server said: %s"
+#~ msgstr "EPRT falló; el sirvidor dixo: %s"
+
+#~ msgid "Data socket connect timed out"
+#~ msgstr "Gandió'l tiempu de conexón col zócalu de datos"
+
+#~ msgid "Unable to accept connection"
+#~ msgstr "Nun se pudo aceptar la conexón"
+
+#, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "Nun se pudo descargar el ficheru; el sirvidor dixo '%s'"
+
+#~ msgid "Data socket timed out"
+#~ msgstr "Gandió'l tiempu del zócalu de datos"
+
+#, c-format
+#~ msgid "Data transfer failed, server said '%s'"
+#~ msgstr "Falló la tresferencia de datos; el sirvidor dixo '%s'"
+
+#~ msgid "Query"
+#~ msgstr "Consulta"
+
+#~ msgid "Unable to invoke "
+#~ msgstr "Nun se pudo invocar "
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "Conexón encaboxada prematuramente"
+
+#, fuzzy
+#~| msgid "The following held packages will be changed:"
+#~ msgid "Changing held packages:Changing held packages:"
+#~ msgstr "Van camudase los siguientes paquetes reteníos:"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "Sí, ¡facer lo que digo!"

@@ -42,7 +42,7 @@ pkgVersionMatch::pkgVersionMatch(string Data,MatchType Type) : Type(Type)
       return;
    
    // Cut up the version representation
-   if (Type == Version)
+   if (Type == Version || Type == SourceVersion)
    {
       if (Data.end()[-1] == '*')
       {
@@ -143,8 +143,8 @@ bool pkgVersionMatch::MatchVer(const char *A,string B,bool Prefix)
    const char *Ae = Ab + strlen(A);
    
    // Strings are not a compatible size.
-   if (((unsigned)(Ae - Ab) != B.length() && Prefix == false) ||
-       (unsigned)(Ae - Ab) < B.length())
+   if (((size_t)(Ae - Ab) != B.length() && Prefix == false) ||
+       (size_t)(Ae - Ab) < B.length())
       return false;
    
    // Match (leading?)
@@ -177,6 +177,14 @@ pkgCache::VerIterator pkgVersionMatch::Find(pkgCache::PkgIterator Pkg)
 /* */
 bool pkgVersionMatch::VersionMatches(pkgCache::VerIterator Ver)
 {
+   if (Type == SourceVersion)
+   {
+      if (MatchVer(Ver.SourceVerStr(),VerStr,VerPrefixMatch) == true)
+	 return true;
+      if (ExpressionMatches(VerStr, Ver.SourceVerStr()) == true)
+	 return true;
+      return false;
+   }
    if (Type == Version)
    {
       if (MatchVer(Ver.VerStr(),VerStr,VerPrefixMatch) == true)

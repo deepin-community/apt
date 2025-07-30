@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apt 1.0.5\n"
 "Report-Msgid-Bugs-To: APT Development Team <deity@lists.debian.org>\n"
-"POT-Creation-Date: 2024-07-29 16:08+0800\n"
+"POT-Creation-Date: 2025-05-19 18:28+0200\n"
 "PO-Revision-Date: 2008-11-20 23:27+0530\n"
 "Last-Translator: Sampada <sampadanakhare@gmail.com>\n"
 "Language-Team: Marathi, janabhaaratii, C-DAC, Mumbai, India "
@@ -52,8 +52,8 @@ msgstr "%s संचिका डायव्हर्ट केली आहे
 
 #: apt-pkg/acquire-item.cc
 msgid ""
-"This is normally not allowed, but the option Acquire::"
-"AllowDowngradeToInsecureRepositories was given to override it."
+"This is normally not allowed, but the option "
+"Acquire::AllowDowngradeToInsecureRepositories was given to override it."
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -120,13 +120,14 @@ msgstr ""
 #, c-format
 msgid ""
 "An error occurred during the signature verification. The repository is not "
-"updated and the previous index files will be used. GPG error: %s: %s"
+"updated and the previous index files will be used. OpenPGP signature "
+"verification failed: %s: %s"
 msgstr ""
 
 #. Invalid signature file, reject (LP: #346386) (Closes: #627642)
 #: apt-pkg/acquire-item.cc
 #, c-format
-msgid "GPG error: %s: %s"
+msgid "OpenPGP signature verification failed: %s: %s"
 msgstr ""
 
 #: apt-pkg/acquire-item.cc
@@ -182,8 +183,7 @@ msgstr ""
 msgid "Conflicting distribution: %s (expected %s but got %s)"
 msgstr ""
 
-#. Both messages are reused from the ReleaseInfoChange feature in acquire-item.cc
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid "Repository '%s' changed its '%s' value from '%s' to '%s'"
 msgstr ""
@@ -194,7 +194,7 @@ msgid "Repository '%s' changed its default priority for %s from %hi to %hi."
 msgstr ""
 
 #. TRANSLATOR: the "this" refers to changes in the repository like a new release or owner change
-#: apt-pkg/acquire-item.cc apt-private/private-update.cc
+#: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
 "More information about this can be found online in the Release notes at: %s"
@@ -216,6 +216,13 @@ msgstr "%s  %s आणणे असफल"
 #: apt-pkg/acquire-item.cc
 #, c-format
 msgid ""
+"Repositories should provide a clear-signed InRelease file, but none found at "
+"%s."
+msgstr ""
+
+#: apt-pkg/acquire-item.cc
+#, c-format
+msgid ""
 "I wasn't able to locate a file for the %s package. This might mean you need "
 "to manually fix this package. (due to missing arch)"
 msgstr ""
@@ -232,13 +239,6 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Changelog unavailable for %s=%s"
 msgstr "%s (%s) ला जोडत आहे"
-
-#: apt-pkg/acquire-worker.cc
-#, c-format
-msgid ""
-"The method '%s' is unsupported and disabled by default. Consider switching "
-"to http(s). Set Dir::Bin::Methods::%s to \"%s\" to enable it again."
-msgstr ""
 
 #: apt-pkg/acquire-worker.cc
 #, c-format
@@ -624,6 +624,30 @@ msgstr "रचनेच्या नियमांचा दोष %s:%u: द�
 msgid "Syntax error %s:%u: Extra junk at end of file"
 msgstr "नियम रचनेचा दोष %s:%u: फाईलच्या अंती अधिक जंक"
 
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Error:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Warning:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Notice:"
+msgstr ""
+
+#: apt-pkg/contrib/error.cc
+msgid "Audit:"
+msgstr ""
+
+#. TRANSLATOR: This is a warning level displayed before the message
+#: apt-pkg/contrib/error.cc
+msgid "Debug:"
+msgstr ""
+
 #: apt-pkg/contrib/extracttar.cc
 #, fuzzy, c-format
 msgid "Cannot find a configured compressor for '%s'"
@@ -733,11 +757,11 @@ msgstr "%s उपक्रियेने (%u) त्रुटी कोड द�
 msgid "Sub-process %s exited unexpectedly"
 msgstr "%s उपक्रिया अचानकपणे बाहेर पडली"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Read error"
 msgstr "त्रुटी वाचा"
 
-#: apt-pkg/contrib/fileutl.cc methods/ftp.cc methods/rsh.cc
+#: apt-pkg/contrib/fileutl.cc
 msgid "Write error"
 msgstr "लिहिण्यात त्रुटी"
 
@@ -1044,6 +1068,12 @@ msgstr "संचयिका यादीला कुलुप लावण्
 msgid "Not locked"
 msgstr ""
 
+#: apt-pkg/deb/debsystem.cc
+msgid ""
+"The dpkg executable set in Dir::Bin::dpkg is missing, falling back to using "
+"default dpkg."
+msgstr ""
+
 #. we don't care for the difference
 #: apt-pkg/deb/dpkgpm.cc
 #, c-format
@@ -1223,6 +1253,16 @@ msgstr ""
 #: apt-pkg/edsp.cc
 msgid "External solver failed without a proper error message"
 msgstr ""
+
+#: apt-pkg/edsp.cc apt-pkg/upgrade.cc
+msgid "Calculating upgrade"
+msgstr "पुढिल आवृत्तीची गणती करीत आहे"
+
+#: apt-pkg/edsp.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Solving dependencies"
+msgstr "एकूण निर्भरता:"
 
 #: apt-pkg/edsp.cc
 msgid "Execute external solver"
@@ -1527,10 +1567,6 @@ msgstr ""
 "काही अनुक्रमणिका संचयिका डाऊनलोड    करण्यास असमर्थ,त्या दुर्लक्षित झाल्या, किंवा "
 "त्याऐवजी जुन्या वापरल्या गेल्या."
 
-#: apt-pkg/upgrade.cc
-msgid "Calculating upgrade"
-msgstr "पुढिल आवृत्तीची गणती करीत आहे"
-
 #. TRANSLATOR: Very short word to be displayed before unchanged files in 'apt-get update'
 #: apt-private/acqprogress.cc
 #, c-format
@@ -1696,12 +1732,6 @@ msgid "Note, selecting '%s' instead of '%s'\n"
 msgstr "लक्षात घ्या,%s ऐवजी %s ची निवड करत आहे \n"
 
 #: apt-private/private-cmndline.cc
-msgid ""
-"Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' "
-"may result in incomplete upgrades."
-msgstr ""
-
-#: apt-private/private-cmndline.cc
 msgid "Most used commands:"
 msgstr ""
 
@@ -1806,6 +1836,12 @@ msgid "Broken packages"
 msgstr "तुटलेली पॅकेजेस"
 
 #: apt-private/private-install.cc
+#, fuzzy
+#| msgid "Write error"
+msgid "Writing error report"
+msgstr "लिहिण्यात त्रुटी"
+
+#: apt-private/private-install.cc
 msgid ""
 "Unmerged usr is no longer supported, use usrmerge to convert to a merged-usr "
 "system."
@@ -1819,10 +1855,10 @@ msgstr ""
 
 #: apt-private/private-install.cc
 msgid ""
-"Unable to fetch some archives, maybe run apt-get update or try with --fix-"
+"Unable to fetch some archives, maybe run apt update or try with --fix-"
 "missing?"
 msgstr ""
-"काही आर्काइव्हज आणण्यास असमर्थ, कदाचित apt-get रन करुन अद्ययावत करा किंवा --fix- "
+"काही आर्काइव्हज आणण्यास असमर्थ, कदाचित apt रन करुन अद्ययावत करा किंवा --fix- "
 "बरोबर प्रयत्न कराहरवलेले/गहाळ?"
 
 #: apt-private/private-install.cc
@@ -1859,12 +1895,23 @@ msgstr "अंतर्गत त्रुटी,क्रम अजून स�
 msgid "How odd... The sizes didn't match, email apt@packages.debian.org"
 msgstr "किती विचित्र...आकार जुळत नाहीत, ईमेल apt@packages.debian.org"
 
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "  Installed: "
+msgid "  Download size: %sB / %sB\n"
+msgstr "अधिष्ठापित केले:"
+
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "Need to get %sB/%sB of archives.\n"
 msgstr "अर्काईव्हजच्या %sB/%sB घेण्याची गरज आहे\n"
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "  Download size: %sB\n"
+msgstr ""
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1873,12 +1920,54 @@ msgstr "अर्काईव्हजच्या %sB/%sB घेण्याच
 msgid "Need to get %sB of archives.\n"
 msgstr "अर्काईव्हज%sB घेण्याची गरज आहे.\n"
 
-#. TRANSLATOR: The required space between number and unit is already included
-#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
 #: apt-private/private-install.cc
 #, c-format
 msgid "After this operation, %sB of additional disk space will be used.\n"
 msgstr "या क्रियेनंतर, %sB एवढी अधिक डिस्क जागा वापरली जाईल.\n"
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#: apt-private/private-install.cc
+#, c-format
+msgid "More space needed than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+#. The first %s is the location of the boot directory (determined from Dir::Boot),
+#. and it tells the space being needed there.
+#. (We have two spaces to align with parent "space needed:"for /boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid "in %s:  %sB / %sB available\n"
+msgstr ""
+
+#. TRANSLATOR: The required space between number and unit is already included
+#. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+#. The first %s is the location of the boot directory (determined from Dir::Boot)
+#: apt-private/private-install.cc
+#, c-format
+msgid ""
+"More space needed in %s than available: %sB > %sB, installation may fail"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, c-format
+msgid "Space needed: %sB\n"
+msgstr ""
+
+#: apt-private/private-install.cc
+#, fuzzy, c-format
+#| msgid "Stored label: %s\n"
+msgid "  Freed space: %sB\n"
+msgstr "ग्रहण केलेले नामदर्शक: %s \n"
 
 #. TRANSLATOR: The required space between number and unit is already included
 #. in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
@@ -1897,19 +1986,18 @@ msgid ""
 "break the system."
 msgstr ""
 
+#: apt-private/private-install.cc
+msgid "Continue anyway?"
+msgstr ""
+
+#: apt-private/private-install.cc
+msgid "Continue?"
+msgstr ""
+
 #: apt-private/private-install.cc cmdline/apt-mark.cc
 #, fuzzy
 msgid "Do you want to continue?"
 msgstr "तुम्हाला पुढे जायचे आहे [Y/n]? "
-
-#: apt-private/private-install.cc
-msgid "The current uninstallation operation involves system-critical "
-"packages. Continuing may cause system instability."
-msgstr ""
-
-#: apt-private/private-install.cc
-msgid "The following are critical system packages:"
-msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Abort."
@@ -1967,6 +2055,13 @@ msgid "Internal Error, AutoRemover broke stuff"
 msgstr "अंतर्गत त्रुटी, AutoRemoverने स्टफला तोडले"
 
 #: apt-private/private-install.cc
+#, fuzzy, c-format
+msgid "Use '%s' to remove it."
+msgid_plural "Use '%s' to remove them."
+msgstr[0] "ती काढून टाकण्यासाठी '%s' वापरा."
+msgstr[1] "ती काढून टाकण्यासाठी '%s' वापरा."
+
+#: apt-private/private-install.cc
 #, fuzzy
 msgid ""
 "The following package was automatically installed and is no longer required:"
@@ -1985,16 +2080,8 @@ msgstr[0] "खालील नवीन पॅकेजेस स्वयंच
 msgstr[1] "खालील नवीन पॅकेजेस स्वयंचलितपणे संस्थापित झाली होती व आता आवश्यक नाहीत:"
 
 #: apt-private/private-install.cc
-#, fuzzy, c-format
-msgid "Use '%s' to remove it."
-msgid_plural "Use '%s' to remove them."
-msgstr[0] "ती काढून टाकण्यासाठी '%s' वापरा."
-msgstr[1] "ती काढून टाकण्यासाठी '%s' वापरा."
-
-#: apt-private/private-install.cc
-#, fuzzy
-msgid "The following additional packages will be installed:"
-msgstr "खालील अतिरिक्त पॅकेजेस संस्थापित होतील:"
+msgid "Result calculated by the 3.0 solver."
+msgstr ""
 
 #: apt-private/private-install.cc
 msgid "Suggested packages:"
@@ -2003,6 +2090,11 @@ msgstr "सुचवलेली पॅकेजेस:"
 #: apt-private/private-install.cc
 msgid "Recommended packages:"
 msgstr "शिफारस केलेली पॅकेजेस:"
+
+#: apt-private/private-install.cc
+#, fuzzy
+msgid "The following additional packages will be installed:"
+msgstr "खालील अतिरिक्त पॅकेजेस संस्थापित होतील:"
 
 #: apt-private/private-install.cc
 #, c-format
@@ -2134,8 +2226,30 @@ msgid "The following packages have unmet dependencies:"
 msgstr "खालील पॅकेजेस मध्ये नमिळणाऱ्या निर्भरता/ डिपेन्डन्सीज आहेत:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Failed to satisfy %s dependency for %s: %s"
+msgid "Unsatisfied dependencies:"
+msgstr "%s साठी %s डिपेंडन्सी पूर्ण होण्यास असमर्थ: %s"
+
+#: apt-private/private-output.cc
 msgid "The following NEW packages will be installed:"
 msgstr "खालील नविन पॅकेजेस संस्थापित होतील:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Installing %s"
+msgid "Installing:"
+msgstr "%s संस्थापित होत आहे"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Total dependencies: "
+msgid "Installing dependencies:"
+msgstr "एकूण निर्भरता:"
+
+#: apt-private/private-output.cc
+msgid "REMOVING:"
+msgstr ""
 
 #: apt-private/private-output.cc
 msgid "The following packages will be REMOVED:"
@@ -2148,6 +2262,16 @@ msgid "The following upgrades have been deferred due to phasing:"
 msgstr "खालील पॅकेजेस परत ठेवली गेली:"
 
 #: apt-private/private-output.cc
+#, fuzzy
+#| msgid "The following packages have been kept back:"
+msgid "Not upgrading yet due to phasing:"
+msgstr "खालील पॅकेजेस परत ठेवली गेली:"
+
+#: apt-private/private-output.cc
+msgid "Not upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages have been kept back:"
 msgstr "खालील पॅकेजेस परत ठेवली गेली:"
 
@@ -2156,8 +2280,22 @@ msgid "The following packages will be upgraded:"
 msgstr "खालील पॅकेजेस पुढिल आवृत्तीकृत होतील:"
 
 #: apt-private/private-output.cc
+msgid "Upgrading:"
+msgstr ""
+
+#: apt-private/private-output.cc
+msgid "DOWNGRADING:"
+msgstr ""
+
+#: apt-private/private-output.cc
 msgid "The following packages will be DOWNGRADED:"
 msgstr "खालील पॅकेजेस पुढच्या आवृत्तीकृत होणार नाहीत:"
+
+#: apt-private/private-output.cc
+#, fuzzy
+#| msgid "Pinned packages:"
+msgid "Changing held packages:"
+msgstr "एकत्रित पॅकेजेस:"
 
 #: apt-private/private-output.cc
 msgid "The following held packages will be changed:"
@@ -2177,14 +2315,30 @@ msgstr ""
 "तुम्हाला तुम्ही काय करत आहात हे कळेपर्यंत असं करता येणार नाही!"
 
 #: apt-private/private-output.cc
+msgid "Summary:"
+msgstr ""
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu upgraded, %lu newly installed, "
 msgstr "%lu पुढे आवृत्तीकृत केले, %lu नव्याने संस्थापित केले,"
 
 #: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Upgrading: %lu, Installing: %lu, "
+msgstr "%s संस्थापित होत आहे"
+
+#: apt-private/private-output.cc
 #, c-format
 msgid "%lu reinstalled, "
 msgstr "%lu पुनर्संस्थापित केले,"
+
+#: apt-private/private-output.cc
+#, fuzzy, c-format
+#| msgid "Installing %s"
+msgid "Reinstalling: %lu, "
+msgstr "%s संस्थापित होत आहे"
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2193,8 +2347,18 @@ msgstr "%lu मागील आवृत्तीकृत केले,"
 
 #: apt-private/private-output.cc
 #, c-format
+msgid "Downgrading: %lu, "
+msgstr ""
+
+#: apt-private/private-output.cc
+#, c-format
 msgid "%lu to remove and %lu not upgraded.\n"
 msgstr "%lu कायमचे काढून टाकण्यासाठी आणि %lu पुढच्या आवृत्तीकृत झालेली नाही.\n"
+
+#: apt-private/private-output.cc
+#, c-format
+msgid "Removing: %lu, Not Upgrading: %lu\n"
+msgstr ""
 
 #: apt-private/private-output.cc
 #, c-format
@@ -2223,7 +2387,7 @@ msgid "Y"
 msgstr "होय"
 
 #. TRANSLATOR: "No" answer printed for a yes/no question if --assume-no is set
-#: apt-private/private-output.cc
+#: apt-private/private-output.cc apt-private/private-sources.cc
 msgid "N"
 msgstr ""
 
@@ -2397,8 +2561,8 @@ msgstr "%s ला बांधणी डिपेंडन्स नाहीत
 #: apt-private/private-source.cc
 #, c-format
 msgid ""
-"No architecture information available for %s. See apt.conf(5) APT::"
-"Architectures for setup"
+"No architecture information available for %s. See apt.conf(5) "
+"APT::Architectures for setup"
 msgstr ""
 
 #: apt-private/private-source.cc
@@ -2435,6 +2599,11 @@ msgstr "%s ला पुनर्नामांकन %s करण्यास 
 msgid "Your '%s' file changed, please run 'apt-get update'.\n"
 msgstr ""
 
+#: apt-private/private-sources.cc
+#, c-format
+msgid "Rewrite %zu sources?"
+msgstr ""
+
 #: apt-private/private-unmet.cc
 #, c-format
 msgid "Package %s version %s has an unmet dep:\n"
@@ -2455,7 +2624,32 @@ msgstr ""
 #. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
 #: apt-private/private-update.cc
 #, c-format
+msgid "The %s entry for '%s' should be upgraded to deb822 .sources"
+msgstr ""
+
+#. TRANSLATOR: the first is manpage reference, the last the URI from a sources.list
+#: apt-private/private-update.cc
+#, c-format
 msgid "Missing Signed-By in the %s entry for '%s'"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"Consider migrating all sources.list(5) entries to the deb822 .sources format"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid ""
+"The deb822 .sources format supports both embedded as well as external "
+"OpenPGP keys"
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "See apt-secure(8) for best practices in configuring repository signing."
+msgstr ""
+
+#: apt-private/private-update.cc
+msgid "Some sources can be modernized. Run 'apt modernize-sources' to do so."
 msgstr ""
 
 #: apt-private/private-update.cc
@@ -2503,6 +2697,12 @@ msgstr "मिश्रित आभासी पॅकेजेस्:"
 #: cmdline/apt-cache.cc
 msgid "  Missing: "
 msgstr " हरवलेले/गहाळ: "
+
+#: cmdline/apt-cache.cc
+#, fuzzy
+#| msgid "Total distinct versions: "
+msgid "Total distinct source versions: "
+msgstr "एकूण स्पष्ट आवृत्या: "
 
 #: cmdline/apt-cache.cc
 msgid "Total distinct versions: "
@@ -2830,6 +3030,12 @@ msgid "concatenate files, with automatic decompression"
 msgstr ""
 
 #: cmdline/apt-helper.cc
+#, fuzzy
+#| msgid "Problem hashing file"
+msgid "hash file"
+msgstr "फाईल हॅश करण्यात त्रुटी"
+
+#: cmdline/apt-helper.cc
 msgid "detect proxy using apt.conf"
 msgstr ""
 
@@ -3077,10 +3283,18 @@ msgid "edit the source information file"
 msgstr "स्थिती माहिती वाचत आहे"
 
 #: cmdline/apt.cc
+msgid "modernize .list files to .sources files"
+msgstr ""
+
+#: cmdline/apt.cc
 #, fuzzy
 #| msgid "Failed to satisfy %s dependency for %s: %s"
 msgid "satisfy dependency strings"
 msgstr "%s साठी %s डिपेंडन्सी पूर्ण होण्यास असमर्थ: %s"
+
+#: cmdline/apt.cc
+msgid "produce a reason trace for the current state of the package"
+msgstr ""
 
 #: dselect/install
 msgid "Bad default setting!"
@@ -3282,7 +3496,7 @@ msgstr "माहित नसलेली/ले संक्षेप पद�
 msgid "Compressed output %s needs a compression set"
 msgstr "%s संकलित आऊटपुट/निर्गत साठी संक्षेप संचाची गरज"
 
-#: ftparchive/multicompress.cc methods/rsh.cc
+#: ftparchive/multicompress.cc
 msgid "Failed to create IPC pipe to subprocess"
 msgstr "उपक्रियेचा आयपीसी वाहिनी तयार करण्यास असमर्थ"
 
@@ -3401,23 +3615,23 @@ msgstr "अर्काईव्ह ला पॅकेज जागा ना�
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no override entry\n"
-msgstr "%s ला ओव्हरराईड/दुर्लक्षित जागा नाही\n"
+msgid "  %.*s has no override entry\n"
+msgstr "%.*s ला ओव्हरराईड/दुर्लक्षित जागा नाही\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s maintainer is %s not %s\n"
-msgstr "%s देखभालकर्ता हा %s आणि %s नाही \n"
+msgid "  %.*s maintainer is %.*s not %s\n"
+msgstr "%.*s देखभालकर्ता हा %.*s आणि %s नाही \n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no source override entry\n"
-msgstr "%s ला उगम ओव्हरराईड/दुर्लक्षित जागा नाही\n"
+msgid "  %.*s has no source override entry\n"
+msgstr "%.*s ला उगम ओव्हरराईड/दुर्लक्षित जागा नाही\n"
 
 #: ftparchive/writer.cc
 #, c-format
-msgid "  %s has no binary override entry either\n"
-msgstr "%s ला द्वयंक ओव्हरराईड जागा नाही\n"
+msgid "  %.*s has no binary override entry either\n"
+msgstr "%.*s ला द्वयंक ओव्हरराईड जागा नाही\n"
 
 #: methods/basehttp.cc
 msgid "Waiting for headers"
@@ -3455,7 +3669,7 @@ msgstr "चुकीचा शीर्षक डाटा"
 msgid "Connection failed"
 msgstr "जोडणी अयशस्वी"
 
-#: methods/basehttp.cc methods/ftp.cc methods/http.cc
+#: methods/basehttp.cc methods/http.cc
 #, c-format
 msgid "File has unexpected size (%llu != %llu). Mirror sync in progress?"
 msgstr ""
@@ -3497,7 +3711,7 @@ msgstr "%s मधील सीडी-रॉम अनमाऊंट करण�
 msgid "Disk not found."
 msgstr "डिस्क सापडत नाही"
 
-#: methods/cdrom.cc methods/file.cc methods/rsh.cc
+#: methods/cdrom.cc methods/file.cc
 msgid "File not found"
 msgstr "फाईल सापडली नाही"
 
@@ -3533,7 +3747,7 @@ msgstr "%s (f=%u t=%u p=%u) साठी सॉकेट तयार करू 
 msgid "Cannot initiate the connection to %s:%s (%s)."
 msgstr "%s:%s (%s). साठी जोडणी इनिशिएट/पुढाकारीत करू शकत नाही"
 
-#: methods/connect.cc methods/ftp.cc methods/rsh.cc
+#: methods/connect.cc
 msgid "Failed"
 msgstr "असमर्थ"
 
@@ -3547,9 +3761,7 @@ msgstr "%s:%s (%s) ला जोडू शकत नाही"
 msgid "Could not connect to %s:%s (%s), connection timed out"
 msgstr "%s:%s (%s) ला जोडू शकत नाही,जोडणी वेळेअभावी तुटली"
 
-#. We say this mainly because the pause here is for the
-#. ssh connection that is still going
-#: methods/connect.cc methods/rsh.cc
+#: methods/connect.cc
 #, c-format
 msgid "Connecting to %s"
 msgstr "%s ला जोडत आहे"
@@ -3587,148 +3799,14 @@ msgstr "स्टॅट करण्यास असमर्थ"
 msgid "Invalid URI, local URIS must not start with //"
 msgstr "अवैध यू आर एल, स्थानिक यू आर आय एस सुरू होऊ नये यापासून //"
 
-#. Login must be before getpeername otherwise dante won't work.
-#: methods/ftp.cc
-msgid "Logging in"
-msgstr "लॉग इन करत आहे"
-
-#: methods/ftp.cc
-msgid "Unable to determine the peer name"
-msgstr "पिअर नाव सांगण्यास/सापडण्यास असमर्थ"
-
-#: methods/ftp.cc
-msgid "Unable to determine the local name"
-msgstr "स्थानिक नाव सांगण्यास असमर्थ"
-
-#: methods/ftp.cc
-#, c-format
-msgid "The server refused the connection and said: %s"
-msgstr "सर्व्हर ने संबंध जोडण्यास नकार दिला व सांगितले: %s"
-
-#: methods/ftp.cc
-#, c-format
-msgid "USER failed, server said: %s"
-msgstr "सर्व्हरने %s सांगितले,यूजर असमर्थ:"
-
-#: methods/ftp.cc
-#, c-format
-msgid "PASS failed, server said: %s"
-msgstr "सर्व्हरने %s सांगितले, पास असमर्थ:"
-
-#: methods/ftp.cc
-msgid ""
-"A proxy server was specified but no login script, Acquire::ftp::ProxyLogin "
-"is empty."
-msgstr ""
-"प्रॉक्सी सर्व्हर निर्देशित केला पण लॉगीन स्क्रिप्ट नाही, प्राप्त केलेले ::ftp:: प्रॉक्सीलॉगीन "
-"निरर्थक आहे."
-
-#: methods/ftp.cc
-#, c-format
-msgid "Login script command '%s' failed, server said: %s"
-msgstr "सर्व्हरने %s सांगितले, '%s' लॉग इन स्क्रिप्ट आज्ञावली असमर्थ:"
-
-#: methods/ftp.cc
-#, c-format
-msgid "TYPE failed, server said: %s"
-msgstr "सर्व्हरने %s सांगितले: टाईप असमर्थ:"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Connection timeout"
-msgstr "वेळेअभावी संबंध जोडता येत नाही"
-
-#: methods/ftp.cc
-msgid "Server closed the connection"
-msgstr "सर्व्हरने संबंध जोडणी बंद केली"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "A response overflowed the buffer."
-msgstr "प्रतिसाधाने बफर भरुन गेले."
-
-#: methods/ftp.cc
-msgid "Protocol corruption"
-msgstr "प्रोटोकॉल खराब झाले"
-
-#: methods/ftp.cc
-msgid "Could not create a socket"
-msgstr "सॉकेट तयार करू शकत नाही"
-
-#: methods/ftp.cc
-msgid "Could not connect data socket, connection timed out"
-msgstr "डेटा सॉकेट जोडू शकत नाही,जोडणी वेळेअभावी बंद केली"
-
-#: methods/ftp.cc
-msgid "Could not connect passive socket."
-msgstr "पॅसिव्ह सॉकेट जोडता येत नाही"
-
-#: methods/ftp.cc
-msgid "getaddrinfo was unable to get a listening socket"
-msgstr "गेटऍड्रेसइनफो लिसनिंग सॉकेट घेण्यास असमर्थ होते"
-
-#: methods/ftp.cc
-msgid "Could not bind a socket"
-msgstr "सॉकेट चिकटवता येत नाही"
-
-#: methods/ftp.cc
-msgid "Could not listen on the socket"
-msgstr "सॉकेट वर ऐकता येत नाही"
-
-#: methods/ftp.cc
-msgid "Could not determine the socket's name"
-msgstr "सॉकेटचे नाव सांगता येत नाही"
-
-#: methods/ftp.cc
-msgid "Unable to send PORT command"
-msgstr "पोर्ट आज्ञा पाठवता येत नाही/पोर्ट आज्ञा  पाठविण्यास असमर्थ"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unknown address family %u (AF_*)"
-msgstr "माहित नसलेला पत्ता फॅमिली %u (AF_*)"
-
-#: methods/ftp.cc
-#, c-format
-msgid "EPRT failed, server said: %s"
-msgstr "ई.पी.आर.टी. चुकले,सर्व्हरने %s सांगितले"
-
-#: methods/ftp.cc
-msgid "Data socket connect timed out"
-msgstr "डेटा सॉकेट जोडणी वेळेअभावी तुटली"
-
-#: methods/ftp.cc
-msgid "Unable to accept connection"
-msgstr "जोडणी स्विकारण्यास असमर्थ"
-
-#: methods/ftp.cc methods/http.cc methods/rsh.cc
-msgid "Problem hashing file"
-msgstr "फाईल हॅश करण्यात त्रुटी"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Unable to fetch file, server said '%s'"
-msgstr "सर्व्हरने %s सांगितले, फाईल मिळवण्यास असमर्थ"
-
-#: methods/ftp.cc methods/rsh.cc
-msgid "Data socket timed out"
-msgstr "डेटा सॉकेट वेळेअभावी तुटले"
-
-#: methods/ftp.cc
-#, c-format
-msgid "Data transfer failed, server said '%s'"
-msgstr "सर्व्हरने %s सांगितले, डेटा स्थानांतरण चुकले"
-
-#. Get the files information
-#: methods/ftp.cc
-msgid "Query"
-msgstr "प्रश्न"
-
-#: methods/ftp.cc
-msgid "Unable to invoke "
-msgstr "जारी करण्यास करण्यास असमर्थ"
-
 #: methods/gpgv.cc
 #, c-format
 msgid "untrusted public key algorithm: %s"
+msgstr ""
+
+#: methods/gpgv.cc
+#, c-format
+msgid "%s will be deprecated in a future release"
 msgstr ""
 
 #. TRANSLATORS: %s is a single techy word like 'NODATA'
@@ -3749,20 +3827,15 @@ msgstr "अंतर्गत त्रुटी: चांगली सही, 
 
 #: methods/gpgv.cc
 #, fuzzy
-msgid "Could not execute 'apt-key' to verify signature (is gnupg installed?)"
+msgid "Could not execute 'gpgv' to verify signature (is gnupg installed?)"
 msgstr ""
 "सहीची खात्री करण्यासाठी '%s' कार्यान्वित करू शकत नाही (gnupg संस्थापित केले आहे का?)"
 
 #: methods/gpgv.cc
-msgid "Unknown error executing apt-key"
+#, fuzzy
+#| msgid "Unknown error executing apt-key"
+msgid "Unknown error executing gpgv"
 msgstr "apt-key कार्यान्वित होत असताना अपरिचित त्रुटी"
-
-#: methods/gpgv.cc
-#, c-format
-msgid ""
-"Key is stored in legacy trusted.gpg keyring (%s), see the DEPRECATION "
-"section in apt-key(8) for details."
-msgstr ""
 
 #. TRANSLATORS: The second %s is the reason and is untranslated for repository owners.
 #: methods/gpgv.cc
@@ -3800,17 +3873,128 @@ msgstr "चुकले/असमर्थ निवड करा"
 msgid "Connection timed out"
 msgstr "जोडणी वेळेअभावी तुटली"
 
+#: methods/http.cc
+msgid "Problem hashing file"
+msgstr "फाईल हॅश करण्यात त्रुटी"
+
 #: methods/rred.cc
 msgid "Failed to set modification time"
 msgstr "बदलण्याचा वेळ निश्चित करण्यास असमर्थ"
 
-#: methods/rsh.cc
-msgid "Connection closed prematurely"
-msgstr "जोडणी अकाली बंद झाली"
-
 #: methods/store.cc
 msgid "Empty files can't be valid archives"
 msgstr ""
+
+#~ msgid "Logging in"
+#~ msgstr "लॉग इन करत आहे"
+
+#~ msgid "Unable to determine the peer name"
+#~ msgstr "पिअर नाव सांगण्यास/सापडण्यास असमर्थ"
+
+#~ msgid "Unable to determine the local name"
+#~ msgstr "स्थानिक नाव सांगण्यास असमर्थ"
+
+#, c-format
+#~ msgid "The server refused the connection and said: %s"
+#~ msgstr "सर्व्हर ने संबंध जोडण्यास नकार दिला व सांगितले: %s"
+
+#, c-format
+#~ msgid "USER failed, server said: %s"
+#~ msgstr "सर्व्हरने %s सांगितले,यूजर असमर्थ:"
+
+#, c-format
+#~ msgid "PASS failed, server said: %s"
+#~ msgstr "सर्व्हरने %s सांगितले, पास असमर्थ:"
+
+#~ msgid ""
+#~ "A proxy server was specified but no login script, "
+#~ "Acquire::ftp::ProxyLogin is empty."
+#~ msgstr ""
+#~ "प्रॉक्सी सर्व्हर निर्देशित केला पण लॉगीन स्क्रिप्ट नाही, प्राप्त केलेले ::ftp:: "
+#~ "प्रॉक्सीलॉगीन निरर्थक आहे."
+
+#, c-format
+#~ msgid "Login script command '%s' failed, server said: %s"
+#~ msgstr "सर्व्हरने %s सांगितले, '%s' लॉग इन स्क्रिप्ट आज्ञावली असमर्थ:"
+
+#, c-format
+#~ msgid "TYPE failed, server said: %s"
+#~ msgstr "सर्व्हरने %s सांगितले: टाईप असमर्थ:"
+
+#~ msgid "Connection timeout"
+#~ msgstr "वेळेअभावी संबंध जोडता येत नाही"
+
+#~ msgid "Server closed the connection"
+#~ msgstr "सर्व्हरने संबंध जोडणी बंद केली"
+
+#~ msgid "A response overflowed the buffer."
+#~ msgstr "प्रतिसाधाने बफर भरुन गेले."
+
+#~ msgid "Protocol corruption"
+#~ msgstr "प्रोटोकॉल खराब झाले"
+
+#~ msgid "Could not create a socket"
+#~ msgstr "सॉकेट तयार करू शकत नाही"
+
+#~ msgid "Could not connect data socket, connection timed out"
+#~ msgstr "डेटा सॉकेट जोडू शकत नाही,जोडणी वेळेअभावी बंद केली"
+
+#~ msgid "Could not connect passive socket."
+#~ msgstr "पॅसिव्ह सॉकेट जोडता येत नाही"
+
+#~ msgid "getaddrinfo was unable to get a listening socket"
+#~ msgstr "गेटऍड्रेसइनफो लिसनिंग सॉकेट घेण्यास असमर्थ होते"
+
+#~ msgid "Could not bind a socket"
+#~ msgstr "सॉकेट चिकटवता येत नाही"
+
+#~ msgid "Could not listen on the socket"
+#~ msgstr "सॉकेट वर ऐकता येत नाही"
+
+#~ msgid "Could not determine the socket's name"
+#~ msgstr "सॉकेटचे नाव सांगता येत नाही"
+
+#~ msgid "Unable to send PORT command"
+#~ msgstr "पोर्ट आज्ञा पाठवता येत नाही/पोर्ट आज्ञा  पाठविण्यास असमर्थ"
+
+#, c-format
+#~ msgid "Unknown address family %u (AF_*)"
+#~ msgstr "माहित नसलेला पत्ता फॅमिली %u (AF_*)"
+
+#, c-format
+#~ msgid "EPRT failed, server said: %s"
+#~ msgstr "ई.पी.आर.टी. चुकले,सर्व्हरने %s सांगितले"
+
+#~ msgid "Data socket connect timed out"
+#~ msgstr "डेटा सॉकेट जोडणी वेळेअभावी तुटली"
+
+#~ msgid "Unable to accept connection"
+#~ msgstr "जोडणी स्विकारण्यास असमर्थ"
+
+#, c-format
+#~ msgid "Unable to fetch file, server said '%s'"
+#~ msgstr "सर्व्हरने %s सांगितले, फाईल मिळवण्यास असमर्थ"
+
+#~ msgid "Data socket timed out"
+#~ msgstr "डेटा सॉकेट वेळेअभावी तुटले"
+
+#, c-format
+#~ msgid "Data transfer failed, server said '%s'"
+#~ msgstr "सर्व्हरने %s सांगितले, डेटा स्थानांतरण चुकले"
+
+#~ msgid "Query"
+#~ msgstr "प्रश्न"
+
+#~ msgid "Unable to invoke "
+#~ msgstr "जारी करण्यास करण्यास असमर्थ"
+
+#~ msgid "Connection closed prematurely"
+#~ msgstr "जोडणी अकाली बंद झाली"
+
+#, fuzzy
+#~| msgid "The following held packages will be changed:"
+#~ msgid "Changing held packages:Changing held packages:"
+#~ msgstr "पुढिल ठेवलेली पॅकेजेस बदलतील:"
 
 #~ msgid "Yes, do as I say!"
 #~ msgstr "हो, मी म्ह्टल्याप्रमाणे करा!"

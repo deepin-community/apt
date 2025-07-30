@@ -30,10 +30,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <list>
 #include <string>
 #include <unistd.h>
 
+#include <apti18n.h>
 									/*}}}*/
 
 // Global Error Object							/*{{{*/
@@ -64,6 +66,7 @@ GEMessage(FatalE, FATAL)
 GEMessage(Errno, ERROR)
 GEMessage(WarningE, WARNING)
 GEMessage(NoticeE, NOTICE)
+GEMessage(AuditE, AUDIT)
 GEMessage(DebugE, DEBUG)
 #undef GEMessage
 									/*}}}*/
@@ -87,6 +90,7 @@ bool GlobalError::InsertErrno(MsgType type, const char* Function,
 			      const char* Description, va_list &args,
 			      int const errsv, size_t &msgSize) {
 	char* S = (char*) malloc(msgSize);
+	DEFER([&] { free(S); });
 	int const n = snprintf(S, msgSize, "%s - %s (%i: %s)", Description,
 			       Function, errsv, strerror(errsv));
 	if (n > -1 && ((unsigned int) n) < msgSize);
@@ -95,13 +99,10 @@ bool GlobalError::InsertErrno(MsgType type, const char* Function,
 			msgSize = n + 1;
 		else
 			msgSize *= 2;
-		free(S);
 		return true;
 	}
 
-	bool const geins = Insert(type, S, args, msgSize);
-	free(S);
-	return geins;
+	return Insert(type, S, args, msgSize);
 }
 									/*}}}*/
 // GlobalError::Fatal, Error, Warning, Notice and Debug - Add to the list/*{{{*/
@@ -121,6 +122,7 @@ GEMessage(Fatal, FATAL)
 GEMessage(Error, ERROR)
 GEMessage(Warning, WARNING)
 GEMessage(Notice, NOTICE)
+GEMessage(Audit, AUDIT)
 GEMessage(Debug, DEBUG)
 #undef GEMessage
 									/*}}}*/
@@ -142,6 +144,7 @@ bool GlobalError::Insert(MsgType const &type, const char *Description,...)
 bool GlobalError::Insert(MsgType type, const char* Description,
 			 va_list &args, size_t &msgSize) {
 	char* S = (char*) malloc(msgSize);
+	DEFER([&] { free(S); });
 	int const n = vsnprintf(S, msgSize, Description, args);
 	if (n > -1 && ((unsigned int) n) < msgSize);
 	else {
@@ -149,7 +152,6 @@ bool GlobalError::Insert(MsgType type, const char* Description,
 			msgSize = n + 1;
 		else
 			msgSize *= 2;
- 		free(S);
 		return true;
 	}
 
@@ -162,7 +164,6 @@ bool GlobalError::Insert(MsgType type, const char* Description,
 	if (type == FATAL || type == DEBUG)
 		std::clog << m << std::endl;
 
-	free(S);
 	return false;
 }
 									/*}}}*/
@@ -252,11 +253,13 @@ void GlobalError::MergeWithStack() {
 APT_HIDDEN std::ostream &operator<<(std::ostream &out, GlobalError::Item i)
 {
    static constexpr auto COLOR_RESET = "\033[0m";
-   static constexpr auto COLOR_NOTICE = "\033[33m";  // normal yellow
+   static constexpr auto COLOR_BOLD = "\033[1m";   // bold neutral
+   static constexpr auto COLOR_NOTICE = "\033[1m";   // bold neutral
    static constexpr auto COLOR_WARN = "\033[1;33m";  // bold yellow
    static constexpr auto COLOR_ERROR = "\033[1;31m"; // bold red
 
    bool use_color = _config->FindB("APT::Color", false);
+   auto out_ver = _config->FindI("APT::Output-Version");
 
    if (use_color)
    {
@@ -270,6 +273,7 @@ APT_HIDDEN std::ostream &operator<<(std::ostream &out, GlobalError::Item i)
 	 out << COLOR_WARN;
 	 break;
       case GlobalError::NOTICE:
+      case GlobalError::AUDIT:
 	 out << COLOR_NOTICE;
 	 break;
       default:
@@ -281,19 +285,26 @@ APT_HIDDEN std::ostream &operator<<(std::ostream &out, GlobalError::Item i)
    {
    case GlobalError::FATAL:
    case GlobalError::ERROR:
-      out << 'E';
+      // TRANSLATOR: This is a warning level displayed before the message
+      out << (out_ver < 30 ? "E:" : _("Error:"));
       break;
    case GlobalError::WARNING:
-      out << 'W';
+      // TRANSLATOR: This is a warning level displayed before the message
+      out << (out_ver < 30 ? "W:" : _("Warning:"));
       break;
    case GlobalError::NOTICE:
-      out << 'N';
+      // TRANSLATOR: This is a warning level displayed before the message
+      out << (out_ver < 30 ? "N:" : _("Notice:"));
+      break;
+   case GlobalError::AUDIT:
+      out << (out_ver < 30 ? "A:" : _("Audit:"));
       break;
    case GlobalError::DEBUG:
-      out << 'D';
+      // TRANSLATOR: This is a warning level displayed before the message
+      out << _("Debug:");
       break;
    }
-   out << ": ";
+   out << " ";
 
    if (use_color)
    {
@@ -302,7 +313,12 @@ APT_HIDDEN std::ostream &operator<<(std::ostream &out, GlobalError::Item i)
       case GlobalError::FATAL:
       case GlobalError::ERROR:
       case GlobalError::WARNING:
+	 out << COLOR_RESET;
+	 if (out_ver >= 30)
+	    out << COLOR_BOLD;
+	 break;
       case GlobalError::NOTICE:
+      case GlobalError::AUDIT:
 	 out << COLOR_RESET;
 	 break;
       default:

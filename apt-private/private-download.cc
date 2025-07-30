@@ -197,7 +197,8 @@ bool DoDownload(CommandLine &CmdL)
       pkgAcquire::Item *I = new pkgAcqArchive(&Fetcher, SrcList, &Recs, *Ver, storefile[i]);
       if (storefile[i].empty())
 	 continue;
-      std::string const filename = cwd + flNotDir(storefile[i]);
+      auto filename = cwd;
+      filename += flNotDir(storefile[i]);
       storefile[i].assign(filename);
       I->DestFile.assign(filename);
    }
@@ -357,7 +358,7 @@ bool DoDistClean(CommandLine &)
  class LogCleaner : public pkgArchiveCleaner
 {
    protected:
-      virtual void Erase(int const dirfd, char const * const File, std::string const &Pkg, std::string const &Ver,struct stat const &St) APT_OVERRIDE
+      void Erase(int const dirfd, char const * const File, std::string const &Pkg, std::string const &Ver,struct stat const &St) override
       {
 	 c1out << "Del " << Pkg << " " << Ver << " [" << SizeToStr(St.st_size) << "B]" << std::endl;
 

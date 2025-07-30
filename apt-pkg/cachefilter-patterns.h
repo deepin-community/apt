@@ -12,13 +12,14 @@
 #include <apt-pkg/cachefilter.h>
 #include <apt-pkg/error.h>
 #include <apt-pkg/header-is-private.h>
-#include <apt-pkg/string_view.h>
 #include <apt-pkg/strutl.h>
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace APT
@@ -59,17 +60,17 @@ struct APT_PUBLIC PatternTreeParser
 
    struct PatternNode : public Node
    {
-      APT::StringView term;
+      std::string_view term;
       std::vector<std::unique_ptr<Node>> arguments;
       bool haveArgumentList = false;
 
       APT_HIDDEN std::ostream &render(std::ostream &stream) override;
-      APT_HIDDEN bool matches(APT::StringView name, int min, int max);
+      APT_HIDDEN bool matches(std::string_view name, int min, int max);
    };
 
    struct WordNode : public Node
    {
-      APT::StringView word;
+      std::string_view word;
       bool quoted = false;
       APT_HIDDEN std::ostream &render(std::ostream &stream) override;
    };
@@ -79,10 +80,26 @@ struct APT_PUBLIC PatternTreeParser
       size_t offset = 0;
    };
 
-   APT::StringView sentence;
+   /// \brief Zero-terminated wrapper for std::string_view
+   ///
+   /// The code peeks a character ahead and assumes the input is zero-terminated, but it may not be,
+   /// this class provides a peek-ahead character access in operator[] by returning 0 for [size()].
+   struct ZeroStringView : private std::string_view
+   {
+      explicit ZeroStringView(std::string_view s) : std::string_view(s) {}
+      char operator[](size_t i)
+      {
+	 assert(i <= size());
+	 if (likely(i < size()))
+	    return std::string_view::operator[](i);
+	 return '\0';
+      }
+      using std::string_view::size;
+      using std::string_view::substr;
+   } sentence;
    State state;
 
-   PatternTreeParser(APT::StringView sentence) : sentence(sentence){};
+   PatternTreeParser(std::string_view sentence) : sentence(sentence){};
    off_t skipSpace()
    {
       while (sentence[state.offset] == ' ' || sentence[state.offset] == '\t' || sentence[state.offset] == '\r' || sentence[state.offset] == '\n')
@@ -132,7 +149,7 @@ using namespace APT::CacheFilter;
 /** \brief Basic helper class for matching regex */
 class BaseRegexMatcher
 {
-   regex_t *pattern;
+   std::optional<regex_t> pattern;
 
    public:
    BaseRegexMatcher(std::string const &string);
@@ -232,11 +249,8 @@ struct APT_HIDDEN PackageIsObsolete : public PackageMatcher
       // if so return false
       for (auto ver = pkg.VersionList(); !ver.end(); ver++)
       {
-	 for (auto file = ver.FileList(); !file.end(); file++)
-	 {
-	    if ((file.File()->Flags & pkgCache::Flag::NotSource) == 0)
-	       return false;
-	 }
+	 if (ver.Downloadable())
+	    return false;
       }
 
       return true;
@@ -460,12 +474,7 @@ struct APT_HIDDEN VersionIsPriority : public VersionAnyMatcher
    explicit VersionIsPriority(std::string name) : name(name) {}
    bool operator()(pkgCache::VerIterator const &Ver) override
    {
-      std::string Mapping[] = {"", "required","important","standard",
-                            "optional","extra"};
-      if (Ver->Priority > 0 && Ver->Priority < APT_ARRAY_SIZE(Mapping)) {
-         return name == Mapping[Ver->Priority];
-      }
-      return false;
+      return Ver->Priority > 0 && name == pkgCache::Priority_NoL10n(Ver->Priority);
    }
 };
 

@@ -7,16 +7,16 @@
 #include <iostream>
 
 #include "assert.h"
-#include <gtest/gtest.h>
+#include "common.h"
 
 class Stream : public pkgDirStream
 {
    public:
     int count;
     Stream () { count = 0; }
-    bool DoItem(Item &Itm,int &Fd) APT_OVERRIDE { (void)Itm; (void)Fd; count++; return true; }
-    bool Fail(Item &Itm,int Fd) APT_OVERRIDE { (void)Itm; (void)Fd; return true; }
-    bool FinishedFile(Item &Itm,int Fd) APT_OVERRIDE { (void)Itm; (void)Fd; return true; }
+    bool DoItem(Item &Itm,int &Fd) override { (void)Itm; (void)Fd; count++; return true; }
+    bool Fail(Item &Itm,int Fd) override { (void)Itm; (void)Fd; return true; }
+    bool FinishedFile(Item &Itm,int Fd) override { (void)Itm; (void)Fd; return true; }
     ~Stream() {}
 };
 

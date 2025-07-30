@@ -4,7 +4,7 @@
 #include <apt-pkg/configuration.h>
 #include <apt-pkg/hashes.h>
 #include <apt-private/acqprogress.h>
-#include <gtest/gtest.h>
+#include "common.h"
 #include <sstream>
 #include <string>
 
@@ -13,8 +13,8 @@ class TestItem: public pkgAcquire::Item
 public:
    explicit TestItem(pkgAcquire * const Acq) : pkgAcquire::Item(Acq) {}
 
-   virtual std::string DescURI() const APT_OVERRIDE { return ""; }
-   virtual HashStringList GetExpectedHashes() const APT_OVERRIDE { return HashStringList(); }
+   [[nodiscard]] std::string DescURI() const override { return ""; }
+   [[nodiscard]] HashStringList GetExpectedHashes() const override { return {}; }
 
 };
 

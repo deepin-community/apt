@@ -20,6 +20,7 @@
 #include <apt-pkg/prettyprinters.h>
 #include <apt-pkg/strutl.h>
 #include <apt-pkg/upgrade.h>
+#include <apt-pkg/version.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -27,7 +28,10 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <sstream>
 #include <vector>
+#include <langinfo.h>
+#include <sys/statvfs.h>
 
 #include <apt-private/acqprogress.h>
 #include <apt-private/private-cachefile.h>
@@ -42,7 +46,7 @@
 									/*}}}*/
 class pkgSourceList;
 
-bool CheckNothingBroken(CacheFile &Cache)				/*{{{*/
+static bool CheckNothingBroken(std::ostream &out, CacheFile &Cache) /*{{{*/
 {
    // Now we check the state of the packages,
    if (Cache->BrokenCount() == 0)
@@ -52,11 +56,11 @@ bool CheckNothingBroken(CacheFile &Cache)				/*{{{*/
    if (_error->PendingError() && _config->Find("APT::Solver") == "dump")
       return false;
 
-   c1out <<
-      _("Some packages could not be installed. This may mean that you have\n"
+   out << _("Some packages could not be installed. This may mean that you have\n"
 	    "requested an impossible situation or if you are using the unstable\n"
 	    "distribution that some required packages have not yet been created\n"
-	    "or been moved out of Incoming.") << std::endl;
+	    "or been moved out of Incoming.")
+       << std::endl;
    /*
    if (Packages == 1)
    {
@@ -68,15 +72,82 @@ bool CheckNothingBroken(CacheFile &Cache)				/*{{{*/
    }
    */
 
-   c1out << _("The following information may help to resolve the situation:") << std::endl;
-   c1out << std::endl;
-   ShowBroken(c1out,Cache,false);
+   out << _("The following information may help to resolve the situation:") << std::endl;
+   out << std::endl;
+   ShowBroken(out, Cache, false);
    if (_error->PendingError() == true)
       return false;
    else
       return _error->Error(_("Broken packages"));
 }
+bool CheckNothingBroken(CacheFile &Cache)
+{
+   return CheckNothingBroken(c1out, Cache);
+}
 									/*}}}*/
+// WriteApportReport - Write an apport bug report	 		/*{{{*/
+// ---------------------------------------------------------------------
+static void WriteApportReport(pkgCacheFile &Cache, std::string &title, std::vector<std::string> const &errors, int mode, bool distUpgrade)
+{
+   auto dumpfile = flCombine(_config->FindDir("Dir::Log"), "edsp.log.zst");
+   auto crashfile = flCombine(_config->FindDir("Dir::Apport", "/var/crash"), "apt-edsp." + std::to_string(getuid()) + ".crash");
+   auto apt = Cache->FindPkg("apt");
+   if (access(flNotFile(dumpfile).c_str(), W_OK) != 0 || access(flNotFile(crashfile).c_str(), W_OK) != 0)
+      return;
+   OpTextProgress Progress(*_config);
+   Progress.OverallProgress(0, 100, 50, _("Writing error report"));
+   FileFd edspDump(dumpfile,
+		   FileFd::Exclusive | FileFd::Create | FileFd::WriteOnly | FileFd::BufferedWrite,
+		   FileFd::Extension);
+   int edspFlags = 0;
+   if (mode || distUpgrade)
+      edspFlags |= EDSP::Request::UPGRADE_ALL;
+   if (mode & APT::Upgrade::FORBID_REMOVE_PACKAGES)
+      edspFlags |= EDSP::Request::FORBID_REMOVE;
+   if (mode & APT::Upgrade::FORBID_INSTALL_NEW_PACKAGES)
+      edspFlags |= EDSP::Request::FORBID_NEW_INSTALL;
+
+   EDSP::WriteRequest(Cache, edspDump, edspFlags, &Progress);
+   EDSP::WriteLimitedScenario(Cache, edspDump, &Progress);
+   edspDump.Close();
+
+   Progress.OverallProgress(50, 100, 50, _("Writing error report"));
+
+   std::ofstream crash(crashfile, std::ios::out | std::ios::trunc);
+   chmod(crashfile.c_str(), 0600);
+   time_t now = time(NULL);
+   char ctime_buf[26]; // need at least 26 bytes according to ctime(3)
+   crash << "ProblemType: AptSolver\n"
+	 << "Architecture: " << _config->Find("APT::Architecture") << "\n"
+	 << "Date: " << ctime_r(&now, ctime_buf)
+	 << "Package: apt " << (apt.end() || apt.CurrentVer().end() ? "" : apt.CurrentVer().VerStr()) << "\n"
+	 << "Title: " << title << "\n"
+	 << "SourcePackage: apt\n";
+
+   if (not errors.empty())
+   {
+      crash << "ErrorMessage:\n";
+      for (auto &error : errors)
+      {
+	 crash << " " << SubstVar(SubstVar(APT::String::Strip(error), "\n\n", "\n.\n"), "\n", "\n ") << "\n";
+      }
+   }
+
+   std::ifstream toCopy(edspDump.Name());
+   std::ostringstream readStream;
+   readStream << toCopy.rdbuf();
+   const auto base64 = Base64Encode(readStream.str());
+   if (not base64.empty())
+   {
+      crash << "AptSolverDump:\n";
+      // Print the base64, with line wrapping, indented by one space; substr(i, 76)
+      // returns at most 76 characters or as many as are left.
+      for (size_t i=0; i < base64.size(); i += 76)
+	 crash << " " << std::string_view{base64}.substr(i, 76) << "\n";
+   }
+   crash.close();
+}
+
 // InstallPackages - Actually download and install the packages		/*{{{*/
 // ---------------------------------------------------------------------
 /* This displays the informative messages describing what is going to 
@@ -139,8 +210,10 @@ struct WarnUsrMerge {
    }
 };
 #endif
+static void ShowWeakDependencies(CacheFile &Cache);
 bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, bool ShwKept, bool Ask, bool Safety, std::string const &Hook, CommandLine const &CmdL)
 {
+   auto outVer = _config->FindI("APT::Output-Version");
 #ifdef REQUIRE_MERGED_USR
    WarnUsrMerge warnUsrMerge(Cache);
 #endif
@@ -203,38 +276,46 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	    std::swap(NewHeldBackPackages, HeldBackPackages);
 	 }
 	 else
-	    return _error->Error(_("Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"));
+	    return _error->Error(_("Unable to fetch some archives, maybe run apt update or try with --fix-missing?"));
       }
       Fetcher.Shutdown();
       if (_error->PendingError() == true)
 	 return false;
    }
 
-   APT::PackageVector PhasingPackages;
-   APT::PackageVector NotPhasingHeldBackPackages;
-   for (auto const &Pkg : HeldBackPackages)
-   {
-      if (Cache->PhasingApplied(Pkg))
-	 PhasingPackages.push_back(Pkg);
-      else
-	 NotPhasingHeldBackPackages.push_back(Pkg);
-   }
-
    // Show all the various warning indicators
-   ShowDel(c1out,Cache);
+   if (_config->FindI("APT::Output-Version") < 30)
+      ShowDel(c1out,Cache);
+   if (_config->FindI("APT::Output-Version") >= 30 && _config->FindB("APT::Get::Show-Upgraded",true) == true)
+      ShowUpgraded(c1out,Cache);
    ShowNew(c1out,Cache);
+   if (_config->FindI("APT::Output-Version") >= 30)
+      ShowWeakDependencies(Cache);
    if (ShwKept == true)
    {
+      APT::PackageVector PhasingPackages;
+      APT::PackageVector NotPhasingHeldBackPackages;
+      for (auto const &Pkg : HeldBackPackages)
+      {
+	 if (Cache->PhasingApplied(Pkg))
+	    PhasingPackages.push_back(Pkg);
+	 else
+	    NotPhasingHeldBackPackages.push_back(Pkg);
+      }
+
       ShowPhasing(c1out, Cache, PhasingPackages);
       ShowKept(c1out, Cache, NotPhasingHeldBackPackages);
       if (not PhasingPackages.empty() && not NotPhasingHeldBackPackages.empty())
 	 _error->Notice("Some packages may have been kept back due to phasing.");
    }
    bool const Hold = not ShowHold(c1out,Cache);
-   if (_config->FindB("APT::Get::Show-Upgraded",true) == true)
+   if (_config->FindI("APT::Output-Version") < 30 && _config->FindB("APT::Get::Show-Upgraded",true) == true)
       ShowUpgraded(c1out,Cache);
    bool const Downgrade = !ShowDowngraded(c1out,Cache);
 
+   // Show removed packages last
+   if (_config->FindI("APT::Output-Version") >= 30)
+      ShowDel(c1out,Cache);
    bool Essential = false;
    if (_config->FindB("APT::Get::Download-Only",false) == false)
         Essential = !ShowEssential(c1out,Cache);
@@ -312,27 +393,88 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
       if (DebBytes != FetchBytes)
 	 //TRANSLATOR: The required space between number and unit is already included
 	 // in the replacement strings, so %sB will be correctly translate in e.g. 1,5 MB
-	 ioprintf(c1out,_("Need to get %sB/%sB of archives.\n"),
+	 ioprintf(c1out,outVer < 30 ? _("Need to get %sB/%sB of archives.\n") : _("  Download size: %sB / %sB\n"),
 	       SizeToStr(FetchBytes).c_str(),SizeToStr(DebBytes).c_str());
       else if (DebBytes != 0)
 	 //TRANSLATOR: The required space between number and unit is already included
 	 // in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
-	 ioprintf(c1out,_("Need to get %sB of archives.\n"),
+	 ioprintf(c1out,outVer < 30 ? _("Need to get %sB of archives.\n") : _("  Download size: %sB\n"),
 	       SizeToStr(DebBytes).c_str());
    }
 
    // Size delta
    if (Cache->UsrSize() >= 0)
+   {
       //TRANSLATOR: The required space between number and unit is already included
       // in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
-      ioprintf(c1out,_("After this operation, %sB of additional disk space will be used.\n"),
-	       SizeToStr(Cache->UsrSize()).c_str());
+      if (outVer < 30)
+	 ioprintf(c1out, _("After this operation, %sB of additional disk space will be used.\n"),
+		  SizeToStr(Cache->UsrSize()).c_str());
+      else
+      {
+	 struct statvfs st;
+	 if (statvfs(_config->FindDir("Dir::Usr").c_str(), &st) == 0)
+	 {
+	    struct statvfs st_boot;
+	    unsigned long long BootSize = 0;
+	    unsigned long long InitrdSize = 0;
+	    if (statvfs(_config->FindDir("Dir::Boot").c_str(), &st_boot) == 0 && st_boot.f_fsid != st.f_fsid)
+	       BootSize = Cache->BootSize(false);
+	    else
+	       InitrdSize = Cache->BootSize(true); /* initrd only, adding to /usr space */
+
+	    ioprintf(c1out, "  ");
+	    // TRANSLATOR: The required space between number and unit is already included
+	    //  in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+	    ioprintf(c1out, _("Space needed: %sB / %sB available\n"),
+		     SizeToStr(Cache->UsrSize() + InitrdSize).c_str(), SizeToStr((st.f_bsize * st.f_bavail)).c_str());
+
+	    if (Cache->UsrSize() > 0 && static_cast<unsigned long long>(Cache->UsrSize()) > (st.f_bsize * st.f_bavail))
+	    {
+	       // TRANSLATOR: The required space between number and unit is already included
+	       //  in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+	       _error->Warning(_("More space needed than available: %sB > %sB, installation may fail"),
+			       SizeToStr(Cache->UsrSize()).c_str(),
+			       SizeToStr((st.f_bsize * st.f_bavail)).c_str());
+	    }
+	    if (BootSize != 0)
+	    {
+	       bool Unicode = strcmp(nl_langinfo(CODESET), "UTF-8") == 0;
+	       ioprintf(c1out,   Unicode ? "  └─ " : "   - ");
+	       // TRANSLATOR: The required space between number and unit is already included
+	       //  in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB -
+	       //  The first %s is the location of the boot directory (determined from Dir::Boot),
+	       //  and it tells the space being needed there.
+	       //  (We have two spaces to align with parent "space needed:"for /boot)
+	       ioprintf(c1out, _("in %s:  %sB / %sB available\n"),
+			_config->FindFile("Dir::Boot").c_str(), SizeToStr(BootSize).c_str(), SizeToStr((st_boot.f_bsize * st_boot.f_bavail)).c_str());
+	       if (BootSize > (st_boot.f_bsize * st_boot.f_bavail))
+		  // TRANSLATOR: The required space between number and unit is already included
+		  //  in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+		  //  The first %s is the location of the boot directory (determined from Dir::Boot)
+		  _error->Warning(_("More space needed in %s than available: %sB > %sB, installation may fail"),
+				  _config->FindFile("Dir::Boot").c_str(),
+				  SizeToStr(BootSize).c_str(),
+				  SizeToStr((st_boot.f_bsize * st_boot.f_bavail)).c_str());
+	    }
+	 }
+	 else
+	 {
+	    // TRANSLATOR: The required space between number and unit is already included
+	    //  in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
+	    ioprintf(c1out, "  ");
+	    ioprintf(c1out, _("Space needed: %sB\n"), SizeToStr(Cache->UsrSize()).c_str());
+	 }
+      }
+   }
    else
       //TRANSLATOR: The required space between number and unit is already included
       // in the replacement string, so %sB will be correctly translate in e.g. 1,5 MB
-      ioprintf(c1out,_("After this operation, %sB disk space will be freed.\n"),
+      ioprintf(c1out,outVer < 30 ? _("After this operation, %sB disk space will be freed.\n") : _("  Freed space: %sB\n"),
 	       SizeToStr(-1*Cache->UsrSize()).c_str());
 
+   if (outVer >= 30)
+      ioprintf(c1out,"\n");
    if (DownloadAllowed)
       if (CheckFreeSpaceBeforeDownload(_config->FindDir("Dir::Cache::Archives"), (FetchBytes - FetchPBytes)) == false)
 	 return false;
@@ -368,65 +510,12 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	 if (_config->FindI("quiet",0) < 2 &&
 	     _config->FindB("APT::Get::Assume-Yes",false) == false)
 	 {
-      std::vector<std::string> dangerousPackages;
-      if (_config->FindB("APT::Get::AutomaticRemove", false))
-      {
-         // Define the list of dangerous package name prefixes
-         const char* dangerousPrefixes[] = {
-            "deepin-", "dde-", "linux-headers-", "linux-image-", 
-            "systemd", "xserver-", "nvidia-", "mesa-"
-         };
-         const size_t prefixCount = sizeof(dangerousPrefixes) / sizeof(dangerousPrefixes[0]);
-
-         for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
-         {
-            if (!Cache[Pkg].Delete()) 
-                continue;  // Only check packages marked for deletion
-
-            const char* pkgName = Pkg.Name();
-            for (size_t i = 0; i < prefixCount; ++i)
-            {
-                // Check if the package name prefix matches the dangerous list
-                if (strncmp(pkgName, dangerousPrefixes[i], strlen(dangerousPrefixes[i])) == 0)
-                {
-                    dangerousPackages.push_back(pkgName);
-                    break;
-                }
-            }
-         }
-      }
-
-      if (!dangerousPackages.empty())
-      {
-         std::string text = _("The current uninstallation operation involves system-critical packages. Continuing may cause system instability.");
-         text += "\n";
-         text += _("The following are critical system packages:");
-         text += "\n";
-         
-         for (const auto& pkg : dangerousPackages) {
-             text += "  • ";
-             text += pkg;
-             text += "\n";
-         }
-         
-         text += _("Do you want to continue?");
-         
-         std::string formattedPrompt = "\033[31m";
-         formattedPrompt += text;
-         formattedPrompt += "\033[0m";
-         if (YnPrompt(formattedPrompt.c_str()) == false)
-         {
-            c2out << _("Abort.") << std::endl;
-            exit(1);
-         }
-      }
-      else
-      {
-         if (YnPrompt(_("Do you want to continue?")) == false)
-         {
-            c2out << _("Abort.") << std::endl;
-            exit(1);
-         }
+	    // YnPrompt shows all warnings before prompting, so ask stronger and default to N if we have any.
+	    auto Default = outVer < 30 ? true : _error->empty();
+	    if (not YnPrompt(outVer < 30 ? _("Do you want to continue?") : (Default ? _("Continue?") : _("Continue anyway?")), Default))
+	    {
+	       c2out << _("Abort.") << std::endl;
+	       exit(1);
 	    }
 	 }
       }
@@ -457,7 +546,7 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
       }
 
       if (Failed == true && _config->FindB("APT::Get::Fix-Missing",false) == false)
-	 return _error->Error(_("Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"));
+	 return _error->Error(_("Unable to fetch some archives, maybe run apt update or try with --fix-missing?"));
 
       if (Transient == true && Failed == true)
 	 return _error->Error(_("--fix-missing and media swapping is not currently supported"));
@@ -600,12 +689,14 @@ bool DoAutomaticRemove(CacheFile &Cache)
 	 for (APT::PackageSet::iterator Pkg = tooMuch.begin();
 	      Pkg != tooMuch.end(); ++Pkg)
 	 {
-	    APT::PackageSet too;
-	    too.insert(*Pkg);
-	    for (pkgCache::PrvIterator Prv = Cache[Pkg].CandidateVerIter(Cache).ProvidesList();
-		 Prv.end() == false; ++Prv)
-	       too.insert(Prv.ParentPkg());
-	    for (APT::PackageSet::const_iterator P = too.begin(); P != too.end(); ++P)
+	    auto const PkgCand = Cache[Pkg].CandidateVerIter(Cache);
+	    if (unlikely(PkgCand.end()))
+	       continue;
+	    std::vector<std::pair<pkgCache::PkgIterator, char const *>> too;
+	    too.emplace_back(*Pkg, PkgCand.VerStr());
+	    for (pkgCache::PrvIterator Prv = PkgCand.ProvidesList(); not Prv.end(); ++Prv)
+	       too.emplace_back(Prv.ParentPkg(), Prv.ProvideVersion());
+	    for (auto const &[P, PVerStr] : too)
 	    {
 	       for (pkgCache::DepIterator R = P.RevDependsList();
 		    R.end() == false; ++R)
@@ -630,6 +721,29 @@ bool DoAutomaticRemove(CacheFile &Cache)
 		 }
 		 else // ignore dependency from a non-candidate version
 		    continue;
+		 if (R->Version != 0)
+		 {
+		    if (not Cache->VS().CheckDep(PVerStr, R->CompareOp, R.TargetVer()))
+		       continue;
+		 }
+		 // ignore new providers if we have installed providers
+		 if (Pkg->CurrentVer == 0)
+		 {
+		    std::unique_ptr<pkgCache::Version *[]> VList(R.AllTargets());
+		    bool has_installed_alt_prov = false;
+		    for (pkgCache::Version **V = VList.get(); *V != 0; ++V)
+		    {
+		       pkgCache::VerIterator Ver(Cache, *V);
+		       auto const P = Ver.ParentPkg();
+		       if (not P.end() && P->CurrentVer != 0 && Cache[P].InstallVer == *V)
+		       {
+			  has_installed_alt_prov = true;
+			  break;
+		       }
+		    }
+		    if (has_installed_alt_prov)
+		       continue;
+		 }
 		 if (Debug == true)
 		    std::clog << "Save " << APT::PrettyPkg(Cache, Pkg) << " as another installed package depends on it: " << APT::PrettyPkg(Cache, RP) << std::endl;
 		 Cache->MarkInstall(Pkg, false, 0, false);
@@ -664,6 +778,16 @@ bool DoAutomaticRemove(CacheFile &Cache)
    // if we don't remove them, we should show them!
    if (doAutoRemove == false && autoRemoveCount != 0)
    {
+      std::string note;
+      std::string autocmd = "apt autoremove";
+      if (getenv("SUDO_USER") != nullptr)
+      {
+	 auto const envsudocmd = getenv("SUDO_COMMAND");
+	 auto const envshell = getenv("SHELL");
+	 if (envsudocmd == nullptr || envshell == nullptr || strcmp(envsudocmd, envshell) != 0)
+	    autocmd = "sudo " + autocmd;
+      }
+      strprintf(note, P_("Use '%s' to remove it.", "Use '%s' to remove them.", autoRemoveCount), autocmd.c_str());
       if (smallList == false)
       {
 	 // trigger marking now so that the package list is correct
@@ -673,21 +797,14 @@ bool DoAutomaticRemove(CacheFile &Cache)
 	          "The following packages were automatically installed and are no longer required:",
 	          autoRemoveCount), Universe,
 	       [&Cache](pkgCache::PkgIterator const &Pkg) { return (*Cache)[Pkg].Garbage == true && (*Cache)[Pkg].Delete() == false; },
-	       &PrettyFullName, CandidateVersion(&Cache));
+	       &PrettyFullName, CurrentVersion(&Cache), "", note);
       }
       else
+      {
 	 ioprintf(c1out, P_("%lu package was automatically installed and is no longer required.\n",
 	          "%lu packages were automatically installed and are no longer required.\n", autoRemoveCount), autoRemoveCount);
-      std::string autocmd = "apt autoremove";
-      if (getenv("SUDO_USER") != nullptr)
-      {
-	 auto const envsudocmd = getenv("SUDO_COMMAND");
-	 auto const envshell = getenv("SHELL");
-	 if (envsudocmd == nullptr || envshell == nullptr || strcmp(envsudocmd, envshell) != 0)
-	    autocmd = "sudo " + autocmd;
+	 c1out << note << std::endl;
       }
-      ioprintf(c1out, P_("Use '%s' to remove it.", "Use '%s' to remove them.", autoRemoveCount), autocmd.c_str());
-      c1out << std::endl;
    }
    return true;
 }
@@ -787,85 +904,176 @@ bool DoCacheManipulationFromCommandLine(CommandLine &CmdL, std::vector<PseudoPkg
   TryToInstall InstallAction(Cache, Fix.get(), BrokenFix);
   TryToRemove RemoveAction(Cache, Fix.get());
   APT::PackageSet UpgradablePackages;
+  bool const distUpgradeMode = strcmp(CmdL.FileList[0], "dist-upgrade") == 0 || strcmp(CmdL.FileList[0], "full-upgrade") == 0;
 
-   {
-      unsigned short const order[] = { MOD_REMOVE, MOD_INSTALL, 0 };
+  {
+     unsigned short const order[] = {MOD_REMOVE, MOD_INSTALL, 0};
 
-      for (unsigned short i = 0; order[i] != 0; ++i)
-      {
-	 if (order[i] == MOD_INSTALL)
-	    InstallAction = std::for_each(verset[MOD_INSTALL].begin(), verset[MOD_INSTALL].end(), InstallAction);
-	 else if (order[i] == MOD_REMOVE)
-	    RemoveAction = std::for_each(verset[MOD_REMOVE].begin(), verset[MOD_REMOVE].end(), RemoveAction);
-      }
+     for (unsigned short i = 0; order[i] != 0; ++i)
+     {
+	if (order[i] == MOD_INSTALL)
+	   InstallAction = std::for_each(verset[MOD_INSTALL].begin(), verset[MOD_INSTALL].end(), InstallAction);
+	else if (order[i] == MOD_REMOVE)
+	   RemoveAction = std::for_each(verset[MOD_REMOVE].begin(), verset[MOD_REMOVE].end(), RemoveAction);
+     }
 
-      {
-	 APT::CacheSetHelper helper;
-	 helper.PackageFrom(APT::CacheSetHelper::PATTERN, &UpgradablePackages, Cache, "?upgradable");
-      }
+     {
+	APT::CacheSetHelper helper;
+	helper.PackageFrom(APT::CacheSetHelper::PATTERN, &UpgradablePackages, Cache, "?upgradable");
+     }
 
-      if (Fix != NULL && _config->FindB("APT::Get::AutoSolving", true) == true)
-      {
-	 InstallAction.propagateReleaseCandidateSwitching(helper.selectedByRelease, c0out);
-	 InstallAction.doAutoInstall();
-      }
+     // Record the state before we call the solver.
+     pkgDepCache::Transaction transaction(Cache, pkgDepCache::Transaction::Behavior::COMMIT);
+     auto runTheSolver = [&](std::ostream &out) -> bool
+     {
+	if (Fix != NULL && _config->FindB("APT::Get::AutoSolving", true) == true)
+	{
+	   InstallAction.propagateReleaseCandidateSwitching(helper.selectedByRelease, c0out);
+	   InstallAction.doAutoInstall();
+	}
 
-      if (_error->PendingError() == true)
-      {
-	 return false;
-      }
+	if (_error->PendingError() == true)
+	{
+	   return false;
+	}
 
-      /* If we are in the Broken fixing mode we do not attempt to fix the
-	 problems. This is if the user invoked install without -f and gave
-	 packages */
-      if (BrokenFix == true && Cache->BrokenCount() != 0)
-      {
-	 c1out << _("You might want to run 'apt --fix-broken install' to correct these.") << std::endl;
-	 ShowBroken(c1out,Cache,false);
-	 return _error->Error(_("Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution)."));
-      }
+	/* If we are in the Broken fixing mode we do not attempt to fix the
+	   problems. This is if the user invoked install without -f and gave
+	   packages */
+	if (BrokenFix == true && Cache->BrokenCount() != 0)
+	{
+	   out << _("You might want to run 'apt --fix-broken install' to correct these.") << std::endl;
+	   ShowBroken(out, Cache, false);
+	   return _error->Error(_("Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution)."));
+	}
 
-      if (Fix != NULL)
-      {
-	 // Call the scored problem resolver
-	 OpTextProgress Progress(*_config);
-	 bool const distUpgradeMode = strcmp(CmdL.FileList[0], "dist-upgrade") == 0 || strcmp(CmdL.FileList[0], "full-upgrade") == 0;
+	if (Fix != NULL)
+	{
+	   // Call the scored problem resolver
+	   OpTextProgress Progress(*_config);
 
-	 if (distUpgradeMode && _config->Find("Binary") == "apt")
-	    _config->CndSet("APT::Get::AutomaticRemove::Kernels", _config->FindB("APT::Get::AutomaticRemove", true));
+	   if (distUpgradeMode && _config->Find("Binary") == "apt")
+	      _config->CndSet("APT::Get::AutomaticRemove::Kernels", _config->FindB("APT::Get::AutomaticRemove", true));
 
-	 bool resolver_fail = false;
-	 if (distUpgradeMode == true || UpgradeMode != APT::Upgrade::ALLOW_EVERYTHING)
-	    resolver_fail = APT::Upgrade::Upgrade(Cache, UpgradeMode, &Progress);
-	 else
-	    resolver_fail = Fix->Resolve(true, &Progress);
+	   bool resolver_fail = false;
+	   if (distUpgradeMode == true || UpgradeMode != APT::Upgrade::ALLOW_EVERYTHING)
+	      resolver_fail = APT::Upgrade::Upgrade(Cache, UpgradeMode, &Progress);
+	   else
+	      resolver_fail = Fix->Resolve(true, &Progress);
 
-	 if (resolver_fail == false && Cache->BrokenCount() == 0)
-	    return false;
-      }
+	   if (resolver_fail == false && Cache->BrokenCount() == 0)
+	      return false;
+	}
 
-      if (CheckNothingBroken(Cache) == false)
-	 return false;
-   }
-   if (!DoAutomaticRemove(Cache)) 
-      return false;
+	if (CheckNothingBroken(out, Cache) == false)
+	   return false;
 
-   // if nothing changed in the cache, but only the automark information
-   // we write the StateFile here, otherwise it will be written in 
-   // cache.commit()
-   if (InstallAction.AutoMarkChanged > 0 &&
-       Cache->DelCount() == 0 && Cache->InstCount() == 0 &&
-       Cache->BadCount() == 0 &&
-       _config->FindB("APT::Get::Simulate",false) == false)
-      Cache->writeStateFile(NULL);
+	return true;
+     };
 
-   SortedPackageUniverse Universe(Cache);
-   for (auto const &Pkg: Universe)
-      if (Pkg->CurrentVer != 0 && not Cache[Pkg].Upgrade() && not Cache[Pkg].Delete() &&
-	  UpgradablePackages.find(Pkg) != UpgradablePackages.end())
-	 HeldBackPackages.push_back(Pkg);
+     std::ostringstream out;
+     _error->PushToStack();
+     auto res = runTheSolver(out);
 
-   return true;
+     // 3.0 solver is a bit more strict and applies the rules to user provided arguments as well, so if you provide
+     // a removal request, but don't allow removals, it fails; or if you install something conflicting with an installed
+     // package during an `upgrade` run, that's the same problem. So if an upgrade restriction is set and we have
+     // arguments specified, don't try solver3.
+     auto invalidCombinations = UpgradeMode && (not verset[MOD_REMOVE].empty() || not verset[MOD_INSTALL].empty());
+     // Fallback to 3.0 if we don't get a result or apport is installed
+     if (not invalidCombinations && _config->Find("APT::Solver", "internal") == "internal" && (not res || (not Cache->FindPkg("apport").end() && Cache->FindPkg("apport")->CurrentVer)))
+     {
+	bool isUpgrade = distUpgradeMode || UpgradeMode != APT::Upgrade::ALLOW_EVERYTHING;
+	auto internalBroken = Cache->BrokenCount();
+	auto internalDel = Cache->DelCount();
+	auto internalInst = Cache->InstCount();
+	auto internalUpgrade = Cache->UpgradeCount();
+
+	// Create a nested transaction. When leaving this scope, we are back to the 'internal' result.
+	pkgDepCache::Transaction solver3(Cache, pkgDepCache::Transaction::Behavior::ROLLBACK);
+	transaction.temporaryRollback(); // Rollback to before internal solver made changes
+
+	std::vector<std::string> errors;
+	_error->PushToStack();
+	_config->Set("APT::Solver", "3.0");
+	_config->CndSet("APT::Solver::RemoveManual", "true"); // otherwise we are always "worse"
+	std::ofstream solver3out;			      // empty out stream...
+	bool solver3Res = runTheSolver(solver3out);
+
+	std::string str;
+	while (not _error->empty())
+	   if (_error->PopMessage(str))
+	      errors.push_back(str);
+	_config->Set("APT::Solver", "internal");
+	_error->RevertToStack();
+
+	// Cost factors to compare two solutions
+	auto solver3Cost = std::make_tuple(Cache->DelCount(), isUpgrade  ? -Cache->UpgradeCount() : 0, Cache->InstCount() - Cache->UpgradeCount(), Cache->UpgradeCount());
+	auto internalCost = std::make_tuple(internalDel, isUpgrade ? -internalUpgrade : 0, internalInst - internalUpgrade, internalUpgrade);
+
+	// An error summary for apport.
+	std::string error;
+	if (solver3Res && Cache->BrokenCount())
+	{
+	   error = "Internal error: The 3.0 solver produced a broken cache";
+	}
+	else if (not solver3Res || Cache->BrokenCount() || not errors.empty())
+	{
+	   if (res && not internalBroken)
+	      error = "Failure: The 3.0 solver did not find a result";
+	}
+	else if (not res)
+	{
+	   // Commit the changes from the 3.0 solver. This in turn commits the 3.0 transaction into the internal
+	   // transaction which sounds a bit awkward, but that's the way it goes: commit() is just delete the
+	   // transaction stage so it can't rollback.
+	   _error->Discard();
+	   _error->Audit(_("Result calculated by the 3.0 solver."));
+	   solver3.commit();
+	   res = true;
+	}
+	else if (solver3Cost > internalCost)
+	{
+	   error = "Failure: The 3.0 solver produced a worse result";
+	}
+
+	if (res && not error.empty() && not Cache->FindPkg("apport").end() && Cache->FindPkg("apport")->CurrentVer)
+	{
+	   pkgDepCache::Transaction dumpTransaction(Cache, pkgDepCache::Transaction::Behavior::ROLLBACK);
+	   transaction.temporaryRollback(); // Rollback to before internal solver made changes so we can dump the OG request
+	   WriteApportReport(Cache, error, errors, UpgradeMode, distUpgradeMode);
+	}
+
+	if (not res && not errors.empty() && not _config->FindB("quiet::NoSolver3Explanation", false))
+	   _error->Error("The following information from --solver 3.0 may provide additional context:\n%s", APT::String::Join(errors, "\n").c_str());
+     }
+     // If the 3.0 solver could not recover either, abort.
+     _error->MergeWithStack();
+     if (not res)
+     {
+	c1out << out.str() << std::flush;
+	return false;
+     }
+  }
+  if (!DoAutomaticRemove(Cache))
+     return false;
+
+  // if nothing changed in the cache, but only the automark information
+  // we write the StateFile here, otherwise it will be written in
+  // cache.commit()
+  if (InstallAction.AutoMarkChanged > 0 &&
+      Cache->DelCount() == 0 && Cache->InstCount() == 0 &&
+      Cache->BadCount() == 0 &&
+      _config->FindB("APT::Get::Simulate", false) == false)
+     Cache->writeStateFile(NULL);
+
+  SortedPackageUniverse Universe(Cache);
+  for (auto const &Pkg : Universe)
+     if (Pkg->CurrentVer != 0 && not Cache[Pkg].Upgrade() && not Cache[Pkg].Delete() &&
+	 UpgradablePackages.find(Pkg) != UpgradablePackages.end())
+	HeldBackPackages.push_back(Pkg);
+
+  return true;
 }
 									/*}}}*/
 bool AddVolatileSourceFile(pkgSourceList *const SL, PseudoPkg &&pkg, std::vector<PseudoPkg> &VolatileCmdL)/*{{{*/
@@ -937,7 +1145,7 @@ std::vector<PseudoPkg> GetAllPackagesAsPseudo(pkgSourceList *const SL, CommandLi
 std::vector<PseudoPkg> GetPseudoPackages(pkgSourceList *const SL, CommandLine &CmdL, bool (*Add)(pkgSourceList *const, PseudoPkg &&, std::vector<PseudoPkg> &), std::string const &pseudoArch)/*{{{*/
 {
    std::vector<PseudoPkg> VolatileCmdL;
-   std::remove_if(CmdL.FileList + 1, CmdL.FileList + 1 + CmdL.FileSize(), [&](char const *const I) {
+   (void)std::remove_if(CmdL.FileList + 1, CmdL.FileList + 1 + CmdL.FileSize(), [&](char const *const I) {
       return AddIfVolatile(SL, VolatileCmdL, Add, I, pseudoArch);
    });
    return VolatileCmdL;
@@ -958,6 +1166,99 @@ struct PkgIsExtraInstalled {
 	return std::find(verset->begin(), verset->end(), Cand) == verset->end();
    }
 };
+/* Print out a list of suggested and recommended packages */
+static void ShowWeakDependencies(CacheFile &Cache)
+{
+   std::list<std::string> Recommends, Suggests, SingleRecommends, SingleSuggests;
+   SortedPackageUniverse Universe(Cache);
+   for (auto const &Pkg: Universe)
+   {
+      /* Just look at the ones we want to install */
+      if ((*Cache)[Pkg].NewInstall() == false)
+	continue;
+
+      // get the recommends/suggests for the candidate ver
+      pkgCache::VerIterator CV = (*Cache)[Pkg].CandidateVerIter(*Cache);
+      for (pkgCache::DepIterator D = CV.DependsList(); D.end() == false; )
+      {
+	 pkgCache::DepIterator Start;
+	 pkgCache::DepIterator End;
+	 D.GlobOr(Start,End); // advances D
+	 if (Start->Type != pkgCache::Dep::Recommends && Start->Type != pkgCache::Dep::Suggests)
+	    continue;
+
+	 {
+	    // Skip if we already saw this
+	    std::string target;
+	    for (pkgCache::DepIterator I = Start; I != D; ++I)
+	    {
+	       if (target.empty() == false)
+		  target.append(" | ");
+	       target.append(I.TargetPkg().FullName(true));
+	    }
+	    std::list<std::string> &Type = Start->Type == pkgCache::Dep::Recommends ? SingleRecommends : SingleSuggests;
+	    if (std::find(Type.begin(), Type.end(), target) != Type.end())
+	       continue;
+	    Type.push_back(target);
+	 }
+
+	 std::list<std::string> OrList;
+	 bool foundInstalledInOrGroup = false;
+	 for (pkgCache::DepIterator I = Start; I != D; ++I)
+	 {
+	    {
+	       // satisfying package is installed and not marked for deletion
+	       APT::VersionList installed = APT::VersionList::FromDependency(Cache, I, APT::CacheSetHelper::INSTALLED);
+	       if (std::find_if(installed.begin(), installed.end(),
+			[&Cache](pkgCache::VerIterator const &Ver) { return Cache[Ver.ParentPkg()].Delete() == false; }) != installed.end())
+	       {
+		  foundInstalledInOrGroup = true;
+		  break;
+	       }
+	    }
+
+	    {
+	       // satisfying package is upgraded to/new install
+	       APT::VersionList upgrades = APT::VersionList::FromDependency(Cache, I, APT::CacheSetHelper::CANDIDATE);
+	       if (std::find_if(upgrades.begin(), upgrades.end(),
+			[&Cache](pkgCache::VerIterator const &Ver) { return Cache[Ver.ParentPkg()].Upgrade(); }) != upgrades.end())
+	       {
+		  foundInstalledInOrGroup = true;
+		  break;
+	       }
+	    }
+
+	    if (OrList.empty())
+	       OrList.push_back(I.TargetPkg().FullName(true));
+	    else
+	       OrList.push_back("| " + I.TargetPkg().FullName(true));
+	 }
+
+	 if(foundInstalledInOrGroup == false)
+	 {
+	    std::list<std::string> &Type = Start->Type == pkgCache::Dep::Recommends ? Recommends : Suggests;
+	    std::move(OrList.begin(), OrList.end(), std::back_inserter(Type));
+	 }
+      }
+   }
+   auto always_true = [](std::string const&) { return true; };
+   auto string_ident = [](std::string const&str) { return str; };
+   auto verbose_show_candidate =
+      [&Cache](std::string str)
+      {
+	 if (APT::String::Startswith(str, "| "))
+	    str.erase(0, 2);
+	 pkgCache::PkgIterator const Pkg = Cache->FindPkg(str);
+	 if (Pkg.end() == true)
+	    return "";
+	 return (*Cache)[Pkg].CandVersion;
+      };
+   ShowList(c1out,_("Suggested packages:"), Suggests,
+	 always_true, string_ident, verbose_show_candidate);
+   ShowList(c1out,_("Recommended packages:"), Recommends,
+	 always_true, string_ident, verbose_show_candidate);
+}
+
 bool DoInstall(CommandLine &CmdL)
 {
    CacheFile Cache;
@@ -988,101 +1289,14 @@ bool DoInstall(CommandLine &CmdL)
    /* Print out a list of packages that are going to be installed extra
       to what the user asked */
    SortedPackageUniverse Universe(Cache);
-   if (Cache->InstCount() != verset[MOD_INSTALL].size())
+   if (_config->FindI("APT::Output-Version") < 30 && Cache->InstCount() != verset[MOD_INSTALL].size())
       ShowList(c1out, _("The following additional packages will be installed:"), Universe,
 	    PkgIsExtraInstalled(&Cache, &verset[MOD_INSTALL]),
-	    &PrettyFullName, CandidateVersion(&Cache));
+	    &PrettyFullName, CandidateVersion(&Cache), "action::install-dependencies");
 
    /* Print out a list of suggested and recommended packages */
-   {
-      std::list<std::string> Recommends, Suggests, SingleRecommends, SingleSuggests;
-      for (auto const &Pkg: Universe)
-      {
-	 /* Just look at the ones we want to install */
-	 if ((*Cache)[Pkg].Install() == false)
-	   continue;
-
-	 // get the recommends/suggests for the candidate ver
-	 pkgCache::VerIterator CV = (*Cache)[Pkg].CandidateVerIter(*Cache);
-	 for (pkgCache::DepIterator D = CV.DependsList(); D.end() == false; )
-	 {
-	    pkgCache::DepIterator Start;
-	    pkgCache::DepIterator End;
-	    D.GlobOr(Start,End); // advances D
-	    if (Start->Type != pkgCache::Dep::Recommends && Start->Type != pkgCache::Dep::Suggests)
-	       continue;
-
-	    {
-	       // Skip if we already saw this
-	       std::string target;
-	       for (pkgCache::DepIterator I = Start; I != D; ++I)
-	       {
-		  if (target.empty() == false)
-		     target.append(" | ");
-		  target.append(I.TargetPkg().FullName(true));
-	       }
-	       std::list<std::string> &Type = Start->Type == pkgCache::Dep::Recommends ? SingleRecommends : SingleSuggests;
-	       if (std::find(Type.begin(), Type.end(), target) != Type.end())
-		  continue;
-	       Type.push_back(target);
-	    }
-
-	    std::list<std::string> OrList;
-	    bool foundInstalledInOrGroup = false;
-	    for (pkgCache::DepIterator I = Start; I != D; ++I)
-	    {
-	       {
-		  // satisfying package is installed and not marked for deletion
-		  APT::VersionList installed = APT::VersionList::FromDependency(Cache, I, APT::CacheSetHelper::INSTALLED);
-		  if (std::find_if(installed.begin(), installed.end(),
-			   [&Cache](pkgCache::VerIterator const &Ver) { return Cache[Ver.ParentPkg()].Delete() == false; }) != installed.end())
-		  {
-		     foundInstalledInOrGroup = true;
-		     break;
-		  }
-	       }
-
-	       {
-		  // satisfying package is upgraded to/new install
-		  APT::VersionList upgrades = APT::VersionList::FromDependency(Cache, I, APT::CacheSetHelper::CANDIDATE);
-		  if (std::find_if(upgrades.begin(), upgrades.end(),
-			   [&Cache](pkgCache::VerIterator const &Ver) { return Cache[Ver.ParentPkg()].Upgrade(); }) != upgrades.end())
-		  {
-		     foundInstalledInOrGroup = true;
-		     break;
-		  }
-	       }
-
-	       if (OrList.empty())
-		  OrList.push_back(I.TargetPkg().FullName(true));
-	       else
-		  OrList.push_back("| " + I.TargetPkg().FullName(true));
-	    }
-
-	    if(foundInstalledInOrGroup == false)
-	    {
-	       std::list<std::string> &Type = Start->Type == pkgCache::Dep::Recommends ? Recommends : Suggests;
-	       std::move(OrList.begin(), OrList.end(), std::back_inserter(Type));
-	    }
-	 }
-      }
-      auto always_true = [](std::string const&) { return true; };
-      auto string_ident = [](std::string const&str) { return str; };
-      auto verbose_show_candidate =
-	 [&Cache](std::string str)
-	 {
-	    if (APT::String::Startswith(str, "| "))
-	       str.erase(0, 2);
-	    pkgCache::PkgIterator const Pkg = Cache->FindPkg(str);
-	    if (Pkg.end() == true)
-	       return "";
-	    return (*Cache)[Pkg].CandVersion;
-	 };
-      ShowList(c1out,_("Suggested packages:"), Suggests,
-	    always_true, string_ident, verbose_show_candidate);
-      ShowList(c1out,_("Recommended packages:"), Recommends,
-	    always_true, string_ident, verbose_show_candidate);
-   }
+   if (_config->FindI("APT::Output-Version") < 30)
+      ShowWeakDependencies(Cache);
 
    RunJsonHook("AptCli::Hooks::Install", "org.debian.apt.hooks.install.pre-prompt", CmdL.FileList, Cache);
 

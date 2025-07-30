@@ -46,6 +46,7 @@ find_package(Iconv REQUIRED)
 find_package(Perl REQUIRED)
 
 find_program(TRIEHASH_EXECUTABLE NAMES triehash)
+find_program(SQV_EXECUTABLE NAMES sqv)
 
 if (NOT TRIEHASH_EXECUTABLE)
   message(FATAL_ERROR "Could not find triehash executable")
@@ -63,7 +64,7 @@ add_definitions(${LFS_DEFINITIONS})
 link_libraries(${LFS_LIBRARIES})
 
 # Set compiler flags
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
@@ -85,16 +86,14 @@ add_optional_compile_options(Wdouble-promotion)
 add_optional_compile_options(Wsuggest-override)
 add_optional_compile_options(Werror=suggest-override)
 add_optional_compile_options(Werror=return-type)
+add_optional_compile_options(Wp,-D_GLIBCXX_ASSERTIONS)
 # apt-ftparchive dependencies
 find_package(Berkeley REQUIRED)
 if (BERKELEY_FOUND)
   set(HAVE_BDB 1)
 endif()
 
-find_package(GnuTLS)
-if (GNUTLS_FOUND)
-  set(HAVE_GNUTLS 1)
-endif()
+find_package(OpenSSL REQUIRED)
 
 # (De)Compressor libraries
 find_package(ZLIB REQUIRED)
@@ -140,7 +139,6 @@ if (SECCOMP_FOUND)
   set(HAVE_SECCOMP 1)
 endif()
 
-find_package(GCRYPT REQUIRED)
 find_package(XXHASH REQUIRED)
 
 # Mount()ing and stat()ing and friends
@@ -206,22 +204,25 @@ endif()
 # Configure some variables like package, version and architecture.
 set(PACKAGE ${PROJECT_NAME})
 set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-set(PACKAGE_VERSION "2.8.0")
+set(PACKAGE_VERSION "3.1.3")
 string(REGEX MATCH "^[0-9.]+" PROJECT_VERSION ${PACKAGE_VERSION})
 
 if (NOT DEFINED DPKG_DATADIR)
   execute_process(COMMAND ${PERL_EXECUTABLE} -MDpkg -e "print $Dpkg::DATADIR;"
-                  OUTPUT_VARIABLE DPKG_DATADIR_CMD OUTPUT_STRIP_TRAILING_WHITESPACE)
+                  OUTPUT_VARIABLE DPKG_DATADIR_CMD OUTPUT_STRIP_TRAILING_WHITESPACE
+                  COMMAND_ERROR_IS_FATAL ANY)
   message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
   set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
 endif()
 if (NOT DEFINED COMMON_ARCH)
   execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE
+                  COMMAND_ERROR_IS_FATAL ANY)
 endif()
 if (NOT DEFINED ROOT_GROUP)
   execute_process(COMMAND id -gn root
-                  OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
+                  OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE
+                  COMMAND_ERROR_IS_FATAL ANY)
   message(STATUS "Found root group: ${ROOT_GROUP}")
 endif()
 set(ROOT_GROUP "${ROOT_GROUP}" CACHE STRING "Group of root (e.g.: wheel or root)")
@@ -234,6 +235,9 @@ set(CONF_DIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}/apt" CACHE PATH "Your /etc/apt")
 set(LIBEXEC_DIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}/apt" CACHE PATH "Your /usr/libexec/apt")
 set(BIN_DIR "${CMAKE_INSTALL_FULL_BINDIR}")
 
+# Setup the default pager and the environment
+set(DEFAULT_PAGER "pager" CACHE STRING "The default pager to use for commands that support it.")
+set(PAGER_ENV "LESS=FRSXMK\\nMORE=FRX\\nLV=-c" CACHE STRING "Environment to pass to the pager. One variable per line, with escaped newlines")
 
 # Configure our configuration headers (config.h and apti18n.h)
 configure_file(CMake/config.h.in ${PROJECT_BINARY_DIR}/include/config.h)
