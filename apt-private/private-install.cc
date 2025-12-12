@@ -369,47 +369,44 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	     _config->FindB("APT::Get::Assume-Yes",false) == false)
 	 {
       std::vector<std::string> dangerousPackages;
-      if (_config->FindB("APT::Get::AutomaticRemove", false))
+      // Get dangerous prefixes from configuration
+      std::vector<std::string> dangerousPrefixes = _config->FindVector("APT::Get::DangerousPrefixes");
+
+      // Also check for a dangerous prefixes whitelist
+      std::vector<std::string> dangerousWhitelist = _config->FindVector("APT::Get::DangerousPrefixes::Whitelist");
+
+      // Only check dangerous packages if dangerous prefixes are configured
+      if (!dangerousPrefixes.empty())
       {
-         // Get dangerous prefixes from configuration
-         std::vector<std::string> dangerousPrefixes = _config->FindVector("APT::Get::DangerousPrefixes");
-
-         // Also check for a dangerous prefixes whitelist
-         std::vector<std::string> dangerousWhitelist = _config->FindVector("APT::Get::DangerousPrefixes::Whitelist");
-
-         // Only check dangerous packages if dangerous prefixes are configured
-         if (!dangerousPrefixes.empty())
+         for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
          {
-            for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
+            if (!Cache[Pkg].Delete()) 
+                continue;  // Only check packages marked for deletion
+
+            const char* pkgName = Pkg.Name();
+            
+            // Check if package is in whitelist
+            bool isWhitelisted = false;
+            for (const auto& whitelistPkg : dangerousWhitelist)
             {
-               if (!Cache[Pkg].Delete()) 
-                   continue;  // Only check packages marked for deletion
-
-               const char* pkgName = Pkg.Name();
-               
-               // Check if package is in whitelist
-               bool isWhitelisted = false;
-               for (const auto& whitelistPkg : dangerousWhitelist)
+               if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
                {
-                  if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
-                  {
-                     isWhitelisted = true;
-                     break;
-                  }
+                  isWhitelisted = true;
+                  break;
                }
-               
-               if (isWhitelisted)
-                  continue;  // Skip whitelisted packages
+            }
+            
+            if (isWhitelisted)
+               continue;  // Skip whitelisted packages
 
-               // Check if the package name matches any dangerous prefix
-               for (const auto& prefix : dangerousPrefixes)
-               {
-                   if (strncmp(pkgName, prefix.c_str(), prefix.length()) == 0)
-                   {
-                       dangerousPackages.push_back(pkgName);
-                       break;
-                   }
-               }
+            // Check if the package name matches any dangerous prefix
+            for (const auto& prefix : dangerousPrefixes)
+            {
+                if (strncmp(pkgName, prefix.c_str(), prefix.length()) == 0)
+                {
+                    dangerousPackages.push_back(pkgName);
+                    break;
+                }
             }
          }
       }
@@ -445,7 +442,7 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
             c2out << _("Abort.") << std::endl;
             exit(1);
          }
-	    }
+      }
 	 }
       }
    }
