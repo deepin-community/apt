@@ -371,27 +371,41 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
       std::vector<std::string> dangerousPackages;
       if (_config->FindB("APT::Get::AutomaticRemove", false))
       {
-         // Define the list of dangerous package name prefixes
-         const char* dangerousPrefixes[] = {
-            "deepin-", "dde-", "linux-headers-", "linux-image-", 
-            "systemd", "xserver-", "nvidia-", "mesa-"
-         };
-         const size_t prefixCount = sizeof(dangerousPrefixes) / sizeof(dangerousPrefixes[0]);
-
+         // Get dangerous package prefixes from configuration
+         std::vector<std::string> dangerousPrefixes = _config->FindVector("APT::Get::DangerousPackagePrefixes");
+         
+         // Get whitelist packages from configuration
+         std::vector<std::string> whitelistPackages = _config->FindVector("APT::Get::DangerousPackageWhitelist");
+         
          for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
          {
             if (!Cache[Pkg].Delete()) 
                 continue;  // Only check packages marked for deletion
 
             const char* pkgName = Pkg.Name();
-            for (size_t i = 0; i < prefixCount; ++i)
+            
+            // Check if package is in whitelist
+            bool isWhitelisted = false;
+            for (const auto& whitelistPkg : whitelistPackages)
             {
-                // Check if the package name prefix matches the dangerous list
-                if (strncmp(pkgName, dangerousPrefixes[i], strlen(dangerousPrefixes[i])) == 0)
-                {
-                    dangerousPackages.push_back(pkgName);
-                    break;
-                }
+               if (whitelistPkg == pkgName)
+               {
+                  isWhitelisted = true;
+                  break;
+               }
+            }
+            
+            if (isWhitelisted)
+               continue;  // Skip whitelisted packages
+            
+            // Check if package name matches any dangerous prefix
+            for (const auto& prefix : dangerousPrefixes)
+            {
+               if (strncmp(pkgName, prefix.c_str(), prefix.length()) == 0)
+               {
+                  dangerousPackages.push_back(pkgName);
+                  break;
+               }
             }
          }
       }
@@ -427,7 +441,7 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
             c2out << _("Abort.") << std::endl;
             exit(1);
          }
-	    }
+      }
 	 }
       }
    }
