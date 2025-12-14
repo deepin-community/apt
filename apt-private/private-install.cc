@@ -385,19 +385,22 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 
             const char* pkgName = Pkg.Name();
             
-            // Check if package is in whitelist
-            bool isWhitelisted = false;
-            for (const auto& whitelistPkg : dangerousWhitelist)
+      // Check if package is in whitelist (only if whitelist is not empty)
+      if (!dangerousWhitelist.empty())
+      {
+         bool isWhitelisted = false;
+         for (const auto& whitelistPkg : dangerousWhitelist)
+         {
+            if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
             {
-               if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
-               {
-                  isWhitelisted = true;
-                  break;
-               }
+               isWhitelisted = true;
+               break;
             }
-            
-            if (isWhitelisted)
-               continue;  // Skip whitelisted packages
+         }
+         
+         if (isWhitelisted)
+            continue;  // Skip whitelisted packages
+      }
 
             // Check if the package name matches any dangerous prefix
             for (const auto& prefix : dangerousPrefixes)
