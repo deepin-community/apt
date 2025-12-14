@@ -1,3 +1,9 @@
+apt (2.8.0deepin6) unstable; urgency=medium
+
+  * add 01dangerous-packages.conf.
+
+ -- lichenggang <lichenggang@deepin.org>  Sun, 14 Dec 2025 18:26:37 +0800
+
 apt (2.8.0deepin5) unstable; urgency=medium
 
   * Apply patch from upstream:
