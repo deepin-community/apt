@@ -376,6 +376,8 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
       std::vector<std::string> dangerousWhitelist = _config->FindVector("APT::Get::DangerousPrefixes::Whitelist");
 
       // Only check dangerous packages if dangerous prefixes are configured
+      // Also check if whitelist is configured but dangerous prefixes are empty
+      // In this case, we should not treat any packages as dangerous
       if (!dangerousPrefixes.empty())
       {
          for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
@@ -385,22 +387,22 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 
             const char* pkgName = Pkg.Name();
             
-      // Check if package is in whitelist (only if whitelist is not empty)
-      if (!dangerousWhitelist.empty())
-      {
-         bool isWhitelisted = false;
-         for (const auto& whitelistPkg : dangerousWhitelist)
-         {
-            if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
+            // Check if package is in whitelist (only if whitelist is not empty)
+            if (!dangerousWhitelist.empty())
             {
-               isWhitelisted = true;
-               break;
+               bool isWhitelisted = false;
+               for (const auto& whitelistPkg : dangerousWhitelist)
+               {
+                  if (strcmp(pkgName, whitelistPkg.c_str()) == 0)
+                  {
+                     isWhitelisted = true;
+                     break;
+                  }
+               }
+               
+               if (isWhitelisted)
+                  continue;  // Skip whitelisted packages
             }
-         }
-         
-         if (isWhitelisted)
-            continue;  // Skip whitelisted packages
-      }
 
             // Check if the package name matches any dangerous prefix
             for (const auto& prefix : dangerousPrefixes)
@@ -440,6 +442,9 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
       }
       else
       {
+         // If dangerous prefixes are empty but whitelist is configured,
+         // it means the dangerous prefix mechanism is disabled
+         // So we should show the normal prompt
          if (YnPrompt(_("Do you want to continue?")) == false)
          {
             c2out << _("Abort.") << std::endl;
