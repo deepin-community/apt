@@ -1,4 +1,4 @@
-apt (2.8.0deepin6) unstable; urgency=medium
+apt (2.8.0deepin7) unstable; urgency=medium
 
   * Fix installation of deb package path name containing colon
 
