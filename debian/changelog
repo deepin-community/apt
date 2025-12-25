@@ -1,3 +1,9 @@
+apt (2.8.0deepin8) unstable; urgency=medium
+
+  * update debian/01dangerous-packages.conf. 
+
+ -- lichenggang <lichenggang@deepin.org>  Thu, 25 Dec 2025 09:23:22 +0800
+
 apt (2.8.0deepin7) unstable; urgency=medium
 
   * Fix installation of deb package path name containing colon
