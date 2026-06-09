@@ -1,0 +1,268 @@
+diff --git a/apt-pkg/acquire-item.cc b/apt-pkg/acquire-item.cc
+index 3c491ad..22dd5aa 100644
+--- a/apt-pkg/acquire-item.cc
++++ b/apt-pkg/acquire-item.cc
+@@ -473,7 +473,7 @@ bool pkgAcqTransactionItem::QueueURI(pkgAcquire::ItemDesc &Item)
+       auto const PushByHashURI = [&](std::string U) {
+ 	 if (unlikely(TargetHash == nullptr))
+ 	    return false;
+-	 auto const trailing_slash = U.find_last_of("/");
++	 auto const trailing_slash = U.find_last_of('/');
+ 	 if (unlikely(trailing_slash == std::string::npos))
+ 	    return false;
+ 	 auto byhashSuffix = "/by-hash/" + TargetHash->HashType() + "/" + TargetHash->HashValue();
+@@ -491,8 +491,8 @@ bool pkgAcqTransactionItem::QueueURI(pkgAcquire::ItemDesc &Item)
+    if (SameMirrorURI.empty() == false)
+    {
+       UsedMirror = TransactionManager->UsedMirror;
+-      if (Item.Description.find(" ") != string::npos)
+-	 Item.Description.replace(0, Item.Description.find(" "), UsedMirror);
++      if (Item.Description.find(' ') != string::npos)
++	 Item.Description.replace(0, Item.Description.find(' '), UsedMirror);
+    }
+    return pkgAcquire::Item::QueueURI(Item);
+ }
+diff --git a/apt-pkg/acquire-worker.cc b/apt-pkg/acquire-worker.cc
+index 3c23893..cec849b 100644
+--- a/apt-pkg/acquire-worker.cc
++++ b/apt-pkg/acquire-worker.cc
+@@ -232,7 +232,7 @@ static void APT_NONNULL(3) ChangeSiteIsMirrorChange(std::string const &NewURI, p
+    if (URI::SiteOnly(NewURI) == URI::SiteOnly(desc.URI))
+       return;
+ 
+-   auto const firstSpace = desc.Description.find(" ");
++   auto const firstSpace = desc.Description.find(' ');
+    if (firstSpace != std::string::npos)
+    {
+       std::string const OldSite = desc.Description.substr(0, firstSpace);
+@@ -278,8 +278,8 @@ bool pkgAcquire::Worker::RunMessages()
+ 	    for (pkgAcquire::Queue::QItem::owner_iterator O = Itm->Owners.begin(); O != Itm->Owners.end(); ++O)
+ 	       (*O)->UsedMirror = UsedMirror;
+ 
+-	    if (Itm->Description.find(" ") != string::npos)
+-	       Itm->Description.replace(0, Itm->Description.find(" "), UsedMirror);
++	    if (Itm->Description.find(' ') != string::npos)
++	       Itm->Description.replace(0, Itm->Description.find(' '), UsedMirror);
+ 	 }
+       }
+ 
+diff --git a/apt-pkg/aptconfiguration.cc b/apt-pkg/aptconfiguration.cc
+index 982e68b..046c315 100644
+--- a/apt-pkg/aptconfiguration.cc
++++ b/apt-pkg/aptconfiguration.cc
+@@ -173,8 +173,8 @@ std::vector<std::string> const Configuration::getLanguages(bool const &All,
+ 		builtin.push_back("none");
+ 		for (struct dirent *Ent = readdir(D); Ent != 0; Ent = readdir(D)) {
+ 			string const name = SubstVar(Ent->d_name, "%5f", "_");
+-			size_t const foundDash = name.rfind("-");
+-			size_t const foundUnderscore = name.rfind("_", foundDash);
++			size_t const foundDash = name.rfind('-');
++			size_t const foundUnderscore = name.rfind('_', foundDash);
+ 			if (foundDash == string::npos || foundUnderscore == string::npos ||
+ 			    foundDash <= foundUnderscore ||
+ 			    name.substr(foundUnderscore+1, foundDash-(foundUnderscore+1)) != "Translation")
+diff --git a/apt-pkg/cdrom.cc b/apt-pkg/cdrom.cc
+index 70192a0..8b1f5e7 100644
+--- a/apt-pkg/cdrom.cc
++++ b/apt-pkg/cdrom.cc
+@@ -264,7 +264,7 @@ bool pkgCdrom::DropBinaryArch(vector<string> &List)
+ 
+       // Between Start and End is the architecture
+       Start += 8;
+-      if ((End = strstr(Start,"/")) != 0 && Start != End &&
++      if ((End = strchr(Start,'/')) != 0 && Start != End &&
+           APT::Configuration::checkArchitecture(string(Start, End)) == true)
+ 	 continue; // okay, architecture is accepted
+ 
+diff --git a/apt-pkg/contrib/strutl.cc b/apt-pkg/contrib/strutl.cc
+index 3689dc1..38a2af2 100644
+--- a/apt-pkg/contrib/strutl.cc
++++ b/apt-pkg/contrib/strutl.cc
+@@ -809,7 +809,7 @@ std::string LookupTag(const std::string &Message, const char *TagC, const char *
+       // skip the space leading a multiline (Keep all other whitespaces in the value)
+       valuestart = std::next(valuestart);
+    }
+-   auto const valueend = result.find_last_not_of("\n");
++   auto const valueend = result.find_last_not_of('\n');
+    if (valueend == std::string::npos)
+       result.clear();
+    else
+@@ -1489,7 +1489,7 @@ char *safe_snprintf(char *Buffer,char *End,const char *Format,...)
+ // ---------------------------------------------------------------------
+ string StripEpoch(const string &VerStr)
+ {
+-   size_t i = VerStr.find(":");
++   size_t i = VerStr.find(':');
+    if (i == string::npos)
+       return VerStr;
+    return VerStr.substr(i+1);
+diff --git a/apt-pkg/deb/debmetaindex.cc b/apt-pkg/deb/debmetaindex.cc
+index 5158931..f447d2c 100644
+--- a/apt-pkg/deb/debmetaindex.cc
++++ b/apt-pkg/deb/debmetaindex.cc
+@@ -1291,7 +1291,7 @@ class APT_HIDDEN debSLTypeDebian : public pkgSourceList::Type		/*{{{*/
+    ///        allows you to match a.b.c against itself, .b.c, and .c, but not b.c
+    static inline std::string NextLevelDomain(std::string Host)
+    {
+-      auto nextDot = Host.find(".", 1);
++      auto nextDot = Host.find('.', 1);
+       if (nextDot == Host.npos)
+ 	 return "";
+       return Host.substr(nextDot);
+diff --git a/apt-pkg/deb/dpkgpm.cc b/apt-pkg/deb/dpkgpm.cc
+index 4f87cc2..6bf0f44 100644
+--- a/apt-pkg/deb/dpkgpm.cc
++++ b/apt-pkg/deb/dpkgpm.cc
+@@ -639,7 +639,7 @@ void pkgDPkgPM::ProcessDpkgStatusLine(char *line)
+    }
+ 
+    // At this point we have a pkgname, but it might not be arch-qualified !
+-   if (pkgname.find(":") == std::string::npos)
++   if (pkgname.find(':') == std::string::npos)
+    {
+       pkgCache::GrpIterator const Grp = Cache.FindGrp(pkgname);
+       if (unlikely(Grp.end()== true))
+@@ -770,7 +770,7 @@ void pkgDPkgPM::ProcessDpkgStatusLine(char *line)
+    }
+ 
+    std::string arch = "";
+-   if (pkgname.find(":") != string::npos)
++   if (pkgname.find(':') != string::npos)
+       arch = StringSplit(pkgname, ":")[1];
+    std::string i18n_pkgname = pkgname;
+    if (arch.size() != 0)
+diff --git a/apt-pkg/indexcopy.cc b/apt-pkg/indexcopy.cc
+index bf78703..c3465d1 100644
+--- a/apt-pkg/indexcopy.cc
++++ b/apt-pkg/indexcopy.cc
+@@ -161,7 +161,7 @@ bool IndexCopy::CopyPackages(string CDROM,string Name,vector<string> &List,
+ 	       // Attempt to fix busted symlink support for one instance
+ 	       string OrigFile = File;
+ 	       string::size_type Start = File.find("binary-");
+-	       string::size_type End = File.find("/",Start+3);
++	       string::size_type End = File.find('/',Start+3);
+ 	       if (Start != string::npos && End != string::npos)
+ 	       {
+ 		  File.replace(Start,End-Start,"binary-all");
+diff --git a/apt-private/private-install.cc b/apt-private/private-install.cc
+index 6a7e1c6..8fb9645 100644
+--- a/apt-private/private-install.cc
++++ b/apt-private/private-install.cc
+@@ -920,8 +920,8 @@ static bool AddIfVolatile(pkgSourceList *const SL, std::vector<PseudoPkg> &Volat
+       }
+       else
+       {
+-	 auto const found = pkg.name.rfind("/");
+-	 if (found == pkg.name.find("/"))
++	 auto const found = pkg.name.rfind('/');
++	 if (found == pkg.name.find('/'))
+ 	    _error->Error(_("Unsupported file %s given on commandline"), I);
+ 	 else
+ 	 {
+diff --git a/apt-private/private-source.cc b/apt-private/private-source.cc
+index 9b9409c..59ff18d 100644
+--- a/apt-private/private-source.cc
++++ b/apt-private/private-source.cc
+@@ -79,21 +79,21 @@ static pkgSrcRecords::Parser *FindSrc(const char *Name,
+    std::string TmpSrc = Name;
+ 
+    // extract release
+-   size_t found = TmpSrc.find_last_of("/");
++   size_t found = TmpSrc.find_last_of('/');
+    if (found != std::string::npos)
+    {
+       RelTag = TmpSrc.substr(found+1);
+       TmpSrc = TmpSrc.substr(0,found);
+    }
+    // extract the version
+-   found = TmpSrc.find_last_of("=");
++   found = TmpSrc.find_last_of('=');
+    if (found != std::string::npos)
+    {
+       VerTag = UserRequestedVerTag = TmpSrc.substr(found+1);
+       TmpSrc = TmpSrc.substr(0,found);
+    }
+    // extract arch
+-   found = TmpSrc.find_last_of(":");
++   found = TmpSrc.find_last_of(':');
+    if (found != std::string::npos)
+    {
+       ArchTag = TmpSrc.substr(found+1);
+@@ -353,14 +353,14 @@ bool DoSource(CommandLine &CmdL)
+       while (pos != std::string::npos)
+       {
+ 	 pos += strlen("\nVcs-");
+-	 std::string vcs = srec.substr(pos,srec.find(":",pos)-pos);
++	 std::string vcs = srec.substr(pos,srec.find(':',pos)-pos);
+ 	 if(vcs == "Browser") 
+ 	 {
+ 	    pos = srec.find("\nVcs-", pos);
+ 	    continue;
+ 	 }
+ 	 pos += vcs.length()+2;
+-	 std::string::size_type epos = srec.find("\n", pos);
++	 std::string::size_type epos = srec.find('\n', pos);
+ 	 std::string const uri = srec.substr(pos,epos-pos);
+ 	 ioprintf(c1out, _("NOTICE: '%s' packaging is maintained in "
+ 		  "the '%s' version control system at:\n"
+@@ -800,7 +800,7 @@ bool DoBuildDep(CommandLine &CmdL)
+ 	 WriteBuildDependencyPackage(buildDepsPkgFile, pseudo, pseudoArch,
+ 	       GetBuildDeps(Last, Src.c_str(), hostArch));
+ 	 std::string reltag = *I;
+-	 size_t found = reltag.find_last_of("/");
++	 size_t found = reltag.find_last_of('/');
+ 	 if (found == std::string::npos)
+ 	    reltag.clear();
+ 	 else
+diff --git a/cmdline/apt-helper.cc b/cmdline/apt-helper.cc
+index f48cb29..83dad50 100644
+--- a/cmdline/apt-helper.cc
++++ b/cmdline/apt-helper.cc
+@@ -117,7 +117,7 @@ static bool DoSrvLookup(CommandLine &CmdL)				/*{{{*/
+       std::vector<SrvRec> srv_records;
+       std::string const name = CmdL.FileList[i];
+       c0out << "# Target\tPriority\tWeight\tPort # for " << name << std::endl;
+-      size_t const found = name.find(":");
++      size_t const found = name.find(':');
+       if (found != std::string::npos)
+       {
+ 	 std::string const host = name.substr(0, found);
+diff --git a/ftparchive/byhash.cc b/ftparchive/byhash.cc
+index b24f615..8013bd7 100644
+--- a/ftparchive/byhash.cc
++++ b/ftparchive/byhash.cc
+@@ -50,7 +50,7 @@ void DeleteAllButMostRecent(std::string dir, int KeepFiles)
+ std::string GenByHashFilename(std::string ByHashOutputFile, HashString const &h)
+ {
+    std::string const ByHash = "/by-hash/" + h.HashType() + "/" + h.HashValue();
+-   size_t trailing_slash = ByHashOutputFile.find_last_of("/");
++   size_t trailing_slash = ByHashOutputFile.find_last_of('/');
+    if (trailing_slash == std::string::npos)
+       trailing_slash = 0;
+    ByHashOutputFile = ByHashOutputFile.replace(
+diff --git a/methods/basehttp.cc b/methods/basehttp.cc
+index 26b633c..46f0a04 100644
+--- a/methods/basehttp.cc
++++ b/methods/basehttp.cc
+@@ -315,7 +315,7 @@ static std::string fixURIEncoding(std::string const &part)
+ {
+    // if the server sends a space this is not an encoded URI
+    // so other clients seem to encode it and we do it as well
+-   if (part.find_first_of(" ") != std::string::npos)
++   if (part.find_first_of(' ') != std::string::npos)
+       return aptMethod::URIEncode(part);
+    return part;
+ }
+diff --git a/methods/mirror.cc b/methods/mirror.cc
+index 787e4c7..bef8cea 100644
+--- a/methods/mirror.cc
++++ b/methods/mirror.cc
+@@ -330,7 +330,7 @@ std::string MirrorMethod::GetMirrorFileURI(std::string const &Message, FetchItem
+ 	 auto const colon = uristr.find(':');
+ 	 if (unlikely(colon == std::string::npos))
+ 	    continue;
+-	 auto const plus = uristr.find("+");
++	 auto const plus = uristr.find('+');
+ 	 if (plus < colon)
+ 	 {
+ 	    // started as tor+mirror+http we want to get the file via tor+http
