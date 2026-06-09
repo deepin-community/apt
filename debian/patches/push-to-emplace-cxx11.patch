@@ -1,0 +1,145 @@
+Description: apt: push to emplace C++11 if possible
+ Convert push_back calls to emplace_back where possible in C++11 contexts
+ for more efficient code.
+Author: Julian Andres Klode <jak@debian.org>
+Origin: upstream, https://salsa.debian.org/apt-team/apt/-/commit/fbde7ea4ce304a30e155a2bd9d014d196abbb496
+Last-Update: 2026-06-09
+---
+diff --git a/apt-pkg/contrib/fileutl.cc b/apt-pkg/contrib/fileutl.cc
+index 69e6dc430728c8393d8f57140d8a4ed1c009604a..74f5ec8bcc9f57d1a5609118e94922f4c1d781d9 100644
+--- a/apt-pkg/contrib/fileutl.cc
++++ b/apt-pkg/contrib/fileutl.cc
+@@ -3091,7 +3091,7 @@ std::vector<std::string> Glob(std::string const &pattern, int flags)
+ 
+    // append results
+    for(i=0;i<globbuf.gl_pathc;i++)
+-      result.push_back(string(globbuf.gl_pathv[i]));
++      result.emplace_back(globbuf.gl_pathv[i]);
+ 
+    globfree(&globbuf);
+    return result;
+diff --git a/apt-pkg/contrib/strutl.cc b/apt-pkg/contrib/strutl.cc
+index 4363ab81813bac3809bc98c15fd834574ac5c197..bfd4967f5ba617a9657d138a886889d04c66621a 100644
+--- a/apt-pkg/contrib/strutl.cc
++++ b/apt-pkg/contrib/strutl.cc
+@@ -1335,7 +1335,7 @@ vector<string> VectorizeString(string_view const &haystack, char const &split)
+    auto end = start;
+    do {
+       for (; end != haystack.end() && *end != split; ++end);
+-      exploded.push_back(string(start, end));
++      exploded.emplace_back(start, end);
+       start = end + 1;
+    } while (end != haystack.end() && (++end) != haystack.end());
+    return exploded;
+diff --git a/apt-pkg/deb/dpkgpm.cc b/apt-pkg/deb/dpkgpm.cc
+index 395227f504d20df10542e464bff150e16b81e59e..0f1d407b75b87633ef8c81923612bda790715ac2 100644
+--- a/apt-pkg/deb/dpkgpm.cc
++++ b/apt-pkg/deb/dpkgpm.cc
+@@ -266,12 +266,12 @@ bool pkgDPkgPM::Configure(PkgIterator Pkg)
+    if (Pkg.end() == true)
+       return false;
+ 
+-   List.push_back(Item(Item::Configure, Pkg));
++   List.emplace_back(Item::Configure, Pkg);
+ 
+    // Use triggers for config calls if we configure "smart"
+    // as otherwise Pre-Depends will not be satisfied, see #526774
+    if (_config->FindB("DPkg::TriggersPending", false) == true)
+-      List.push_back(Item(Item::TriggersPending, PkgIterator()));
++      List.emplace_back(Item::TriggersPending, PkgIterator());
+ 
+    return true;
+ }
+@@ -285,9 +285,9 @@ bool pkgDPkgPM::Remove(PkgIterator Pkg,bool Purge)
+       return false;
+ 
+    if (Purge == true)
+-      List.push_back(Item(Item::Purge,Pkg));
++      List.emplace_back(Item::Purge,Pkg);
+    else
+-      List.push_back(Item(Item::Remove,Pkg));
++      List.emplace_back(Item::Remove,Pkg);
+    return true;
+ }
+ 									/*}}}*/
+@@ -2328,10 +2328,10 @@ void pkgDPkgPM::WriteApportReport(const char *pkgpath, const char *errormsg)
+    // do not report dpkg I/O errors, this is a format string, so we compare
+    // the prefix and the suffix of the error with the dpkg error message
+    vector<string> io_errors;
+-   io_errors.push_back(string("failed to read"));
+-   io_errors.push_back(string("failed to write"));
+-   io_errors.push_back(string("failed to seek"));
+-   io_errors.push_back(string("unexpected end of file or stream"));
++   io_errors.emplace_back("failed to read");
++   io_errors.emplace_back("failed to write");
++   io_errors.emplace_back("failed to seek");
++   io_errors.emplace_back("unexpected end of file or stream");
+ 
+    for (vector<string>::iterator I = io_errors.begin(); I != io_errors.end(); ++I)
+    {
+index 33c5297120622d8f4aa9db3609d48d9843a245b1..7b3e6eee2911cc73d26a69d7280b24626c0922a4 100644
+--- a/apt-private/private-install.cc
++++ b/apt-private/private-install.cc
+@@ -860,10 +860,10 @@ bool DoCacheManipulationFromCommandLine(CommandLine &CmdL, std::vector<PseudoPkg
+    Cache->MarkAndSweep();
+ 
+    std::list<APT::VersionSet::Modifier> mods;
+-   mods.push_back(APT::VersionSet::Modifier(MOD_INSTALL, "+",
+-		APT::VersionSet::Modifier::POSTFIX, APT::CacheSetHelper::CANDIDATE));
+-   mods.push_back(APT::VersionSet::Modifier(MOD_REMOVE, "-",
+-		APT::VersionSet::Modifier::POSTFIX, APT::CacheSetHelper::NEWEST));
++   mods.emplace_back(MOD_INSTALL, "+",
++		APT::VersionSet::Modifier::POSTFIX, APT::CacheSetHelper::CANDIDATE);
++   mods.emplace_back(MOD_REMOVE, "-",
++		APT::VersionSet::Modifier::POSTFIX, APT::CacheSetHelper::NEWEST);
+    CacheSetHelperAPTGet helper(c0out);
+    verset = APT::VersionVector::GroupedFromCommandLine(Cache,
+ 		CmdL.FileList + 1, mods, fallback, helper);
+diff --git a/cmdline/apt-cache.cc b/cmdline/apt-cache.cc
+index d8e9e7e4b00907162ab0fcb29a751d0db4ffdaf7..ce2d791022a56242323435126314d5d2e5f84f22 100644
+--- a/cmdline/apt-cache.cc
++++ b/cmdline/apt-cache.cc
+@@ -586,8 +586,8 @@ static bool XVcg(CommandLine &CmdL)
+    // Load the list of packages from the command line into the show list
+    APT::CacheSetHelper helper(true, GlobalError::NOTICE);
+    std::list<APT::CacheSetHelper::PkgModifier> mods;
+-   mods.push_back(APT::CacheSetHelper::PkgModifier(0, ",", APT::CacheSetHelper::PkgModifier::POSTFIX));
+-   mods.push_back(APT::CacheSetHelper::PkgModifier(1, "^", APT::CacheSetHelper::PkgModifier::POSTFIX));
++   mods.emplace_back(0, ",", APT::CacheSetHelper::PkgModifier::POSTFIX);
++   mods.emplace_back(1, "^", APT::CacheSetHelper::PkgModifier::POSTFIX);
+    std::map<unsigned short, APT::PackageSet> pkgsets =
+ 		APT::PackageSet::GroupedFromCommandLine(CacheFile, CmdL.FileList + 1, mods, 0, helper);
+ 
+@@ -799,8 +799,8 @@ static bool Dotty(CommandLine &CmdL)
+    // Load the list of packages from the command line into the show list
+    APT::CacheSetHelper helper(true, GlobalError::NOTICE);
+    std::list<APT::CacheSetHelper::PkgModifier> mods;
+-   mods.push_back(APT::CacheSetHelper::PkgModifier(0, ",", APT::CacheSetHelper::PkgModifier::POSTFIX));
+-   mods.push_back(APT::CacheSetHelper::PkgModifier(1, "^", APT::CacheSetHelper::PkgModifier::POSTFIX));
++   mods.emplace_back(0, ",", APT::CacheSetHelper::PkgModifier::POSTFIX);
++   mods.emplace_back(1, "^", APT::CacheSetHelper::PkgModifier::POSTFIX);
+    std::map<unsigned short, APT::PackageSet> pkgsets =
+ 		APT::PackageSet::GroupedFromCommandLine(CacheFile, CmdL.FileList + 1, mods, 0, helper);
+ 
+diff --git a/methods/rred.cc b/methods/rred.cc
+index 836697a1150a40c6973623b8c9e6c4da35a8321b..56b536a82c88d88c784bc9206505e7b98c021db0 100644
+--- a/methods/rred.cc
++++ b/methods/rred.cc
+@@ -657,7 +657,7 @@ class RredMethod final : public aptMethod {
+ 	    std::string const FileName = Path + ".ed";
+ 	    if (ExpectedHashes.usable() == false)
+ 	       return _error->Error("No hashes found for uncompressed patch: %s", FileName.c_str());
+-	    patchfiles.push_back(PDiffFile(FileName, ExpectedHashes));
++	    patchfiles.emplace_back(FileName, ExpectedHashes);
+ 	 }
+ 	 else
+ 	 {
+@@ -675,7 +675,7 @@ class RredMethod final : public aptMethod {
+ 		  HashStringList const ExpectedHashes = ReadExpectedHashesForPatch(seen_patches, Message);
+ 		  if (ExpectedHashes.usable() == false)
+ 		     return _error->Error("No hashes found for uncompressed patch %d: %s", seen_patches, p->c_str());
+-		  patchfiles.push_back(PDiffFile(*p, ExpectedHashes));
++		  patchfiles.emplace_back(*p, ExpectedHashes);
+ 		  ++seen_patches;
+ 	       }
+ 	    }
