@@ -53,6 +53,23 @@
 
 using namespace std;
 
+// Post-mortem diagnostics for stuck acquire queues. Pure in-memory
+// bookkeeping without side effects; read with gdb when apt update
+// hangs to determine whether Cycle() was invoked and why it skipped
+// items. Kept out of pkgAcquire::Queue to preserve the ABI.
+struct AcquireQueueDiag
+{
+   unsigned long cycleCount = 0;             // Cycle() invocations in total
+   char const *lastCaller = nullptr;         // call site of the last Cycle()
+   char const *lastQueue = nullptr;          // queue name of the last Cycle()
+   char const *lastSkipReason = nullptr;     // why the last Cycle() returned early
+   unsigned long lastQueued = 0;             // items queued by the last Cycle()
+   unsigned long enqueueCount = 0;           // Enqueue() invocations in total
+   bool lastEnqueueTriggeredCycle = false;   // did the last Enqueue() run Cycle()
+   char const *pendingCaller = nullptr;      // call site to record on next Cycle()
+};
+AcquireQueueDiag g_acquireQueueDiag;
+
 // helper to convert time_point to a timeval
 constexpr struct timeval SteadyDurationToTimeVal(std::chrono::steady_clock::duration Time)
 {
@@ -737,6 +754,7 @@ pkgAcquire::RunResult pkgAcquire::Run(int PulseInterval)
 
 	 if (f <= now)
 	 {
+	    g_acquireQueueDiag.pendingCaller = "Run";
 	    if (not I->Cycle()) // Queue got stuck, unstuck it.
 	       goto stop;
 	    fetchAfter = now; // need to time out in select() below
@@ -1012,6 +1030,7 @@ pkgAcquire::Queue::~Queue()
 /* */
 bool pkgAcquire::Queue::Enqueue(ItemDesc &Item)
 {
+   g_acquireQueueDiag.enqueueCount++;
    // MetaKeysMatch checks whether the two items have no non-matching
    // meta-keys. If the items are not transaction items, it returns
    // true, so other items can still be merged.
@@ -1061,8 +1080,12 @@ bool pkgAcquire::Queue::Enqueue(ItemDesc &Item)
    *OptimalI = Itm;
    
    Item.Owner->QueueCounter++;   
+   g_acquireQueueDiag.lastEnqueueTriggeredCycle = (Items->Next == 0);
    if (Items->Next == 0)
+   {
+      g_acquireQueueDiag.pendingCaller = "Enqueue";
       Cycle();
+   }
    return true;
 }
 									/*}}}*/
@@ -1131,6 +1154,7 @@ bool pkgAcquire::Queue::Startup()
 	 MaxPipeDepth = 1;
    }
    
+   g_acquireQueueDiag.pendingCaller = "Startup";
    return Cycle();
 }
 									/*}}}*/
@@ -1206,6 +1230,7 @@ bool pkgAcquire::Queue::ItemDone(QItem *Itm)
       Owner->Bump();
    }
 
+   g_acquireQueueDiag.pendingCaller = "ItemDone";
    return Cycle();
 }
 									/*}}}*/
@@ -1215,8 +1240,18 @@ bool pkgAcquire::Queue::ItemDone(QItem *Itm)
    is enabled then it keeps the pipe full. */
 bool pkgAcquire::Queue::Cycle()
 {
+   g_acquireQueueDiag.cycleCount++;
+   g_acquireQueueDiag.lastCaller = g_acquireQueueDiag.pendingCaller;
+   g_acquireQueueDiag.pendingCaller = nullptr;
+   g_acquireQueueDiag.lastQueue = Name.c_str();
+   g_acquireQueueDiag.lastSkipReason = nullptr;
+   g_acquireQueueDiag.lastQueued = 0;
+
    if (Items == 0 || Workers == 0)
+   {
+      g_acquireQueueDiag.lastSkipReason = "no items or workers";
       return true;
+   }
 
    if (PipeDepth < 0)
       return _error->Error("Pipedepth failure");
@@ -1236,23 +1271,36 @@ bool pkgAcquire::Queue::Cycle()
 
       // Nothing to do, queue is idle.
       if (I == 0)
+      {
+	 g_acquireQueueDiag.lastSkipReason = "no idle item";
 	 return true;
+      }
 
       // This item has a lower priority than stuff in the pipeline, pretend
       // the queue is idle
       if (I->GetPriority() < ActivePriority)
+      {
+	 g_acquireQueueDiag.lastSkipReason = "lower priority";
 	 return true;
+      }
 
       // Item is not ready yet, delay
       if (I->GetFetchAfter() > currentTime)
+      {
+	 g_acquireQueueDiag.lastSkipReason = "item delayed";
 	 return true;
+      }
 
       I->Worker = Workers;
       for (auto const &O: I->Owners)
 	 O->Status = pkgAcquire::Item::StatFetching;
       PipeDepth++;
+      g_acquireQueueDiag.lastQueued++;
       if (Workers->QueueItem(I) == false)
+      {
+	 g_acquireQueueDiag.lastSkipReason = "QueueItem failed";
 	 return false;
+      }
    }
 
    return true;
@@ -1263,6 +1311,7 @@ bool pkgAcquire::Queue::Cycle()
 /* This is called when an item in multiple queues is dequeued */
 void pkgAcquire::Queue::Bump()
 {
+   g_acquireQueueDiag.pendingCaller = "Bump";
    Cycle();
 }
 									/*}}}*/

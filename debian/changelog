@@ -1,3 +1,9 @@
+apt (2.8.0deepin12) unstable; urgency=medium
+
+  * Add diagnostic state for post-mortem analysis of stuck acquire queues
+
+ -- xinpeng.wang <wangxinpeng@uniontech.com>  Tue, 04 Aug 2026 17:30:00 +0800
+
 apt (2.8.0deepin11) unstable; urgency=medium
 
   * Fix stuck acquire queues on partial server errors (LP: #2003851)
