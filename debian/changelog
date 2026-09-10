@@ -1,3 +1,9 @@
+apt (2.8.0deepin13) unstable; urgency=medium
+
+  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+
+ -- tunaichao <tunaichao@uniontech.com>  Thu, 10 Sep 2026 16:31:19 +0800
+
 apt (2.8.0deepin12) unstable; urgency=medium
 
   * Add diagnostic state for post-mortem analysis of stuck acquire queues
