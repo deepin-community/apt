@@ -1,3 +1,11 @@
+apt (2.8.0deepin14) unstable; urgency=medium
+
+  * fix(cve): CVE-2026-109518 (unknown) - methods: Open target files
+    exclusively   Upstream: https://salsa.debian.org/apt-team/apt/-
+    /commit/161d686fbab7059059723c86e02569138b25b407
+
+ -- deepin-ci-robot <packages@deepin.org>  Thu, 05 Nov 2026 00:06:21 +0800
+
 apt (2.8.0deepin13) unstable; urgency=medium
 
   * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
