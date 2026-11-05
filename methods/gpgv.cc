@@ -141,7 +141,8 @@ static void PushEntryWithKeyID(std::vector<std::string> &Signers, char * const b
    while (*p && !isspace(*p))
       ++p;
    // skip the separator whitespace
-   ++p;
+   if (*p != '\0')
+      ++p;
    // skip the hexdigit fingerprint
    while (*p && isxdigit(*p))
       ++p;
@@ -260,6 +261,18 @@ string GPGVMethod::VerifyGetSigners(const char *file, const char *outfile,
 	    Signers.Good.erase(std::remove_if(Signers.Good.begin(), Signers.Good.end(), [&](std::string const &goodsig)
 					      { return IsTheSameKey(fpr, goodsig); }),
 			       Signers.Good.end());
+	 }
+	 else if (not IsAssertedPubKeyAlgo(pkstr, "APT::Key::Assert-Pubkey-Algo::Next"))
+	 {
+	    std::string reason;
+	    Signers.SoonWorthless.push_back({fpr, pkstr});
+	 }
+	 else if (not IsAssertedPubKeyAlgo(pkstr, "APT::Key::Assert-Pubkey-Algo::Future"))
+	 {
+	    std::string reason;
+	    strprintf(reason, _("%s will be deprecated in a future release"), pkstr.c_str());
+	    // FIXME: We do not have audit messages yet, so the infrastructure to show them doesn't exist
+	    // Signers.LaterWorthless.push_back({fpr, reason});
 	 }
       }
       else if (strncmp(buffer, GNUPGGOODSIG, sizeof(GNUPGGOODSIG)-1) == 0)

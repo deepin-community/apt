@@ -1,89 +1,62 @@
-apt (2.8.0deepin13) unstable; urgency=medium
+apt (2.8.4) noble-security; urgency=medium
 
-  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+  * SECURITY UPDATE: Download verification bypass
+    - methods/*.cc: Open target files exclusively
+    - CVE-2026-109518
+  * SECURITY UPDATE: Out-of-bounds accesses
+    - deb: guard against unsigned underflow when trimming control newlines
+    - gpgv: don't advance past the null terminator in PushEntryWithKeyID
+    - debDebFileParser: reject .deb without a Version field
+    - srvrec: reject res_query answers bigger than our buffer
+    - tagfile: fix unbounded backward scan in Fill()'s trailing-newline check
+  * Memory exhaustion during download
+    - Move "Tried to start delayed item […], but failed" to debugging
+     (Closes: #1111554)
+  * Test suite reliability:
+    - test: Limit valgrind to 1024 open files
 
- -- tunaichao <tunaichao@uniontech.com>  Fri, 11 Sep 2026 09:59:07 +0800
+ -- Julian Andres Klode <juliank@ubuntu.com>  Mon, 02 Nov 2026 13:55:21 +0100
 
-apt (2.8.0deepin12) unstable; urgency=medium
+apt (2.8.3) noble; urgency=medium
 
-  * Add diagnostic state for post-mortem analysis of stuck acquire queues
+  * Revert increased key size requirements from 2.8.0-2.8.2 (LP: #2073126)
+    - Revert "Only install 00-temporary-rsa1024 for >=2.7.6 and improve comment"
+    - Revert "Only warn about <rsa2048 when upgrading from 2.7.x to 2.8.x"
+    - Revert rsa1024 to warnings again
+    This leaves the mechanisms in place and no longer warns about NIST curves.
+  * Fix keeping back removals of obsolete packages; and return an error if
+    ResolveByKeep() is unsuccessful (LP: #2078720)
+  * Fix buffer overflow, stack overflow, exponential complexity in
+    apt-ftparchive Contents generation (LP: #2083697)
+    - ftparchive: Mystrdup: Add safety check and bump buffer size
+    - ftparchive: contents: Avoid exponential complexity and overflows
+    - test framework: Improve valgrind support
+    - test: Check that apt-ftparchive handles deep paths
+    - Workaround valgrind "invalid read" in ExtractTar::Go by moving large
+      buffer from stack to heap. The large buffer triggered some bugs in
+      valgrind stack clash protection handling.
 
- -- xinpeng.wang <wangxinpeng@uniontech.com>  Tue, 04 Aug 2026 17:30:00 +0800
+ -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 22 Oct 2024 15:02:22 +0200
 
-apt (2.8.0deepin11) unstable; urgency=medium
+apt (2.8.2) noble; urgency=medium
 
-  * Fix stuck acquire queues on partial server errors (LP: #2003851)
+  * Only install 00-temporary-rsa1024 for >=2.7.6 and improve comment
+    (follow-up for LP: #2073126)
 
- -- xinpeng.wang <wangxinpeng@uniontech.com>  Tue, 04 Aug 2026 17:30:00 +0800
+ -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 13 Aug 2024 16:47:13 +0200
 
-apt (2.8.0deepin10) unstable; urgency=medium
+apt (2.8.1) noble; urgency=medium
 
-  * update debian/01dangerous-packages.conf - Add com.deepin. prefix to
-    DangerousPackagePrefixes to cover reverse-domain-name packages
+  * Only revoke weak RSA keys for now, add 'next' and 'future' levels
+    (backported from 2.9.7)
+    Note that the changes to warn about keys not matching the future level
+    in the --audit level are not fully included, as the --audit feature
+    has not yet been backported. (LP: #2073126)
+  * Introduce further mitigation on upgrades from 2.7.x to allow these
+    systems to continue using rsa1024 repositories with warnings
+    until the 24.04.2 point release (LP: #2073126)
 
- -- lichenggang <lichenggang@uniontech.com>  Wed, 15 Jul 2026 11:00:00 +0800
-
-apt (2.8.0deepin9) unstable; urgency=medium
-
-  * update debian/01dangerous-packages.conf - Add deepin-systemassistant-
-    knowledge to DangerousPackageWhitelist
-
- -- lichenggang <lichenggang@uniontech.com>  Tue, 26 May 2026 21:34:01 +0800
-
-apt (2.8.0deepin8) unstable; urgency=medium
-
-  * update debian/01dangerous-packages.conf. 
-
- -- lichenggang <lichenggang@deepin.org>  Thu, 25 Dec 2025 09:23:22 +0800
-
-apt (2.8.0deepin7) unstable; urgency=medium
-
-  * Fix installation of deb package path name containing colon
-
- -- dongshengyuan <dongshengyuan@uniontech.com>  Thu, 18 Dec 2025 17:33:28 +0800
-
-apt (2.8.0deepin6) unstable; urgency=medium
-
-  * add 01dangerous-packages.conf.
-
- -- lichenggang <lichenggang@deepin.org>  Sun, 14 Dec 2025 18:26:37 +0800
-
-apt (2.8.0deepin5) unstable; urgency=medium
-
-  * Apply patch from upstream:
-    - Correctly copy provided version in m-a lazy-init. (Closes: #1120463)
-      https://salsa.debian.org/apt-team/apt/-/merge_requests/530
-
- -- Tianyu Chen <sweetyfish@deepin.org>  Mon, 10 Nov 2025 18:01:27 +0800
-
-apt (2.8.0deepin4) unstable; urgency=medium
-
-  * optimize prompt translation files.
-  * add reminders for uninstalled packages.
-
- -- lhdjply <lhdjply@126.com>  Mon, 23 Jun 2025 17:23:10 +0800
-
-apt (2.8.0deepin3) unstable; urgency=medium
-
-  * add a prompt for uninstalling critical system packages
-
- -- lhdjply <lhdjply@126.com>  Mon, 23 Jun 2025 12:01:10 +0800
-
-apt (2.8.0deepin2) unstable; urgency=medium
-
-  * add a warning regarding `apt upgrade' usage.
-
- -- LiChengGang <lichenggang@uniontech.com>  Mon, 29 Jul 2024 17:16:50 +0800
-
-apt (2.8.0deepin1) unstable; urgency=medium
-
-  * Revert 64-bit time_t transition changes.
-  * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
-    juliank: it is one of the t64 workarounds to force libnettle8t64 to be
-    installed and apt to be upgraded rather than both being kept back
-  * Apply deepin changes.
-
- -- Tianyu Chen <sweetyfish@deepin.org>  Mon, 06 May 2024 14:34:27 +0800
+ -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 30 Jul 2024 17:12:00 +0900
 
 apt (2.8.0) noble; urgency=medium
 

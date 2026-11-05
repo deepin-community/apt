@@ -974,21 +974,6 @@ void HttpMethod::SendReq(FetchItem *Itm)
    Req << "User-Agent: " << ConfigFind("User-Agent",
 		"Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")");
 
-    std::string domain;
-    auto const found = ProperHost.substr(0, ProperHost.find_last_of(".")).find_last_of(".");
-
-    if (found != string::npos)
-        domain = ProperHost.substr(found+1, ProperHost.length());
-    else
-        domain = ProperHost;
-
-    Configuration::MatchAgainstConfig DomainList("Acquire::SmartMirrors::DomainList");
-
-    if (DomainList.Match(domain) == true)
-    { 
-	 Req << "\r\n";
-        Req << "X-Repo-Token: " << ConfigFindSmartMirrors("Token", "");
-    } 
 #ifdef HAVE_SYSTEMD
    if (ConfigFindB("User-Agent-Non-Interactive", false))
    {
@@ -1034,8 +1019,24 @@ BaseHttpMethod::DealWithHeadersResult HttpMethod::DealWithHeaders(FetchResult &R
    auto ret = BaseHttpMethod::DealWithHeaders(Res, Req);
    if (ret != BaseHttpMethod::FILE_IS_OPEN)
       return ret;
-   if (Req.File.Open(Queue->DestFile, FileFd::WriteAny) == false)
+
+   // If we are resuming, we first need to rescue the data we already have
+   FileFd partial;
+   if (Req.StartPos > 0 && FileExists(Queue->DestFile))
+   {
+      if (not partial.Open(Queue->DestFile, FileFd::ReadOnly))
+	 return ERROR_NOT_FROM_SERVER;
+   }
+   // Open the file exclusively to avoid injection attacks by links
+   if (Req.File.Open(Queue->DestFile, FileFd::WriteAny | FileFd::Exclusive) == false)
       return ERROR_NOT_FROM_SERVER;
+   if (partial.IsOpen())
+   {
+      // The exclusive open unlinked the old file; copy its content
+      // into the new one and rewind for hashing.
+      if (not CopyFile(partial, Req.File) || not partial.Close() || not Req.File.Seek(0))
+	 return ERROR_NOT_FROM_SERVER;
+   }
 
    FailFile = Queue->DestFile;
    (void)(FailFile.c_str()); // Make sure we don't do a malloc in the signal handler

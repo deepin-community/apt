@@ -193,8 +193,7 @@ static bool addArgumentsAPTGet(std::vector<CommandLine::Args> &Args, char const 
       addArg('U', "update", "APT::Update", 0);
       if (CmdMatches("upgrade"))
       {
-         _error->Warning(_("Please use `apt dist-upgrade' to upgrade your system. Using `apt upgrade' may result in incomplete upgrades."));
-         addArg(0, "new-pkgs", "APT::Get::Upgrade-Allow-New",
+         addArg(0, "new-pkgs", "APT::Get::Upgrade-Allow-New", 
                 CommandLine::Boolean);
       }
    }

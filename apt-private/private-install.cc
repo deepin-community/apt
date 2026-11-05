@@ -368,80 +368,11 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 	 if (_config->FindI("quiet",0) < 2 &&
 	     _config->FindB("APT::Get::Assume-Yes",false) == false)
 	 {
-      std::vector<std::string> dangerousPackages;
-      if (_config->FindB("APT::Get::AutomaticRemove", false))
-      {
-         // Get dangerous package prefixes from configuration
-         std::vector<std::string> dangerousPrefixes = _config->FindVector("APT::Get::DangerousPackagePrefixes");
-         
-         // Get whitelist packages from configuration
-         std::vector<std::string> whitelistPackages = _config->FindVector("APT::Get::DangerousPackageWhitelist");
-         
-         for (pkgCache::PkgIterator Pkg = Cache->PkgBegin(); !Pkg.end(); ++Pkg)
-         {
-            if (!Cache[Pkg].Delete()) 
-                continue;  // Only check packages marked for deletion
-
-            const char* pkgName = Pkg.Name();
-            
-            // Check if package is in whitelist
-            bool isWhitelisted = false;
-            for (const auto& whitelistPkg : whitelistPackages)
-            {
-               if (whitelistPkg == pkgName)
-               {
-                  isWhitelisted = true;
-                  break;
-               }
-            }
-            
-            if (isWhitelisted)
-               continue;  // Skip whitelisted packages
-            
-            // Check if package name matches any dangerous prefix
-            for (const auto& prefix : dangerousPrefixes)
-            {
-               if (strncmp(pkgName, prefix.c_str(), prefix.length()) == 0)
-               {
-                  dangerousPackages.push_back(pkgName);
-                  break;
-               }
-            }
-         }
-      }
-
-      if (!dangerousPackages.empty())
-      {
-         std::string text = _("The current uninstallation operation involves system-critical packages. Continuing may cause system instability.");
-         text += "\n";
-         text += _("The following are critical system packages:");
-         text += "\n";
-         
-         for (const auto& pkg : dangerousPackages) {
-             text += "  • ";
-             text += pkg;
-             text += "\n";
-         }
-         
-         text += _("Do you want to continue?");
-         
-         std::string formattedPrompt = "\033[31m";
-         formattedPrompt += text;
-         formattedPrompt += "\033[0m";
-         if (YnPrompt(formattedPrompt.c_str()) == false)
-         {
-            c2out << _("Abort.") << std::endl;
-            exit(1);
-         }
-      }
-      else
-      {
-         if (YnPrompt(_("Do you want to continue?")) == false)
-         {
-            c2out << _("Abort.") << std::endl;
-            exit(1);
-         }
-      }
+	    if (YnPrompt(_("Do you want to continue?")) == false)
+	    {
+	       c2out << _("Abort.") << std::endl;
+	       exit(1);
+	    }
 	 }
       }
    }
