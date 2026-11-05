@@ -1,3 +1,21 @@
+apt (2.8.4deepin1) unstable; urgency=medium
+
+  * Revert 64-bit time_t transition changes.
+  * Do not conflicts against libnettle8 (<< 3.9.1-2.2~).
+  * Use deepin-keyring via the deepin/UOS vendor and fix vendor detection
+    in the x86 automatic build environment.
+  * Add smart mirror support.
+  * Warn about `apt upgrade' usage.
+  * Prompt before uninstalling critical system packages.
+  * Add reminders for uninstalled packages.
+  * Correctly copy provided version in m-a lazy-init (Closes: #1120463).
+  * Move dangerous-package prefix detection to a config file with a whitelist.
+  * Fix installation of deb package path name containing colon.
+  * Fix stuck acquire queues on partial server errors and add diagnostics
+    (LP: #2003851).
+
+ -- Tianyu Chen <sweetyfish@deepin.org>  Thu, 05 Nov 2026 10:31:21 +0800
+
 apt (2.8.4) noble-security; urgency=medium
 
   * SECURITY UPDATE: Download verification bypass
